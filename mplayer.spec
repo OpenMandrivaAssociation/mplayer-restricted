@@ -8,7 +8,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.11
+%define rel 1.%prerel.12
 %endif
 %define release		%mkrel %rel
 %define amrnb 610
@@ -34,6 +34,7 @@
 %define	build_arts	0
 %define build_aa	1
 %define build_cdda	1
+%define build_dirac	1
 %define build_dv	1
 %define build_dvdread	0
 %define build_dvdnav	1
@@ -82,6 +83,9 @@
 %define build_pulse	0
 %endif
 
+%if %mdkversion < 200800
+%define build_dirac 0
+%endif
 
 %ifnarch %ix86
 %define build_vesa 0
@@ -141,6 +145,8 @@
 %{?_without_aa: %{expand: %%global build_aa 0}}
 %{?_with_cdda: %{expand: %%global build_cdda 1}}
 %{?_without_cdda: %{expand: %%global build_cdda 0}}
+%{?_with_dirac: %{expand: %%global build_dirac 1}}
+%{?_without_dirac: %{expand: %%global build_dirac 0}}
 %{?_with_dv: %{expand: %%global build_dv 1}}
 %{?_without_dv: %{expand: %%global build_dv 0}}
 %{?_with_dvdread: %{expand: %%global build_dvdread 1}}
@@ -214,6 +220,9 @@ Patch14:        mplayer-1.0rc1-rtsp-overflow.patch
 Patch15:	mplayer-1.0rc1-pulseaudio.patch
 Patch16:	mplayer-CVE-2007-1246.patch
 Patch17:	DS_VideoDecoder-CVE-2007-1387.patch
+#gw add experimental Dirac support, drop this if it doesn't apply anymore
+#http://downloads.sourceforge.net/dirac/MPlayer-1.0rc1_dirac-0.7.x.patch.tgz
+Patch18:        MPlayer-1.0rc1_dirac-0.7.x.patch
 URL:		http://www.mplayerhq.hu
 License:	GPL
 Group:		Video
@@ -238,6 +247,9 @@ BuildRequires:  libopenal-devel
 %endif
 %if %build_cdda
 BuildRequires:	libcdda-devel
+%endif
+%if %build_dirac
+BuildRequires:	libdirac-devel >= 0.7.0
 %endif
 %if %build_dv
 BuildRequires:	libdv-devel
@@ -462,6 +474,7 @@ rm -f Blue/README
 %patch15 -p1 -b .pulseaudio
 %patch16 -p1 -b .cve-2007-1246
 %patch17 -p1 -b .cve-2007-1387
+%patch18 -p1 -b .dirac
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
