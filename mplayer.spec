@@ -474,7 +474,9 @@ rm -f Blue/README
 %patch15 -p1 -b .pulseaudio
 %patch16 -p1 -b .cve-2007-1246
 %patch17 -p1 -b .cve-2007-1387
+%if %build_dirac
 %patch18 -p1 -b .dirac
+%endif
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
@@ -526,9 +528,6 @@ export CPPFLAGS="-I%_includedir/directfb"
 %endif
 %if ! %build_dvdnav
         --disable-dvdnav \
-%endif
-%if ! %build_dirac
-        --disable-dirac \
 %endif
 %if %build_dvdread || ! %build_plf
 	--disable-mpdvdkit\
