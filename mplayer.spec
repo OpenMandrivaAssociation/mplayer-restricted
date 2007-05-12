@@ -8,7 +8,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.12
+%define rel 1.%prerel.13
 %endif
 %define release		%mkrel %rel
 %define amrnb 610
@@ -34,7 +34,7 @@
 %define	build_arts	0
 %define build_aa	1
 %define build_cdda	1
-%define build_dirac	1
+%define build_dirac	0
 %define build_dv	1
 %define build_dvdread	0
 %define build_dvdnav	1
@@ -526,6 +526,9 @@ export CPPFLAGS="-I%_includedir/directfb"
 %endif
 %if ! %build_dvdnav
         --disable-dvdnav \
+%endif
+%if ! %build_dirac
+        --disable-dirac \
 %endif
 %if %build_dvdread || ! %build_plf
 	--disable-mpdvdkit\
