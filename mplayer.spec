@@ -12,7 +12,7 @@
 %endif
 %define release		%mkrel %rel
 %define amrnb 610
-%define amrwb 600
+%define amrwb 700
 
 %define build_plf 0
 %define build_optimization 0
