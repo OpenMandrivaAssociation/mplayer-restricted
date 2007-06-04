@@ -8,7 +8,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.14
+%define rel 1.%prerel.15
 %endif
 %define release		%mkrel %rel
 %define amrnb 610
@@ -223,6 +223,7 @@ Patch17:	DS_VideoDecoder-CVE-2007-1387.patch
 #gw add experimental Dirac support, drop this if it doesn't apply anymore
 #http://downloads.sourceforge.net/dirac/MPlayer-1.0rc1_dirac-0.7.x.patch.tgz
 Patch18:        MPlayer-1.0rc1_dirac-0.7.x.patch
+Patch19:	MPlayer-1.0pre8-CVE-2006-6172.patch
 URL:		http://www.mplayerhq.hu
 License:	GPL
 Group:		Video
@@ -477,6 +478,9 @@ rm -f Blue/README
 %if %build_dirac
 %patch18 -p1 -b .dirac
 %endif
+cd stream
+%patch19 -p2 -b .cve-2006-6172
+cd ..
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
