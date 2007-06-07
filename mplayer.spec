@@ -8,7 +8,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.15
+%define rel 1.%prerel.16
 %endif
 %define release		%mkrel %rel
 %define amrnb 610
@@ -224,6 +224,9 @@ Patch17:	DS_VideoDecoder-CVE-2007-1387.patch
 #http://downloads.sourceforge.net/dirac/MPlayer-1.0rc1_dirac-0.7.x.patch.tgz
 Patch18:        MPlayer-1.0rc1_dirac-0.7.x.patch
 Patch19:	MPlayer-1.0pre8-CVE-2006-6172.patch
+# gw security fix for CDDB overflow
+# http://lists.mplayerhq.hu/pipermail/mplayer-announce/2007-June/000066.html
+Patch20: cddb_fix_20070605.diff
 URL:		http://www.mplayerhq.hu
 License:	GPL
 Group:		Video
@@ -481,6 +484,7 @@ rm -f Blue/README
 cd stream
 %patch19 -p2 -b .cve-2006-6172
 cd ..
+%patch20 -p0 -b .cddboverflow
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
@@ -488,7 +492,7 @@ mv DOCS/README README.DOCS
 
 %build
 %if !%build_optimization
-export CFLAGS="$CFLAGS $RPM_OPT_FLAGS" 
+export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 %endif
 %if %build_debug
 export CFLAGS="$CFLAGS -g"
