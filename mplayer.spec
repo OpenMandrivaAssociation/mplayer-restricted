@@ -34,6 +34,7 @@
 %define	build_arts	0
 %define build_aa	1
 %define build_cdda	1
+%define build_compiz	1
 %define build_dirac	0
 %define build_dv	1
 %define build_dvdread	0
@@ -226,7 +227,11 @@ Patch18:        MPlayer-1.0rc1_dirac-0.7.x.patch
 Patch19:	MPlayer-1.0pre8-CVE-2006-6172.patch
 # gw security fix for CDDB overflow
 # http://lists.mplayerhq.hu/pipermail/mplayer-announce/2007-June/000066.html
-Patch20: cddb_fix_20070605.diff
+Patch20:	cddb_fix_20070605.diff
+# cg add compiz support for xv when combined with video plugin
+# http://lists.freedesktop.org/archives/compiz/2007-July/002494.html
+Patch21:	mplayer-xv-compiz-video-2.patch
+
 URL:		http://www.mplayerhq.hu
 License:	GPL
 Group:		Video
@@ -485,6 +490,9 @@ cd stream
 %patch19 -p2 -b .cve-2006-6172
 cd ..
 %patch20 -p0 -b .cddboverflow
+%if %build_compiz
+%patch21 -p0 -b .compiz
+%endif
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
