@@ -8,7 +8,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.19
+%define rel 1.%prerel.20
 %endif
 %define release		%mkrel %rel
 %define amrnb 610
@@ -231,7 +231,8 @@ Patch20:	cddb_fix_20070605.diff
 # cg add compiz support for xv when combined with video plugin
 # http://lists.freedesktop.org/archives/compiz/2007-July/002494.html
 Patch21:	mplayer-xv-compiz-video-2.patch
-
+# gw from svn, fix security problem with manipulated AVI files
+Patch22: mplayer-24447-avi-index-security-fix.patch
 URL:		http://www.mplayerhq.hu
 License:	GPL
 Group:		Video
@@ -493,6 +494,7 @@ cd ..
 %if %build_compiz
 %patch21 -p0 -b .compiz
 %endif
+%patch22 -p1 -b .avi-idx
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
