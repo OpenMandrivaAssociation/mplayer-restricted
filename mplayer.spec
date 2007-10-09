@@ -1,18 +1,16 @@
 %define name		mplayer
 %define Name		MPlayer
 %define Summary		Movie player for linux
-%define prerel		rc1
+%define prerel		rc2
 %define version 1.0
 %define fversion %version%prerel
 %define svn 0
 %if %svn
-%define rel		1.%prerel.0.%svn.2
+%define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.20
+%define rel 1.%prerel.1
 %endif
 %define release		%mkrel %rel
-%define amrnb 610
-%define amrwb 700
 
 %define build_plf 0
 %define build_optimization 0
@@ -34,7 +32,7 @@
 %define	build_arts	0
 %define build_aa	1
 %define build_cdda	1
-%define build_compiz	1
+%define build_compiz	0
 %define build_dirac	0
 %define build_dv	1
 %define build_dvdread	0
@@ -50,7 +48,7 @@
 %define build_alsa	1
 %define build_jack	1
 %define build_openal	0
-%define build_pulse	1
+%define build_pulse	0
 %define build_twolame 0
 %define build_lame 0
 %define build_faac 0
@@ -109,13 +107,6 @@
 %else
 %define realpath %{_libdir}/RealPlayer10GOLD/codecs
 %endif
-
-# Only support those arches for DHA at the moment
-%define vidix_arches %{ix86} ppc
-
-%define ppmajor		0
-%define dhamajor	1.0
-%define libname		%mklibname dha %dhamajor
 
 %{?_with_amr: %{expand: %%global build_amr 1}}
 %{?_without_amr: %{expand: %%global build_amr 0}}
@@ -196,45 +187,18 @@ Source0:	%{name}-%{svn}.tar.bz2
 %else
 Source0:	%{Name}-%{fversion}.tar.bz2
 %endif
-Source1:	http://www.3gpp.org/ftp/Specs/latest/Rel-5/26_series/26104-%{amrnb}.zip
-Source2:	http://www.3gpp.org/ftp/Specs/latest/Rel-5/26_series/26204-%{amrwb}.zip
 #gw default skin
 Source4:	Blue-1.5.tar.bz2
 Source5:	kernel-version.sh
 Patch0:		mplayer-mdvconfig.patch
 Patch1:		MPlayer-gnome-screensaver.patch
-Patch2:		mplayer-1.0rc1-wmva.patch
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
-# gw from SVN, fix xv with mplayerplugin
-Patch4:		mplayer-1.0rc1-xv.patch
-Patch5:		mplayer-1.0pre7-lzo2.patch
-# from SVN, fix -use-filedir-conf
-Patch6:		mplayer-1.0rc1-use-filedir-conf.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
-Patch8:		mplayer-mgavid.patch
-Patch9:		mplayer-radeonvid.patch
-Patch10:	mplayer-0.90pre10-ppc-build.patch
 Patch11:	mplayer-lib64.patch
-Patch12:	mplayer-1.0rc1-desktop.patch
-Patch13:	MPlayer-20060101-64bit-fixes.patch
-Patch14:        mplayer-1.0rc1-rtsp-overflow.patch
-Patch15:	mplayer-1.0rc1-pulseaudio.patch
-Patch16:	mplayer-CVE-2007-1246.patch
-Patch17:	DS_VideoDecoder-CVE-2007-1387.patch
-#gw add experimental Dirac support, drop this if it doesn't apply anymore
-#http://downloads.sourceforge.net/dirac/MPlayer-1.0rc1_dirac-0.7.x.patch.tgz
-Patch18:        MPlayer-1.0rc1_dirac-0.7.x.patch
+Patch12:	MPlayer-1.0rc2-desktopentry.patch
 Patch19:	MPlayer-1.0pre8-CVE-2006-6172.patch
-# gw security fix for CDDB overflow
-# http://lists.mplayerhq.hu/pipermail/mplayer-announce/2007-June/000066.html
-Patch20:	cddb_fix_20070605.diff
-# cg add compiz support for xv when combined with video plugin
-# http://lists.freedesktop.org/archives/compiz/2007-July/002494.html
-Patch21:	mplayer-xv-compiz-video-2.patch
-# gw from svn, fix security problem with manipulated AVI files
-Patch22: mplayer-24447-avi-index-security-fix.patch
 URL:		http://www.mplayerhq.hu
-License:	GPL
+License:	GPLv2
 Group:		Video
 %if %build_dvb && %mdkversion < 1000
 BuildRequires:  kernel-source
@@ -246,6 +210,11 @@ BuildRequires:	libaa-devel
 %if %build_arts
 BuildRequires:  libarts-devel
 %endif
+%if %build_amr
+BuildRequires:  libamrnb-devel
+BuildRequires:  libamrwb-devel
+%endif
+
 %if %build_jack
 BuildRequires:  libjack-devel
 %endif
@@ -308,7 +277,7 @@ BuildRequires: dtsdec-devel
 BuildRequires: liblame-devel
 %endif
 %if %build_dvdnav
-BuildRequires:	libdvdnav-devel
+BuildRequires:	libdvdnav-devel >= 4.1.1
 %if %build_plf
 Requires: %mklibname dvdcss 2
 %endif
@@ -350,9 +319,6 @@ BuildRequires: libcaca-devel
 BuildRequires: ungif-devel
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
-%ifarch %{vidix_arches}
-Requires:	%libname = %version
-%endif
 Provides:	mplayer1.0
 Obsoletes:	mplayer1.0
 
@@ -433,68 +399,32 @@ be illegal in some countries.
 %endif
 %endif
 
-%package -n %libname
-Summary:	Support library for MPlayer's vidix video drivers
-Group:		System/Libraries
-
-%description -n %libname
-
-This package contains the libdha shared library required by the vidix
-video output drivers of MPlayer.
 
 %prep
 rm -rf $RPM_BUILD_ROOT
 
 %if %svn
-%setup -q -n %name -a 4 -a 1 -a 2
+%setup -q -n %name -a 4
 %else
-%setup -q -n MPlayer-%{version}%{prerel} -a 4 -a 1 -a 2
-%endif
-%if %build_amr
-unzip -qq 26104-%{amrnb}_ANSI_C_source_code.zip
-mv c-code libavcodec/amr_float
-unzip -qq 26204-%{amrwb}_ANSI-C_source_code.zip
-mv c-code libavcodec/amrwb_float
+%setup -q -n MPlayer-%{version}%{prerel} -a 4
 %endif
 #gw fix permissions
 find DOCS -type d|xargs chmod 755
 find DOCS -type f|xargs chmod 644
 find DOCS -name .svn|xargs rm -rf
-chmod 644 AUTHORS ChangeLog README Copyright
+chmod 644 AUTHORS Changelog README Copyright
 rm -f Blue/README
 %patch0 -p1 -b .mdv
 %patch1 -p0 -b .gnome-screensaver
-%patch2 -p0
 %patch3 -p1 -b .mp2
-%patch4 -p1 -b .xv
-%if %mdkversion >= 200600
-%patch5 -p1 -b .lzo2
-%endif
-%patch6 -p1 -b .dirconf
 %patch7 -p1 -b .mga
-%patch8 -p1 -b .mga
-%patch9 -p1 -b .radeon
-%patch10 -p1 -b .ppc
 %ifarch x86_64
 %patch11 -p1 -b .lib64
 %endif
 %patch12 -p1 -b .desktopentry
-%patch13 -p2 -b .64bit-fixes
-%patch14 -p0 -b .rtsp-overflow
-%patch15 -p1 -b .pulseaudio
-%patch16 -p1 -b .cve-2007-1246
-%patch17 -p1 -b .cve-2007-1387
-%if %build_dirac
-%patch18 -p1 -b .dirac
-%endif
 cd stream
 %patch19 -p2 -b .cve-2006-6172
 cd ..
-%patch20 -p0 -b .cddboverflow
-%if %build_compiz
-%patch21 -p0 -b .compiz
-%endif
-%patch22 -p1 -b .avi-idx
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
@@ -544,11 +474,13 @@ export CPPFLAGS="-I%_includedir/directfb"
 %if !%build_plf
 	--disable-faad-internal \
 %endif
-%if ! %build_dvdnav
+%if %build_dvdnav
+        --enable-dvdnav \
+%else
         --disable-dvdnav \
 %endif
 %if %build_dvdread || ! %build_plf
-	--disable-mpdvdkit\
+	--disable-libdvdcss-internal \
 %endif
 %if %build_lirc
 	--enable-lirc \
@@ -579,9 +511,7 @@ export CPPFLAGS="-I%_includedir/directfb"
 %else
 	--disable-mencoder \
 %endif
-%if %build_live
-	--enable-live --with-livelibdir=%_libdir/live \
-%else
+%if ! %build_live
 	--disable-live \
 %endif
 %if ! %build_vesa
@@ -607,14 +537,14 @@ export CPPFLAGS="-I%_includedir/directfb"
        --disable-dvb \
        --disable-dvbhead \
 %endif
-	--with-xanimlibdir=%{_prefix}/X11R6/lib/xanim/mods \
-	--with-reallibdir=%{realpath} \
+	--xanimcodecsdir=%{_prefix}/X11R6/lib/xanim/mods \
+	--realcodecsdir=%{realpath} \
 %if ! %build_ggi
 	--disable-ggi \
 %endif
 %ifarch %ix86
 	\
-	--with-win32libdir=%{_prefix}/lib/win32 \
+	--win32codecsdir=%{_prefix}/lib/win32 \
 %endif
 %if ! %build_arts
 	--disable-arts \
@@ -668,9 +598,6 @@ make CC=gcc" -fno-unit-at-a-time"
 make
 %endif
 
-# (sb) these aren't building on their own for some reason
-make -C vidix
-
 # build HTML docs
 (cd DOCS/xml && make)
 
@@ -678,7 +605,6 @@ make -C vidix
 rm -rf $RPM_BUILD_ROOT
 install -d -m 755 $RPM_BUILD_ROOT%{_bindir}
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/%name
-install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/%name/vidix
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/%name
 install -d -m 755 $RPM_BUILD_ROOT%{_mandir}/{de,fr,hu,pl,es,zh_CN,""}/man1
 install -m 755 mplayer $RPM_BUILD_ROOT%{_bindir}
@@ -702,10 +628,6 @@ install -m 644 etc/example.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/mplayer.co
 install -m 644 etc/codecs.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 install -m 644 etc/input.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 install -m 644 etc/menu.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
-%ifarch %{vidix_arches}
-install -m 755 -p libdha/libdha.so.%dhamajor %buildroot/%_libdir
-install -m 755 -p vidix/drivers/*.so %buildroot/%_libdir/%name/vidix
-%endif
 
 %if %build_gui
 # default Skin
@@ -719,20 +641,6 @@ mkdir -p $RPM_BUILD_ROOT{%_liconsdir,%_iconsdir,%{_miconsdir}}
 convert -transparent white Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_liconsdir}/gmplayer.png 
 convert -transparent white Blue/icons/icon32x32.png $RPM_BUILD_ROOT%{_iconsdir}/gmplayer.png 
 convert -transparent white -scale 16x16 Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_miconsdir}/gmplayer.png
-# menu
-install -d -m 755 $RPM_BUILD_ROOT%{_menudir}
-cat >$RPM_BUILD_ROOT%{_menudir}/%{name}-gui <<EOF
-?package(%{name}-gui): \
-	command="soundwrapper %{_bindir}/gmplayer -quiet -nofs"\
-	needs="X11"\
-	section="Multimedia/Video"\
-	icon="gmplayer.png"\
-	mimetypes="video/mpeg,video/msvideo,video/quicktime,video/x-avi,video/x-ms-asf,video/x-ms-wmv,video/x-msvideo,application/x-ogg,application/ogg,audio/x-mp3,audio/x-mpeg,video/x-fli,audio/x-wav"\
-	accept_url="true"\
-	multiple_files="true"\
-	title="%{Name}"\
-	longtitle="%{Summary}" xdg="true"
-EOF
 install -D -m 644 etc/mplayer.desktop %buildroot%_datadir/applications/mplayer.desktop
 %endif
 
@@ -756,15 +664,13 @@ fi
 %clean_desktop_database
 %endif
 
-%post -n %libname -p /sbin/ldconfig
-%postun -n %libname -p /sbin/ldconfig
 
 %clean
 rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%doc AUTHORS ChangeLog README Copyright
+%doc AUTHORS Changelog README Copyright
 %dir %{_sysconfdir}/%name
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/mplayer.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/codecs.conf
@@ -780,17 +686,11 @@ rm -rf %{buildroot}
 %lang(zh_CN) %{_mandir}/zh_CN/man1/mplayer.1*
 %lang(es) %{_mandir}/es/man1/mplayer.1*
 %dir %{_datadir}/%{name}
-%dir %_libdir/%name/
-%dir %_libdir/%name/vidix/
-%ifarch %{vidix_arches}
-%_libdir/%name/vidix/*so
-%endif
 
 %files doc
 %defattr(-,root,root)
 %doc README.DOCS
-%doc DOCS/default.css DOCS/HTML DOCS/tech/ DOCS/zh/
-
+%doc DOCS/default.css DOCS/HTML DOCS/tech/
 %if %build_mencoder
 %files -n mencoder
 %defattr(-,root,root)
@@ -807,17 +707,10 @@ rm -rf %{buildroot}
 %lang(es) %{_mandir}/es/man1/mencoder.1*
 %endif
 
-%ifarch %{vidix_arches}
-%files -n %libname
-%defattr(-,root,root)
-%_libdir/libdha.so.%dhamajor
-%endif
-
 %if %build_gui
 %files gui
 %defattr(-,root,root)
 %{_bindir}/gmplayer
-%{_menudir}/%{name}-gui
 %_datadir/applications/mplayer.desktop
 %_datadir/%name/Skin/
 %{_iconsdir}/gmplayer.png
