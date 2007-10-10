@@ -621,7 +621,6 @@ done
 install -m 755 TOOLS/mencvcd TOOLS/divx2svcd TOOLS/wma2ogg.pl TOOLS/midentify %buildroot%_bindir
 %endif
 install -m 644 etc/example.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/mplayer.conf
-install -m 644 etc/codecs.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 install -m 644 etc/input.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 install -m 644 etc/menu.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
@@ -669,7 +668,6 @@ rm -rf %{buildroot}
 %doc AUTHORS Changelog README Copyright
 %dir %{_sysconfdir}/%name
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/mplayer.conf
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/codecs.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/input.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/menu.conf
 %{_bindir}/midentify
