@@ -8,7 +8,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.1
+%define rel 1.%prerel.2
 %endif
 %define release		%mkrel %rel
 
