@@ -194,7 +194,6 @@ Patch0:		mplayer-mdvconfig.patch
 Patch1:		MPlayer-gnome-screensaver.patch
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
-Patch11:	mplayer-lib64.patch
 Patch12:	MPlayer-1.0rc2-desktopentry.patch
 Patch19:	MPlayer-1.0pre8-CVE-2006-6172.patch
 URL:		http://www.mplayerhq.hu
@@ -418,9 +417,6 @@ rm -f Blue/README
 %patch1 -p0 -b .gnome-screensaver
 %patch3 -p1 -b .mp2
 %patch7 -p1 -b .mga
-%ifarch x86_64
-%patch11 -p1 -b .lib64
-%endif
 %patch12 -p1 -b .desktopentry
 cd stream
 %patch19 -p2 -b .cve-2006-6172
