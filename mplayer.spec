@@ -8,7 +8,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.2
+%define rel 1.%prerel.3
 %endif
 %define release		%mkrel %rel
 
@@ -48,7 +48,7 @@
 %define build_alsa	1
 %define build_jack	1
 %define build_openal	0
-%define build_pulse	0
+%define build_pulse	1
 %define build_twolame 0
 %define build_lame 0
 %define build_faac 0
@@ -196,6 +196,8 @@ Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
 Patch12:	MPlayer-1.0rc2-desktopentry.patch
 Patch19:	MPlayer-1.0pre8-CVE-2006-6172.patch
+Patch20:	mplayer-1.0rc2-pulseaudio.patch
+Patch21:	mplayer-1.0rc2-compiz.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -421,6 +423,8 @@ rm -f Blue/README
 cd stream
 %patch19 -p2 -b .cve-2006-6172
 cd ..
+%patch20 -p0 -b .pulse
+%patch21 -p0 -b .compiz
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
