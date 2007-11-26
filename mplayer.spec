@@ -8,7 +8,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.3
+%define rel 1.%prerel.4
 %endif
 %define release		%mkrel %rel
 
@@ -625,7 +625,6 @@ done
 install -m 755 TOOLS/mencvcd TOOLS/divx2svcd TOOLS/wma2ogg.pl TOOLS/midentify %buildroot%_bindir
 %endif
 install -m 644 etc/example.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/mplayer.conf
-install -m 644 etc/input.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 install -m 644 etc/menu.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
 %if %build_gui
@@ -672,7 +671,6 @@ rm -rf %{buildroot}
 %doc AUTHORS Changelog README Copyright
 %dir %{_sysconfdir}/%name
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/mplayer.conf
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/input.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/menu.conf
 %{_bindir}/midentify
 %{_bindir}/mplayer
