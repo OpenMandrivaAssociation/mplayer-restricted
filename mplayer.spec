@@ -319,6 +319,7 @@ BuildRequires: docbook-dtd412-xml
 BuildRequires: libcaca-devel
 BuildRequires: ungif-devel
 
+BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 Provides:	mplayer1.0
 Obsoletes:	mplayer1.0
 
