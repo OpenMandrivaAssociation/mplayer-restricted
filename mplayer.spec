@@ -82,7 +82,7 @@
 %define build_pulse	0
 %endif
 
-%if %mdkversion < 200800
+%if %mdkversion <= 200800
 %define build_dirac 0
 %endif
 
@@ -192,6 +192,10 @@ Source4:	Blue-1.5.tar.bz2
 Source5:	kernel-version.sh
 Patch0:		mplayer-mdvconfig.patch
 Patch1:		MPlayer-gnome-screensaver.patch
+# http://downloads.sourceforge.net/dirac/MPlayer-1.0rc2_dirac-0.9.x.patch.tgz
+# disabled by default for this bug:
+# http://sourceforge.net/tracker/index.php?func=detail&aid=1878017&group_id=102564&atid=632200
+Patch2: MPlayer-1.0rc2_dirac-0.9.x.patch
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
 Patch12:	MPlayer-1.0rc2-desktopentry.patch
@@ -229,7 +233,7 @@ BuildRequires:  libopenal-devel
 BuildRequires:	libcdda-devel
 %endif
 %if %build_dirac
-BuildRequires:	libdirac-devel >= 0.7.0
+BuildRequires:	libdirac-devel >= 0.9.0
 %endif
 %if %build_dv
 BuildRequires:	libdv-devel
@@ -417,6 +421,9 @@ chmod 644 AUTHORS Changelog README Copyright
 rm -f Blue/README
 %patch0 -p1 -b .mdv
 %patch1 -p0 -b .gnome-screensaver
+%if %build_dirac
+%patch2 -p1 -b .dirac
+%endif
 %patch3 -p1 -b .mp2
 %patch7 -p1 -b .mga
 %patch12 -p1 -b .desktopentry
