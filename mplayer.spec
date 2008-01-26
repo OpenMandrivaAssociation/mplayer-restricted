@@ -8,7 +8,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.6
+%define rel 1.%prerel.7
 %endif
 %define release		%mkrel %rel
 
@@ -33,7 +33,7 @@
 %define build_aa	1
 %define build_cdda	1
 %define build_compiz	0
-%define build_dirac	0
+%define build_dirac	1
 %define build_dv	1
 %define build_dvdread	0
 %define build_dvdnav	1
