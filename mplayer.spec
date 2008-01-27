@@ -1,4 +1,13 @@
-%define name		mplayer
+%define build_3264bit     0
+%{?_with_3264bit: %{expand: %%global build_3264bit 1}}
+%{?_without_3264bit: %{expand: %%global build_3264bit 0}}
+%if %{build_3264bit}
+%define	pkgext	32
+%else
+%define pkgext	%{nil}
+%endif
+
+%define name		mplayer%{pkgext}
 %define Name		MPlayer
 %define Summary		Movie player for linux
 %define prerel		rc2
@@ -8,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.7
+%define rel 1.%prerel.8
 %endif
 %define release		%mkrel %rel
 
@@ -324,8 +333,8 @@ BuildRequires: libcaca-devel
 BuildRequires: ungif-devel
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
-Provides:	mplayer1.0
-Obsoletes:	mplayer1.0
+Provides:	mplayer%{pkgext}1.0
+Obsoletes:	mplayer%{pkgext}1.0
 
 
 %description
@@ -375,8 +384,8 @@ BuildRequires:	ImageMagick
 Requires(post): desktop-file-utils
 Requires(postun): desktop-file-utils
 Requires: soundwrapper
-Provides:	mplayer1.0-gui
-Obsoletes:	mplayer1.0-gui
+Provides:	mplayer%{pkgext}1.0-gui
+Obsoletes:	mplayer%{pkgext}1.0-gui
 Conflicts:	mplayer-skins < 1.3-8mdk
 
 %description gui
@@ -384,14 +393,14 @@ This package contains a GUI for %{name}.
 %endif
 
 %if %build_mencoder
-%package -n mencoder
+%package -n mencoder%{pkgext}
 Summary: MPlayer's movie encoder
 Group:		Video
 Requires:	%{name} = %version
-Provides:	mencoder1.0
-Obsoletes:	mencoder1.0
+Provides:	mencoder%{pkgext}1.0
+Obsoletes:	mencoder%{pkgext}1.0
 
-%description -n mencoder
+%description -n mencoder%{pkgext}
 MEncoder a movie encoder and is a part of the MPlayer package.
 %if !%build_plf
 Note: this version doesn't have support for encoding mp3 audio streams in the
@@ -448,6 +457,9 @@ export CFLAGS="$CFLAGS -g"
 export CFLAGS="$CFLAGS -mcpu=7450 -maltivec"
 %endif
 export CPPFLAGS="-I%_includedir/directfb"
+%if %{build_3264bit}
+export EXESUF=32
+%endif
 ./configure \
 	--prefix=%{_prefix} \
 	--datadir=%{_datadir}/%{name} \
@@ -600,9 +612,9 @@ export CPPFLAGS="-I%_includedir/directfb"
 
 # Keep this line before empty end %%configure (ppc conditionnal pb)
 %if %mdkversion == 1000 && %build_optimization
-make CC=gcc" -fno-unit-at-a-time"
+make CC=gcc" -fno-unit-at-a-time" EXESUF=%{pkgext}
 %else
-make
+make EXESUF=%{pkgext}
 %endif
 
 # build HTML docs
@@ -613,23 +625,26 @@ rm -rf $RPM_BUILD_ROOT
 install -d -m 755 $RPM_BUILD_ROOT%{_bindir}
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/%name
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/%name
-install -d -m 755 $RPM_BUILD_ROOT%{_mandir}/{de,fr,hu,pl,es,zh_CN,""}/man1
-install -m 755 mplayer $RPM_BUILD_ROOT%{_bindir}
-install -m 644 DOCS/man/en/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/man1
-install -m 644 DOCS/man/de/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/de/man1/mplayer.1
-install -m 644 DOCS/man/fr/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/fr/man1/mplayer.1
-install -m 644 DOCS/man/hu/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/hu/man1/mplayer.1
-install -m 644 DOCS/man/pl/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/pl/man1/mplayer.1
-install -m 644 DOCS/man/zh/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/zh_CN/man1/mplayer.1
-install -m 644 DOCS/man/es/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/es/man1/mplayer.1
-
+install -d -m 755 $RPM_BUILD_ROOT%{_mandir}/{de,fr,hu,pl,es,it,zh_CN,""}/man1
+install -m 755 mplayer%{pkgext} $RPM_BUILD_ROOT%{_bindir}
+install -m 644 DOCS/man/en/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/man1/mplayer%{pkgext}.1
+install -m 644 DOCS/man/de/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/de/man1/mplayer%{pkgext}.1
+install -m 644 DOCS/man/fr/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/fr/man1/mplayer%{pkgext}.1
+install -m 644 DOCS/man/hu/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/hu/man1/mplayer%{pkgext}.1
+install -m 644 DOCS/man/pl/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/pl/man1/mplayer%{pkgext}.1
+install -m 644 DOCS/man/zh/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/zh_CN/man1/mplayer%{pkgext}.1
+install -m 644 DOCS/man/es/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/es/man1/mplayer%{pkgext}.1
+install -m 644 DOCS/man/it/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/it/man1/mplayer%{pkgext}.1
  
 %if %build_mencoder
-install -m 755 mencoder $RPM_BUILD_ROOT%{_bindir}
-for man_dir in $RPM_BUILD_ROOT%{_mandir}/{de,fr,hu,pl,es,zh_CN,""}/man1; do
-(cd $man_dir && ln -s mplayer.1 mencoder.1)
+install -m 755 mencoder%{pkgext} $RPM_BUILD_ROOT%{_bindir}
+for man_dir in $RPM_BUILD_ROOT%{_mandir}/{de,fr,hu,pl,es,it,zh_CN,""}/man1; do
+(cd $man_dir && ln -s mplayer%{pkgext}.1 mencoder%{pkgext}.1)
 done
-install -m 755 TOOLS/mencvcd TOOLS/divx2svcd TOOLS/wma2ogg.pl TOOLS/midentify %buildroot%_bindir
+install -m 755 TOOLS/mencvcd %buildroot%_bindir/mencvcd%{pkgext}
+install -m 755 TOOLS/divx2svcd %buildroot%_bindir/divx2svcd%{pkgext}
+install -m 755 TOOLS/wma2ogg.pl %buildroot%_bindir/wma2ogg%{pkgext}.pl
+install -m 755 TOOLS/midentify %buildroot%_bindir/midentify%{pkgext}
 %endif
 install -m 644 etc/example.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/mplayer.conf
 install -m 644 etc/menu.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
@@ -640,13 +655,28 @@ install -d -m 755 %buildroot%_datadir/%name/Skin/
 cp -r Blue %buildroot%_datadir/%name/Skin/
 ln -s Blue %buildroot%_datadir/%name/Skin/default
 # gmplayer equals mplayer -gui
-(cd $RPM_BUILD_ROOT%{_bindir} && ln -s mplayer gmplayer)
+(cd $RPM_BUILD_ROOT%{_bindir} && ln -s mplayer%{pkgext} gmplayer%{pkgext})
 # icons
 mkdir -p $RPM_BUILD_ROOT{%_liconsdir,%_iconsdir,%{_miconsdir}}
-convert -transparent white Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_liconsdir}/gmplayer.png 
-convert -transparent white Blue/icons/icon32x32.png $RPM_BUILD_ROOT%{_iconsdir}/gmplayer.png 
-convert -transparent white -scale 16x16 Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_miconsdir}/gmplayer.png
-install -D -m 644 etc/mplayer.desktop %buildroot%_datadir/applications/mplayer.desktop
+convert -transparent white Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_liconsdir}/gmplayer%{pkgext}.png 
+convert -transparent white Blue/icons/icon32x32.png $RPM_BUILD_ROOT%{_iconsdir}/gmplayer%{pkgext}.png 
+convert -transparent white -scale 16x16 Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_miconsdir}/gmplayer%{pkgext}.png
+install -D -m 644 etc/mplayer.desktop %buildroot%_datadir/applications/mplayer%{pkgext}.desktop
+perl -pi -e 's@gmplayer$@gmplayer%{pkgext}@g' %buildroot%_datadir/applications/mplayer%{pkgext}.desktop
+%endif
+%if %{build_3264bit}
+if [ -e %{buildroot}%{_liconsdir}/gmplayer%{pkgext}.png ]; then
+	convert %{buildroot}%{_liconsdir}/gmplayer%{pkgext}.png -channel green -negate \
+		%{buildroot}%{_liconsdir}/gmplayer%{pkgext}.png
+fi
+if [ -e %{buildroot}%{_iconsdir}/gmplayer%{pkgext}.png ]; then
+	convert %{buildroot}%{_iconsdir}/gmplayer%{pkgext}.png -channel green -negate \
+		%{buildroot}%{_iconsdir}/gmplayer%{pkgext}.png
+fi
+if [ -e %{buildroot}%{_miconsdir}/gmplayer%{pkgext}.png ]; then
+	convert %{buildroot}%{_miconsdir}/gmplayer%{pkgext}.png -channel green -negate \
+        	%{buildroot}%{_miconsdir}/gmplayer%{pkgext}.png
+fi
 %endif
 
 %if %build_debug
@@ -679,15 +709,16 @@ rm -rf %{buildroot}
 %dir %{_sysconfdir}/%name
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/mplayer.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/menu.conf
-%{_bindir}/midentify
-%{_bindir}/mplayer
-%{_mandir}/man1/mplayer.1*
-%lang(de) %{_mandir}/de/man1/mplayer.1*
-%lang(fr) %{_mandir}/fr/man1/mplayer.1*
-%lang(hu) %{_mandir}/hu/man1/mplayer.1*
-%lang(pl) %{_mandir}/pl/man1/mplayer.1*
-%lang(zh_CN) %{_mandir}/zh_CN/man1/mplayer.1*
-%lang(es) %{_mandir}/es/man1/mplayer.1*
+%{_bindir}/midentify%{pkgext}
+%{_bindir}/mplayer%{pkgext}
+%{_mandir}/man1/mplayer%{pkgext}.1*
+%lang(de) %{_mandir}/de/man1/mplayer%{pkgext}.1*
+%lang(fr) %{_mandir}/fr/man1/mplayer%{pkgext}.1*
+%lang(hu) %{_mandir}/hu/man1/mplayer%{pkgext}.1*
+%lang(pl) %{_mandir}/pl/man1/mplayer%{pkgext}.1*
+%lang(zh_CN) %{_mandir}/zh_CN/man1/mplayer%{pkgext}.1*
+%lang(es) %{_mandir}/es/man1/mplayer%{pkgext}.1*
+%lang(it) %{_mandir}/it/man1/mplayer%{pkgext}.1*
 %dir %{_datadir}/%{name}
 
 %files doc
@@ -695,30 +726,31 @@ rm -rf %{buildroot}
 %doc README.DOCS
 %doc DOCS/default.css DOCS/HTML DOCS/tech/
 %if %build_mencoder
-%files -n mencoder
+%files -n mencoder%{pkgext}
 %defattr(-,root,root)
-%{_bindir}/mencoder
-%{_bindir}/divx2svcd
-%{_bindir}/mencvcd
-%{_bindir}/wma2ogg.pl
-%{_mandir}/man1/mencoder.1*
-%lang(de) %{_mandir}/de/man1/mencoder.1*
-%lang(fr) %{_mandir}/fr/man1/mencoder.1*
-%lang(hu) %{_mandir}/hu/man1/mencoder.1*
-%lang(pl) %{_mandir}/pl/man1/mencoder.1*
-%lang(zh_CN) %{_mandir}/zh_CN/man1/mencoder.1*
-%lang(es) %{_mandir}/es/man1/mencoder.1*
+%{_bindir}/mencoder%{pkgext}
+%{_bindir}/divx2svcd%{pkgext}
+%{_bindir}/mencvcd%{pkgext}
+%{_bindir}/wma2ogg%{pkgext}.pl
+%{_mandir}/man1/mencoder%{pkgext}.1*
+%lang(de) %{_mandir}/de/man1/mencoder%{pkgext}.1*
+%lang(fr) %{_mandir}/fr/man1/mencoder%{pkgext}.1*
+%lang(hu) %{_mandir}/hu/man1/mencoder%{pkgext}.1*
+%lang(pl) %{_mandir}/pl/man1/mencoder%{pkgext}.1*
+%lang(zh_CN) %{_mandir}/zh_CN/man1/mencoder%{pkgext}.1*
+%lang(es) %{_mandir}/es/man1/mencoder%{pkgext}.1*
+%lang(it) %{_mandir}/it/man1/mencoder%{pkgext}.1*
 %endif
 
 %if %build_gui
 %files gui
 %defattr(-,root,root)
-%{_bindir}/gmplayer
-%_datadir/applications/mplayer.desktop
+%{_bindir}/gmplayer%{pkgext}
+%_datadir/applications/mplayer%{pkgext}.desktop
 %_datadir/%name/Skin/
-%{_iconsdir}/gmplayer.png
-%{_miconsdir}/gmplayer.png
-%{_liconsdir}/gmplayer.png
+%{_iconsdir}/gmplayer%{pkgext}.png
+%{_miconsdir}/gmplayer%{pkgext}.png
+%{_liconsdir}/gmplayer%{pkgext}.png
 %endif
 
 
