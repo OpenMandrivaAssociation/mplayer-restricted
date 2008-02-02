@@ -202,8 +202,6 @@ Source5:	kernel-version.sh
 Patch0:		mplayer-mdvconfig.patch
 Patch1:		MPlayer-gnome-screensaver.patch
 # http://downloads.sourceforge.net/dirac/MPlayer-1.0rc2_dirac-0.9.x.patch.tgz
-# disabled by default for this bug:
-# http://sourceforge.net/tracker/index.php?func=detail&aid=1878017&group_id=102564&atid=632200
 Patch2: MPlayer-1.0rc2_dirac-0.9.x.patch
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
