@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.8
+%define rel 1.%prerel.9
 %endif
 %define release		%mkrel %rel
 
@@ -209,6 +209,11 @@ Patch12:	MPlayer-1.0rc2-desktopentry.patch
 Patch19:	MPlayer-1.0pre8-CVE-2006-6172.patch
 Patch20:	mplayer-1.0rc2-pulseaudio.patch
 Patch21:	mplayer-1.0rc2-compiz.patch
+#gw official security fixes:
+Patch22:	http://www.mplayerhq.hu/MPlayer/patches/stream_cddb_fix_20080120.diff
+Patch23: 	http://www.mplayerhq.hu/MPlayer/patches/url_fix_20080120.diff
+Patch24:	http://www.mplayerhq.hu/MPlayer/patches/demux_mov_fix_20080129.diff
+Patch25:	http://www.mplayerhq.hu/MPlayer/patches/demux_audio_fix_20080129.diff
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -439,6 +444,13 @@ cd stream
 cd ..
 %patch20 -p0 -b .pulse
 %patch21 -p0 -b .compiz
+cd stream
+%patch22
+%patch23
+cd ../libmpdemux
+%patch24
+%patch25
+cd ..
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
