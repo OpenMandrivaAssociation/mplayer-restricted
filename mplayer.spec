@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.9
+%define rel 1.%prerel.10
 %endif
 %define release		%mkrel %rel
 
@@ -442,7 +442,7 @@ rm -f Blue/README
 cd stream
 %patch19 -p2 -b .cve-2006-6172
 cd ..
-%patch20 -p0 -b .pulse
+%patch20 -p1 -b .pulse
 %patch21 -p0 -b .compiz
 cd stream
 %patch22
