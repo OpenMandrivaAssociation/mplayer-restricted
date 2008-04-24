@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.10
+%define rel 1.%prerel.11
 %endif
 %define release		%mkrel %rel
 
@@ -466,7 +466,7 @@ export CFLAGS="$CFLAGS -g"
 %ifarch ppc
 export CFLAGS="$CFLAGS -mcpu=7450 -maltivec"
 %endif
-export CPPFLAGS="-I%_includedir/directfb"
+export CPPFLAGS="-I%_includedir/directfb -I%_includedir/dvdnav"
 %if %{build_3264bit}
 export EXESUF=32
 %endif
@@ -503,9 +503,7 @@ export EXESUF=32
 %if !%build_plf
 	--disable-faad-internal \
 %endif
-%if %build_dvdnav
-        --enable-dvdnav \
-%else
+%if ! %build_dvdnav
         --disable-dvdnav \
 %endif
 %if %build_dvdread || ! %build_plf
