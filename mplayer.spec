@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.11
+%define rel 1.%prerel.12
 %endif
 %define release		%mkrel %rel
 
@@ -61,6 +61,7 @@
 %define build_twolame 0
 %define build_lame 0
 %define build_faac 0
+%define build_faad 0
 %define build_x264 0
 %define build_xvid 0
 %define build_dts 0
@@ -99,8 +100,6 @@
 %define build_vesa 0
 %endif
 
-%{?!mkrel:%define mkrel(c:) %{-c:0.%{-c*}.}%{!?_with_unstable:%(perl -e '$_="%{1}";m/(.*)(\\d+)$/;$rel=$2-1;re;print "$1$rel";').%{?subrel:%subrel}%{!?subrel:1}.%{?distversion:%distversion}%{?!distversion:%(echo $[%{mdkversion}/10])}}%{?_with_unstable:%{1}}%{?distsuffix:%distsuffix}%{?!distsuffix:mdk}}
-
 %{?_with_plf: %{expand: %%global build_plf 1}}
 %if %build_plf
 %define realpath %{_libdir}/real
@@ -110,6 +109,7 @@
 %define build_twolame 1
 %define build_lame 1
 %define build_faac 1
+%define build_faad 1
 %define build_x264 1
 %define build_xvid 1
 %define build_dts 1
@@ -176,6 +176,8 @@
 %{?_without_lame: %{expand: %%global build_lame 0}}
 %{?_with_faac: %{expand: %%global build_faac 1}}
 %{?_without_faac: %{expand: %%global build_faac 0}}
+%{?_with_faad: %{expand: %%global build_faad 1}}
+%{?_without_faad: %{expand: %%global build_faad 0}}
 %{?_with_x264: %{expand: %%global build_x264 1}}
 %{?_without_x264: %{expand: %%global build_x264 0}}
 %{?_with_xvid: %{expand: %%global build_xvid 1}}
@@ -280,6 +282,9 @@ BuildRequires:	libtwolame-devel
 %endif
 %if %build_faac
 BuildRequires:	libfaac-devel
+%endif
+%if %build_faad
+BuildRequires: libfaad2-devel
 %endif
 %if %build_x264
 BuildRequires:	libx264-devel
@@ -445,11 +450,11 @@ cd ..
 %patch20 -p1 -b .pulse
 %patch21 -p0 -b .compiz
 cd stream
-%patch22
-%patch23
+%patch22 -b .cddb
+%patch23 -b .url
 cd ../libmpdemux
-%patch24
-%patch25
+%patch24 -b .demux-mov
+%patch25 -b .demux-audio
 cd ..
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
@@ -500,8 +505,9 @@ export EXESUF=32
 %endif
 	--language=all \
 	\
-%if !%build_plf
 	--disable-faad-internal \
+%if %build_faad
+	--enable-faad-external \
 %endif
 %if ! %build_dvdnav
         --disable-dvdnav \
