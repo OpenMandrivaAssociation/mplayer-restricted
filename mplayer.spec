@@ -696,8 +696,12 @@ fi
 %if %build_debug
 export DONT_STRIP=1
 %endif
+%if %mdkversion < 200900
 %post -p /sbin/ldconfig
+%endif
+%if %mdkversion < 200900
 %postun -p /sbin/ldconfig
+%endif
 
 %if %build_gui
 %pre gui
