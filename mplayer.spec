@@ -325,12 +325,10 @@ BuildRequires: libenca-devel
 %if %build_directfb
 BuildRequires: libdirectfb-devel
 %endif
-%if %mdkversion >= 200700
 BuildRequires: libxvmc-devel
 BuildRequires: libmesagl-devel
 BuildRequires: libxxf86vm-devel
 BuildRequires: libxxf86dga-devel
-%endif
 BuildRequires: libspeex-devel
 BuildRequires: libmpcdec-devel
 BuildRequires: ladspa-devel
