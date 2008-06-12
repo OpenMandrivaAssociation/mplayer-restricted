@@ -706,13 +706,17 @@ export DONT_STRIP=1
 if [ -d %_datadir/%name/Skin/default ]
   then rm -rf %_datadir/%name/Skin/default
 fi
+%if %mdkversion < 200900
 %post gui
 %{update_menus}
 %update_desktop_database
+%endif
 
+%if %mdkversion < 200900
 %postun gui
 %{clean_menus}
 %clean_desktop_database
+%endif
 %endif
 
 
