@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.13
+%define rel 1.%prerel.14
 %endif
 %define release		%mkrel %rel
 
@@ -275,7 +275,8 @@ BuildRequires:  libxmms-devel
 BuildRequires:	libggiwmh-devel
 %endif
 %if %build_smb
-BuildRequires:	libsmbclient-devel > 2.2.8a-7mdk 
+# require samba < 3.2.0 to avoid shipping GPLv2 vs GPLv3
+BuildRequires:	libsmbclient-devel < 3.2.0
 %endif
 %if %build_twolame
 BuildRequires:	libtwolame-devel
