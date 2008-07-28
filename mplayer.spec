@@ -42,7 +42,7 @@
 %define build_aa	1
 %define build_cdda	1
 %define build_compiz	0
-%define build_dirac	1
+%define build_dirac	0
 %define build_dv	1
 %define build_dvdread	0
 %define build_dvdnav	1
