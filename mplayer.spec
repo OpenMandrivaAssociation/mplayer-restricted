@@ -96,6 +96,10 @@
 %define build_dirac 0
 %endif
 
+%if %mdkversion >= 200900
+%define build_smb       0
+%endif
+
 %ifnarch %ix86
 %define build_vesa 0
 %endif
