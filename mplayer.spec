@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.15
+%define rel 1.%prerel.16
 %endif
 %define release		%mkrel %rel
 
@@ -205,6 +205,9 @@ Source0:	%{Name}-%{fversion}.tar.bz2
 #gw default skin
 Source4:	Blue-1.5.tar.bz2
 Source5:	kernel-version.sh
+#gw from svn, scaletempo audio filter (bug #43529) :
+# http://scaletempo.sourceforge.net/0/
+Source6:	mplayer-scaletempo-patches-r1.tar.bz2
 Patch0:		mplayer-mdvconfig.patch
 Patch1:		MPlayer-gnome-screensaver.patch
 # http://downloads.sourceforge.net/dirac/MPlayer-1.0rc2_dirac-0.9.x.patch.tgz
@@ -220,6 +223,7 @@ Patch22:	http://www.mplayerhq.hu/MPlayer/patches/stream_cddb_fix_20080120.diff
 Patch23: 	http://www.mplayerhq.hu/MPlayer/patches/url_fix_20080120.diff
 Patch24:	http://www.mplayerhq.hu/MPlayer/patches/demux_mov_fix_20080129.diff
 Patch25:	http://www.mplayerhq.hu/MPlayer/patches/demux_audio_fix_20080129.diff
+Patch26:	mplayer-1.0rc2-fribidi-0.19.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -429,9 +433,9 @@ be illegal in some countries.
 rm -rf $RPM_BUILD_ROOT
 
 %if %svn
-%setup -q -n %name -a 4
+%setup -q -n %name -a 4 -a 6
 %else
-%setup -q -n MPlayer-%{version}%{prerel} -a 4
+%setup -q -n MPlayer-%{version}%{prerel} -a 4 -a 6
 %endif
 #gw fix permissions
 find DOCS -type d|xargs chmod 755
@@ -459,6 +463,12 @@ cd ../libmpdemux
 %patch24 -b .demux-mov
 %patch25 -b .demux-audio
 cd ..
+for patch in mplayer-scaletempo-patches-r1/*.patch; do
+  patch -p0 < $patch
+done
+%if %mdvver >= 200900
+%patch26 -p1
+%endif
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
