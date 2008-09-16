@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.16
+%define rel 1.%prerel.17
 %endif
 %define release		%mkrel %rel
 
@@ -68,6 +68,7 @@
 %define build_directfb 1
 %define build_v4l2 1
 %define build_xvmc 1
+%define build_ivtv 0
 
 %if ! %build_dvdnav
 %define build_dvdread 1
@@ -94,6 +95,10 @@
 
 %if %mdkversion <= 200800
 %define build_dirac 0
+%endif
+
+%if %mdvver < 200900
+%define build_ivtv 1
 %endif
 
 %if %mdkversion >= 200900
@@ -224,6 +229,9 @@ Patch23: 	http://www.mplayerhq.hu/MPlayer/patches/url_fix_20080120.diff
 Patch24:	http://www.mplayerhq.hu/MPlayer/patches/demux_mov_fix_20080129.diff
 Patch25:	http://www.mplayerhq.hu/MPlayer/patches/demux_audio_fix_20080129.diff
 Patch26:	mplayer-1.0rc2-fribidi-0.19.patch
+Patch27:	mplayer-1.0rc1-CVE-2008-1558.patch
+# fixes for crashes found while fixing CVE-2008-1558
+Patch28:	mplayer-1.0rc1-rtsp-extra-fixes.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -469,6 +477,9 @@ done
 %if %mdvver >= 200900
 %patch26 -p1
 %endif
+%patch27 -p1 -b .cve-2008-1558
+%patch28 -p1 -b .rtsp-extra-fixes
+
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
@@ -634,7 +645,9 @@ export EXESUF=32
 %if %build_xvmc
 	--enable-xvmc \
 %endif
-
+%if ! %build_ivtv
+	--disable-ivtv \
+%endif
 
 
 # Keep this line before empty end %%configure (ppc conditionnal pb)
