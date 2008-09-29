@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.17
+%define rel 1.%prerel.18
 %endif
 %define release		%mkrel %rel
 
@@ -232,6 +232,9 @@ Patch26:	mplayer-1.0rc2-fribidi-0.19.patch
 Patch27:	mplayer-1.0rc1-CVE-2008-1558.patch
 # fixes for crashes found while fixing CVE-2008-1558
 Patch28:	mplayer-1.0rc1-rtsp-extra-fixes.patch
+# security patch for integer underflow in Real demuxer (oCERT-2008-013)a
+# http://www.ocert.org/advisories/ocert-2008-013.html
+Patch29:	http://www.ocert.org/patches/2008-013/mplayer_demux_real.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -479,6 +482,7 @@ done
 %endif
 %patch27 -p1 -b .cve-2008-1558
 %patch28 -p1 -b .rtsp-extra-fixes
+%patch29 -p0 -b .real-demux
 
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
