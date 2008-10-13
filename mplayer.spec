@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.20
+%define rel 1.%prerel.21
 %endif
 %define release		%mkrel %rel
 
