@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.19
+%define rel 1.%prerel.20
 %endif
 %define release		%mkrel %rel
 
@@ -218,6 +218,7 @@ Patch1:		MPlayer-gnome-screensaver.patch
 # http://downloads.sourceforge.net/dirac/MPlayer-1.0rc2_dirac-0.9.x.patch.tgz
 Patch2: MPlayer-1.0rc2_dirac-0.9.x.patch
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
+Patch4:		MPlayer-1.0rc2-new-libx264.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
 Patch12:	MPlayer-1.0rc2-desktopentry.patch
 Patch19:	MPlayer-1.0pre8-CVE-2006-6172.patch
@@ -460,6 +461,7 @@ rm -f Blue/README
 %patch2 -p1 -b .dirac
 %endif
 %patch3 -p1 -b .mp2
+%patch4 -p1 -b .x264
 %patch7 -p1 -b .mga
 %patch12 -p1 -b .desktopentry
 cd stream
