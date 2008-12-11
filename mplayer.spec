@@ -408,7 +408,7 @@ Summary:	GUI for %{name}
 Group:		Video
 Requires:	%{name} = %{version}
 BuildRequires:	gtk+2-devel
-BuildRequires:	ImageMagick
+BuildRequires:	imagemagick
 Requires(post): desktop-file-utils
 Requires(postun): desktop-file-utils
 Requires: soundwrapper
