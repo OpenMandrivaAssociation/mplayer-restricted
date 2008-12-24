@@ -238,6 +238,7 @@ Patch28:	mplayer-1.0rc1-rtsp-extra-fixes.patch
 Patch29:	http://www.ocert.org/patches/2008-013/mplayer_demux_real.patch
 Patch30:	mplayer-CVE-2008-0073.patch
 Patch31:	mplayer-1.0rc2-format-string-literal.patch
+Patch32:	mplayer-1.0rc2-fix-invalid-free.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -489,6 +490,8 @@ done
 %patch29 -p0 -b .real-demux
 %patch30 -p0 -b .cve-2008-0073
 %patch31 -p1 -b .format~
+%patch32 -p1 -b .invalid_free~
+
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
