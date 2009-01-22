@@ -490,9 +490,8 @@ export EXESUF=32
 %endif
 	--language=all \
 	\
+%if ! %build_faad
 	--disable-faad-internal \
-%if %build_faad
-	--enable-faad-external \
 %endif
 	--disable-libdvdcss-internal \
 %if %build_lirc
