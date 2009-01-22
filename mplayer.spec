@@ -12,10 +12,10 @@
 %define Summary		Movie player for linux
 %define prerel		rc2
 %define version 1.0
-%define fversion %version%prerel
-%define svn 0
+%define fversion %svn
+%define svn r28347
 %if %svn
-%define rel		1.%prerel.0.%svn.1
+%define rel		1.%prerel.23.%svn.1
 %else 
 %define rel 1.%prerel.23
 %endif
@@ -42,10 +42,8 @@
 %define build_aa	1
 %define build_cdda	1
 %define build_compiz	0
-%define build_dirac	0
+%define build_dirac	1
 %define build_dv	1
-%define build_dvdread	0
-%define build_dvdnav	1
 %define build_sdl	1
 %define build_lzo	1
 %define build_smb	1
@@ -70,9 +68,6 @@
 %define build_xvmc 1
 %define build_ivtv 0
 
-%if ! %build_dvdnav
-%define build_dvdread 1
-%endif
 
 %if %mdkversion < 920
 %define build_smb 0
@@ -113,7 +108,6 @@
 %if %build_plf
 %define realpath %{_libdir}/real
 %define distsuffix plf
-%define build_dvdread 0
 %define build_amr 1
 %define build_twolame 1
 %define build_lame 1
@@ -159,10 +153,6 @@
 %{?_without_dirac: %{expand: %%global build_dirac 0}}
 %{?_with_dv: %{expand: %%global build_dv 1}}
 %{?_without_dv: %{expand: %%global build_dv 0}}
-%{?_with_dvdread: %{expand: %%global build_dvdread 1}}
-%{?_without_dvdread: %{expand: %%global build_dvdread 0}}
-%{?_with_dvdnav: %{expand: %%global build_dvdnav 1}}
-%{?_without_dvdnav: %{expand: %%global build_dvdnav 0}}
 %{?_with_sdl: %{expand: %%global build_sdl 1}}
 %{?_without_sdl: %{expand: %%global build_sdl 0}}
 %{?_with_lzo: %{expand: %%global build_lzo 1}}
@@ -210,35 +200,19 @@ Source0:	%{Name}-%{fversion}.tar.bz2
 #gw default skin
 Source4:	Blue-1.5.tar.bz2
 Source5:	kernel-version.sh
-#gw from svn, scaletempo audio filter (bug #43529) :
-# http://scaletempo.sourceforge.net/0/
-Source6:	mplayer-scaletempo-patches-r1.tar.bz2
 Patch0:		mplayer-mdvconfig.patch
 Patch1:		MPlayer-gnome-screensaver.patch
-# http://downloads.sourceforge.net/dirac/MPlayer-1.0rc2_dirac-0.9.x.patch.tgz
-Patch2: MPlayer-1.0rc2_dirac-0.9.x.patch
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
-Patch4:		MPlayer-1.0rc2-new-libx264.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
-Patch12:	MPlayer-1.0rc2-desktopentry.patch
-Patch19:	MPlayer-1.0pre8-CVE-2006-6172.patch
-Patch20:	mplayer-1.0rc2-pulseaudio.patch
+Patch12:	mplayer-desktopentry.patch
 Patch21:	mplayer-1.0rc2-compiz.patch
 #gw official security fixes:
-Patch22:	http://www.mplayerhq.hu/MPlayer/patches/stream_cddb_fix_20080120.diff
-Patch23: 	http://www.mplayerhq.hu/MPlayer/patches/url_fix_20080120.diff
-Patch24:	http://www.mplayerhq.hu/MPlayer/patches/demux_mov_fix_20080129.diff
-Patch25:	http://www.mplayerhq.hu/MPlayer/patches/demux_audio_fix_20080129.diff
 Patch26:	mplayer-1.0rc2-fribidi-0.19.patch
-Patch27:	mplayer-1.0rc1-CVE-2008-1558.patch
 # fixes for crashes found while fixing CVE-2008-1558
 Patch28:	mplayer-1.0rc1-rtsp-extra-fixes.patch
-# security patch for integer underflow in Real demuxer (oCERT-2008-013)a
-# http://www.ocert.org/advisories/ocert-2008-013.html
-Patch29:	http://www.ocert.org/patches/2008-013/mplayer_demux_real.patch
-Patch30:	mplayer-CVE-2008-0073.patch
-Patch31:	mplayer-1.0rc2-format-string-literal.patch
-Patch32:	mplayer-1.0rc2-fix-invalid-free.patch
+Patch31:       mplayer-format-string-literal.patch
+#gw HAVE_DLFCN_H isn't defined
+Patch33:       mplayer-have-dlfcn_h.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -272,6 +246,7 @@ BuildRequires:	libcdda-devel
 %if %build_dirac
 BuildRequires:	libdirac-devel >= 0.9.0
 %endif
+BuildRequires:	libschroedinger-devel
 %if %build_dv
 BuildRequires:	libdv-devel
 %endif
@@ -322,14 +297,8 @@ BuildRequires: dtsdec-devel
 %if %build_lame
 BuildRequires: liblame-devel
 %endif
-%if %build_dvdnav
-BuildRequires:	libdvdnav-devel >= 4.1.1
 %if %build_plf
 Requires: %mklibname dvdcss 2
-%endif
-%endif
-%if %build_dvdread
-BuildRequires:	libdvdread-devel >= 0.9.4
 %endif
 %if %build_live
 BuildRequires: live-devel
@@ -349,10 +318,12 @@ BuildRequires: libenca-devel
 %if %build_directfb
 BuildRequires: libdirectfb-devel
 %endif
+BuildRequires: libmng-devel
 BuildRequires: libxvmc-devel
 BuildRequires: libmesagl-devel
 BuildRequires: libxxf86vm-devel
 BuildRequires: libxxf86dga-devel
+BuildRequires: libxscrnsaver-devel
 BuildRequires: libspeex-devel
 BuildRequires: libmpcdec-devel
 BuildRequires: ladspa-devel
@@ -448,9 +419,9 @@ be illegal in some countries.
 rm -rf $RPM_BUILD_ROOT
 
 %if %svn
-%setup -q -n %name -a 4 -a 6
+%setup -q -n %name -a 4
 %else
-%setup -q -n MPlayer-%{version}%{prerel} -a 4 -a 6
+%setup -q -n MPlayer-%{version}%{prerel} -a 4
 %endif
 #gw fix permissions
 find DOCS -type d|xargs chmod 755
@@ -459,39 +430,17 @@ find DOCS -name .svn|xargs rm -rf
 chmod 644 AUTHORS Changelog README Copyright
 rm -f Blue/README
 %patch0 -p1 -b .mdv
-%patch1 -p0 -b .gnome-screensaver
-%if %build_dirac
-%patch2 -p1 -b .dirac
-%endif
-%patch3 -p1 -b .mp2
-%patch4 -p1 -b .x264
-%patch7 -p1 -b .mga
+#%patch1 -p0 -b .gnome-screensaver
+#%patch3 -p1 -b .mp2
+#%patch7 -p1 -b .mga
 %patch12 -p1 -b .desktopentry
-cd stream
-%patch19 -p2 -b .cve-2006-6172
-cd ..
-%patch20 -p1 -b .pulse
-%patch21 -p0 -b .compiz
-cd stream
-%patch22 -b .cddb
-%patch23 -b .url
-cd ../libmpdemux
-%patch24 -b .demux-mov
-%patch25 -b .demux-audio
-cd ..
-for patch in mplayer-scaletempo-patches-r1/*.patch; do
-  patch -p0 < $patch
-done
+#%patch21 -p0 -b .compiz
 %if %mdvver >= 200900
 %patch26 -p1
 %endif
-%patch27 -p1 -b .cve-2008-1558
 %patch28 -p1 -b .rtsp-extra-fixes
-%patch29 -p0 -b .real-demux
-%patch30 -p0 -b .cve-2008-0073
-%patch31 -p1 -b .format~
-%patch32 -p1 -b .invalid_free~
-
+%patch31 -p0 -b .format~
+%patch33 -p0
 
 perl -pi -e "s^%fversion^%version-%release^" version.sh
 
@@ -507,7 +456,7 @@ export CFLAGS="$CFLAGS -g"
 %ifarch ppc
 export CFLAGS="$CFLAGS -mcpu=7450 -maltivec"
 %endif
-export CPPFLAGS="-I%_includedir/directfb -I%_includedir/dvdnav"
+export CPPFLAGS="-I%_includedir/directfb"
 %if %{build_3264bit}
 export EXESUF=32
 %endif
@@ -545,12 +494,7 @@ export EXESUF=32
 %if %build_faad
 	--enable-faad-external \
 %endif
-%if ! %build_dvdnav
-        --disable-dvdnav \
-%endif
-%if %build_dvdread || ! %build_plf
 	--disable-libdvdcss-internal \
-%endif
 %if %build_lirc
 	--enable-lirc \
 %else
@@ -693,10 +637,10 @@ install -m 755 mencoder%{pkgext} $RPM_BUILD_ROOT%{_bindir}
 for man_dir in $RPM_BUILD_ROOT%{_mandir}/{de,fr,hu,pl,es,it,zh_CN,""}/man1; do
 (cd $man_dir && ln -s mplayer%{pkgext}.1 mencoder%{pkgext}.1)
 done
-install -m 755 TOOLS/mencvcd %buildroot%_bindir/mencvcd%{pkgext}
-install -m 755 TOOLS/divx2svcd %buildroot%_bindir/divx2svcd%{pkgext}
+install -m 755 TOOLS/mencvcd.sh %buildroot%_bindir/mencvcd%{pkgext}
+install -m 755 TOOLS/divx2svcd.sh %buildroot%_bindir/divx2svcd%{pkgext}
 install -m 755 TOOLS/wma2ogg.pl %buildroot%_bindir/wma2ogg%{pkgext}.pl
-install -m 755 TOOLS/midentify %buildroot%_bindir/midentify%{pkgext}
+install -m 755 TOOLS/midentify.sh %buildroot%_bindir/midentify%{pkgext}
 %endif
 install -m 644 etc/example.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/mplayer.conf
 install -m 644 etc/menu.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
