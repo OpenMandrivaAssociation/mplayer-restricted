@@ -56,6 +56,7 @@
 %define build_jack	1
 %define build_openal	0
 %define build_pulse	1
+%define build_schroedinger	1
 %define build_twolame 0
 %define build_lame 0
 %define build_faac 0
@@ -88,12 +89,13 @@
 %define build_pulse	0
 %endif
 
-%if %mdkversion <= 200800
-%define build_dirac 0
-%endif
-
 %if %mdvver < 200900
 %define build_ivtv 1
+%endif
+
+%if %mdvver <= 200900
+%define build_dirac 0
+%define build_schroedinger 0
 %endif
 
 %if %mdkversion >= 200900
@@ -169,6 +171,8 @@
 %{?_without_pulse: %{expand: %%global build_pulse 0}}
 %{?_with_openal: %{expand: %%global build_openal 1}}
 %{?_without_openal: %{expand: %%global build_openal 0}}
+%{?_with_schroedinger: %{expand: %%global build_schroedinger 1}}
+%{?_without_schroedinger: %{expand: %%global build_schroedinger 0}}
 %{?_with_twolame: %{expand: %%global build_twolame 1}}
 %{?_without_twolame: %{expand: %%global build_twolame 0}}
 %{?_with_lame: %{expand: %%global build_lame 1}}
@@ -245,7 +249,9 @@ BuildRequires:	libcdda-devel
 %if %build_dirac
 BuildRequires:	libdirac-devel >= 0.9.0
 %endif
+%if %build_schroedinger
 BuildRequires:	libschroedinger-devel
+%endif
 %if %build_dv
 BuildRequires:	libdv-devel
 %endif
