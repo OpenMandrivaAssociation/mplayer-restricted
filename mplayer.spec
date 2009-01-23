@@ -13,7 +13,7 @@
 %define prerel		rc2
 %define version 1.0
 %define fversion %svn
-%define svn r28347
+%define svn r28348
 %if %svn
 %define rel		1.%prerel.23.%svn.1
 %else 
@@ -201,7 +201,6 @@ Source0:	%{Name}-%{fversion}.tar.bz2
 Source4:	Blue-1.5.tar.bz2
 Source5:	kernel-version.sh
 Patch0:		mplayer-mdvconfig.patch
-Patch1:		MPlayer-gnome-screensaver.patch
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
 Patch12:	mplayer-desktopentry.patch
@@ -430,7 +429,6 @@ find DOCS -name .svn|xargs rm -rf
 chmod 644 AUTHORS Changelog README Copyright
 rm -f Blue/README
 %patch0 -p1 -b .mdv
-#%patch1 -p0 -b .gnome-screensaver
 #%patch3 -p1 -b .mp2
 #%patch7 -p1 -b .mga
 %patch12 -p1 -b .desktopentry
@@ -653,24 +651,24 @@ ln -s Blue %buildroot%_datadir/%name/Skin/default
 (cd $RPM_BUILD_ROOT%{_bindir} && ln -s mplayer%{pkgext} gmplayer%{pkgext})
 # icons
 mkdir -p $RPM_BUILD_ROOT{%_liconsdir,%_iconsdir,%{_miconsdir}}
-convert -transparent white Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_liconsdir}/gmplayer%{pkgext}.png 
-convert -transparent white Blue/icons/icon32x32.png $RPM_BUILD_ROOT%{_iconsdir}/gmplayer%{pkgext}.png 
-convert -transparent white -scale 16x16 Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_miconsdir}/gmplayer%{pkgext}.png
+convert -transparent white Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_liconsdir}/mplayer%{pkgext}.png 
+convert -transparent white Blue/icons/icon32x32.png $RPM_BUILD_ROOT%{_iconsdir}/mplayer%{pkgext}.png 
+convert -transparent white -scale 16x16 Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_miconsdir}/mplayer%{pkgext}.png
 install -D -m 644 etc/mplayer.desktop %buildroot%_datadir/applications/mplayer%{pkgext}.desktop
-perl -pi -e 's@gmplayer$@gmplayer%{pkgext}@g' %buildroot%_datadir/applications/mplayer%{pkgext}.desktop
+perl -pi -e 's@mplayer$@mplayer%{pkgext}@g' %buildroot%_datadir/applications/mplayer%{pkgext}.desktop
 %endif
 %if %{build_3264bit}
-if [ -e %{buildroot}%{_liconsdir}/gmplayer%{pkgext}.png ]; then
-	convert %{buildroot}%{_liconsdir}/gmplayer%{pkgext}.png -channel green -negate \
-		%{buildroot}%{_liconsdir}/gmplayer%{pkgext}.png
+if [ -e %{buildroot}%{_liconsdir}/mplayer%{pkgext}.png ]; then
+	convert %{buildroot}%{_liconsdir}/mplayer%{pkgext}.png -channel green -negate \
+		%{buildroot}%{_liconsdir}/mplayer%{pkgext}.png
 fi
-if [ -e %{buildroot}%{_iconsdir}/gmplayer%{pkgext}.png ]; then
-	convert %{buildroot}%{_iconsdir}/gmplayer%{pkgext}.png -channel green -negate \
-		%{buildroot}%{_iconsdir}/gmplayer%{pkgext}.png
+if [ -e %{buildroot}%{_iconsdir}/mplayer%{pkgext}.png ]; then
+	convert %{buildroot}%{_iconsdir}/mplayer%{pkgext}.png -channel green -negate \
+		%{buildroot}%{_iconsdir}/mplayer%{pkgext}.png
 fi
-if [ -e %{buildroot}%{_miconsdir}/gmplayer%{pkgext}.png ]; then
-	convert %{buildroot}%{_miconsdir}/gmplayer%{pkgext}.png -channel green -negate \
-        	%{buildroot}%{_miconsdir}/gmplayer%{pkgext}.png
+if [ -e %{buildroot}%{_miconsdir}/mplayer%{pkgext}.png ]; then
+	convert %{buildroot}%{_miconsdir}/mplayer%{pkgext}.png -channel green -negate \
+        	%{buildroot}%{_miconsdir}/mplayer%{pkgext}.png
 fi
 %endif
 
@@ -751,9 +749,9 @@ rm -rf %{buildroot}
 %{_bindir}/gmplayer%{pkgext}
 %_datadir/applications/mplayer%{pkgext}.desktop
 %_datadir/%name/Skin/
-%{_iconsdir}/gmplayer%{pkgext}.png
-%{_miconsdir}/gmplayer%{pkgext}.png
-%{_liconsdir}/gmplayer%{pkgext}.png
+%{_iconsdir}/mplayer%{pkgext}.png
+%{_miconsdir}/mplayer%{pkgext}.png
+%{_liconsdir}/mplayer%{pkgext}.png
 %endif
 
 
