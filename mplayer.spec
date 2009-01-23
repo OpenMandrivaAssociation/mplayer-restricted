@@ -460,7 +460,9 @@ export CFLAGS="$CFLAGS -g"
 %ifarch ppc
 export CFLAGS="$CFLAGS -mcpu=7450 -maltivec"
 %endif
+%if %build_directfb
 export CPPFLAGS="-I%_includedir/directfb"
+%endif
 %if %{build_3264bit}
 export EXESUF=32
 %endif
