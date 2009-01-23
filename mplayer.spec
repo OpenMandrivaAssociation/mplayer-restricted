@@ -446,7 +446,7 @@ rm -f Blue/README
 %patch31 -p0 -b .format~
 %patch33 -p0
 
-perl -pi -e "s^%fversion^%version-%release^" version.sh
+perl -pi -e 's^r\$\{svn_revision\}^%release^' version.sh
 
 mv DOCS/README README.DOCS
 
