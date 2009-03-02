@@ -13,7 +13,7 @@
 %define prerel		rc2
 %define version 1.0
 %define fversion %svn
-%define svn r28387
+%define svn r28791
 %if %svn
 %define rel		1.%prerel.23.%svn.1
 %else 
@@ -31,6 +31,7 @@
 %define kver 		%(/bin/bash %{SOURCE5} | sed -e 's/-/./')
 %define kvername	%(/bin/bash %{SOURCE5} | sed -e 's/-/./' | sed -e 's/mdk//')
 
+%define build_yasm	1
 %define build_live	1
 %define build_vesa	1
 %define build_theora	1
@@ -94,8 +95,10 @@
 %endif
 
 %if %mdvver <= 200900
+# gw these were not in main before 2009.1
 %define build_dirac 0
 %define build_schroedinger 0
+%define build_yasm 0
 %endif
 
 %if %mdkversion >= 200900
@@ -118,6 +121,11 @@
 %define build_x264 1
 %define build_xvid 1
 %define build_dts 1
+%define build_yasm 1
+%if %mdvver >= 200900
+%define build_dirac 1
+%define build_schroedinger 1
+%endif
 %else
 %define realpath %{_libdir}/RealPlayer10GOLD/codecs
 %endif
@@ -126,6 +134,8 @@
 %{?_without_amr: %{expand: %%global build_amr 0}}
 %{?_with_live: %{expand: %%global build_live 1}}
 %{?_without_live: %{expand: %%global build_live 0}}
+%{?_with_yasm: %{expand: %%global build_yasm 1}}
+%{?_without_yasm: %{expand: %%global build_yasm 0}}
 %{?_with_vesa: %{expand: %%global build_vesa 1}}
 %{?_without_vesa: %{expand: %%global build_vesa 0}}
 %{?_with_optimization: %{expand: %%global build_optimization 1}}
@@ -323,6 +333,7 @@ BuildRequires: libenca-devel
 %if %build_directfb
 BuildRequires: libdirectfb-devel
 %endif
+BuildRequires: bzip2-devel
 BuildRequires: libmng-devel
 BuildRequires: libxvmc-devel
 BuildRequires: libmesagl-devel
@@ -337,6 +348,9 @@ BuildRequires: docbook-style-xsl
 BuildRequires: docbook-dtd412-xml
 BuildRequires: libcaca-devel
 BuildRequires: ungif-devel
+%if %build_yasm
+BuildRequires: yasm
+%endif
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 Provides:	mplayer%{pkgext}1.0
@@ -443,7 +457,7 @@ rm -f Blue/README
 %patch26 -p1
 %endif
 %patch28 -p1 -b .rtsp-extra-fixes
-%patch31 -p0 -b .format~
+%patch31 -p1 -b .format~
 %patch33 -p0
 
 perl -pi -e 's^r\$\{svn_revision\}^%release^' version.sh
@@ -633,7 +647,7 @@ install -m 644 DOCS/man/de/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/de/man1/mplayer%{
 install -m 644 DOCS/man/fr/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/fr/man1/mplayer%{pkgext}.1
 install -m 644 DOCS/man/hu/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/hu/man1/mplayer%{pkgext}.1
 install -m 644 DOCS/man/pl/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/pl/man1/mplayer%{pkgext}.1
-install -m 644 DOCS/man/zh/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/zh_CN/man1/mplayer%{pkgext}.1
+install -m 644 DOCS/man/zh_CN/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/zh_CN/man1/mplayer%{pkgext}.1
 install -m 644 DOCS/man/es/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/es/man1/mplayer%{pkgext}.1
 install -m 644 DOCS/man/it/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/it/man1/mplayer%{pkgext}.1
  
