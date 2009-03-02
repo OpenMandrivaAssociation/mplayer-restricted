@@ -15,7 +15,7 @@
 %define fversion %svn
 %define svn r28791
 %if %svn
-%define rel		1.%prerel.23.%svn.1
+%define rel		1.%prerel.23.%svn.2
 %else 
 %define rel 1.%prerel.23
 %endif
@@ -68,6 +68,7 @@
 %define build_directfb 1
 %define build_v4l2 1
 %define build_xvmc 1
+%define build_vdpau 1
 %define build_ivtv 0
 
 
@@ -92,6 +93,7 @@
 
 %if %mdvver < 200900
 %define build_ivtv 1
+%define build_vdpau 0
 %endif
 
 %if %mdvver <= 200900
@@ -201,6 +203,10 @@
 %{?_without_directfb: %{expand: %%global build_directfb 0}}
 %{?_with_v4l2: %{expand: %%global build_v4l2 1}}
 %{?_without_v4l2: %{expand: %%global build_v4l2 0}}
+%{?_with_xvmc: %{expand: %%global build_xvmc 1}}
+%{?_without_xvmc: %{expand: %%global build_xvmc 0}}
+%{?_with_vdpau: %{expand: %%global build_vdpau 1}}
+%{?_without_vdpau: %{expand: %%global build_vdpau 0}}
 
 Name:		%{name}
 Version:	%{version}
@@ -333,9 +339,14 @@ BuildRequires: libenca-devel
 %if %build_directfb
 BuildRequires: libdirectfb-devel
 %endif
+%if %build_xvmc
+BuildRequires: libxvmc-devel
+%endif
+%if %build_vdpau
+BuildRequires: vdpau-devel
+%endif
 BuildRequires: bzip2-devel
 BuildRequires: libmng-devel
-BuildRequires: libxvmc-devel
 BuildRequires: libmesagl-devel
 BuildRequires: libxxf86vm-devel
 BuildRequires: libxxf86dga-devel
@@ -622,6 +633,9 @@ export EXESUF=32
 %endif
 %if ! %build_ivtv
 	--disable-ivtv \
+%endif
+%if ! %build_vdpau
+	--disable-vdpau
 %endif
 
 
