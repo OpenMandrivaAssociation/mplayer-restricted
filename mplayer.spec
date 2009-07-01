@@ -13,9 +13,9 @@
 %define prerel		rc2
 %define version 1.0
 %define fversion %svn
-%define svn r28791
+%define svn r29409
 %if %svn
-%define rel		1.%prerel.23.%svn.2
+%define rel		1.%prerel.23.%svn.1
 %else 
 %define rel 1.%prerel.23
 %endif
@@ -228,7 +228,7 @@ Patch21:	mplayer-1.0rc2-compiz.patch
 #gw official security fixes:
 Patch26:	mplayer-1.0rc2-fribidi-0.19.patch
 # fixes for crashes found while fixing CVE-2008-1558
-Patch28:	mplayer-1.0rc1-rtsp-extra-fixes.patch
+Patch28:	mplayer-rtsp-extra-fixes.patch
 Patch31:       mplayer-format-string-literal.patch
 #gw HAVE_DLFCN_H isn't defined
 Patch33:       mplayer-have-dlfcn_h.patch
@@ -606,8 +606,6 @@ export EXESUF=32
 %endif
 %if ! %build_lzo
 	--disable-liblzo \
-%else
-	--with-extraincdir=%_includedir/lzo \
 %endif
 %if ! %build_sdl
 	--disable-sdl \
