@@ -13,7 +13,7 @@
 %define prerel		rc2
 %define version 1.0
 %define fversion %svn
-%define svn r29409
+%define svn r29416
 %if %svn
 %define rel		1.%prerel.23.%svn.1
 %else 
@@ -471,7 +471,7 @@ rm -f Blue/README
 %patch31 -p1 -b .format~
 %patch33 -p0
 
-perl -pi -e 's^r\$\{svn_revision\}^%release^' version.sh
+perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
 mv DOCS/README README.DOCS
 
@@ -643,6 +643,8 @@ make CC=gcc" -fno-unit-at-a-time" EXESUF=%{pkgext}
 %else
 make EXESUF=%{pkgext}
 %endif
+#gw make sure we have our version string included:
+fgrep %release version.h
 
 # build HTML docs
 (cd DOCS/xml && make)
