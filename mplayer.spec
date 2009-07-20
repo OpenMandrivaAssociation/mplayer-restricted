@@ -15,7 +15,7 @@
 %define fversion %svn
 %define svn r29433
 %if %svn
-%define rel		1.%prerel.24.%svn.1
+%define rel		1.%prerel.25.%svn.1
 %else 
 %define rel 1.%prerel.23
 %endif
@@ -490,6 +490,7 @@ export CPPFLAGS="-I%_includedir/directfb"
 %if %{build_3264bit}
 export EXESUF=32
 %endif
+export LDFLAGS="%{?ldflags}"
 ./configure \
 	--prefix=%{_prefix} \
 	--datadir=%{_datadir}/%{name} \
