@@ -13,7 +13,7 @@
 %define prerel		rc2
 %define version 1.0
 %define fversion %svn
-%define svn r29416
+%define svn r29433
 %if %svn
 %define rel		1.%prerel.23.%svn.1
 %else 
@@ -246,8 +246,7 @@ BuildRequires:	libaa-devel
 BuildRequires:  libarts-devel
 %endif
 %if %build_amr
-BuildRequires:  libamrnb-devel
-BuildRequires:  libamrwb-devel
+BuildRequires:  opencore-amr-devel
 %endif
 
 %if %build_jack
