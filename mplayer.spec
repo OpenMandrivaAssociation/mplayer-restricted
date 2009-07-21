@@ -13,7 +13,7 @@
 %define prerel		rc2
 %define version 1.0
 %define fversion %svn
-%define svn r29433
+%define svn r29434
 %if %svn
 %define rel		1.%prerel.25.%svn.1
 %else 
@@ -361,6 +361,7 @@ BuildRequires: ungif-devel
 %if %build_yasm
 BuildRequires: yasm
 %endif
+BuildRequires: libbs2b-devel
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 Provides:	mplayer%{pkgext}1.0
