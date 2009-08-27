@@ -10,14 +10,14 @@
 %define name		mplayer%{pkgext}
 %define Name		MPlayer
 %define Summary		Movie player for linux
-%define prerel		rc2
+%define prerel		rc3
 %define version 1.0
 %define fversion %svn
 %define svn r29554
 %if %svn
-%define rel		1.%prerel.25.%svn.1
+%define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.24
+%define rel 1.%prerel.1
 %endif
 %define release		%mkrel %rel
 
