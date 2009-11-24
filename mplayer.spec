@@ -13,9 +13,9 @@
 %define prerel		rc4
 %define version 1.0
 %define fversion %svn
-%define svn r29850
+%define svn r29964
 %if %svn
-%define rel		1.%prerel.0.%svn.3
+%define rel		1.%prerel.0.%svn.1
 %else 
 %define rel 1.%prerel.1
 %endif
@@ -234,6 +234,8 @@ Patch31:       mplayer-format-string-literal.patch
 Patch33:       mplayer-have-dlfcn_h.patch
 # (cg) Fix pulse initial volume setting
 Patch34: mplayer-pulse-initial-volume.patch
+#gw fix crash: https://qa.mandriva.com/show_bug.cgi?id=55443
+Patch35: mplayer-fix-dvd-crash.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -473,6 +475,7 @@ rm -f Blue/README
 %patch31 -p1 -b .format~
 %patch33 -p0
 %patch34 -p0
+%patch35 -p0
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
