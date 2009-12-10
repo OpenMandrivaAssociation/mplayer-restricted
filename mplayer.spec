@@ -13,7 +13,7 @@
 %define prerel		rc4
 %define version 1.0
 %define fversion %svn
-%define svn r29964
+%define svn r29987
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
@@ -463,7 +463,7 @@ find DOCS -type f|xargs chmod 644
 find DOCS -name .svn|xargs rm -rf
 chmod 644 AUTHORS Changelog README Copyright
 rm -f Blue/README
-%patch0 -p1 -b .mdv
+%patch0 -p0 -b .mdv
 #%patch3 -p1 -b .mp2
 #%patch7 -p1 -b .mga
 %patch12 -p1 -b .desktopentry
