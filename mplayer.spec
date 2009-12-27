@@ -13,7 +13,7 @@
 %define prerel		rc4
 %define version 1.0
 %define fversion %svn
-%define svn r29987
+%define svn r30130
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
@@ -232,8 +232,6 @@ Patch28:	mplayer-rtsp-extra-fixes.patch
 Patch31:       mplayer-format-string-literal.patch
 #gw HAVE_DLFCN_H isn't defined
 Patch33:       mplayer-have-dlfcn_h.patch
-# (cg) Fix pulse initial volume setting
-Patch34: mplayer-pulse-initial-volume.patch
 #gw fix crash: https://qa.mandriva.com/show_bug.cgi?id=55443
 Patch35: mplayer-fix-dvd-crash.patch
 URL:		http://www.mplayerhq.hu
@@ -474,7 +472,6 @@ rm -f Blue/README
 %patch28 -p1 -b .rtsp-extra-fixes
 %patch31 -p1 -b .format~
 %patch33 -p0
-%patch34 -p0
 %patch35 -p0
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
