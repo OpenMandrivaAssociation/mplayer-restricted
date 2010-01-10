@@ -13,9 +13,9 @@
 %define prerel		rc4
 %define version 1.0
 %define fversion %svn
-%define svn r30130
+%define svn r30268
 %if %svn
-%define rel		1.%prerel.0.%svn.2
+%define rel		1.%prerel.0.%svn.1
 %else 
 %define rel 1.%prerel.2
 %endif
@@ -234,6 +234,7 @@ Patch31:       mplayer-format-string-literal.patch
 Patch33:       mplayer-have-dlfcn_h.patch
 #gw fix crash: https://qa.mandriva.com/show_bug.cgi?id=55443
 Patch35: mplayer-fix-dvd-crash.patch
+Patch36: mplayer-fix-gif-check.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -244,6 +245,7 @@ BuildRequires:	libncurses-devel
 %if %build_aa
 BuildRequires:	libaa-devel
 %endif
+BuildRequires:  a52dec-devel
 %if %build_arts
 BuildRequires:  libarts-devel
 %endif
@@ -275,6 +277,7 @@ BuildRequires:	libdv-devel
 BuildRequires:	libdxr3-devel
 BuildRequires:	libesound-devel
 BuildRequires:	libjpeg-devel
+BuildRequires:	openjpeg-devel
 %if %build_lirc
 BuildRequires:	liblirc-devel
 %endif
@@ -359,7 +362,11 @@ BuildRequires: libxslt-proc
 BuildRequires: docbook-style-xsl
 BuildRequires: docbook-dtd412-xml
 BuildRequires: libcaca-devel
+%if %mdvver >= 201010
+BuildRequires: giflib-devel
+%else
 BuildRequires: ungif-devel
+%endif
 %if %build_yasm
 BuildRequires: yasm
 %endif
@@ -473,6 +480,7 @@ rm -f Blue/README
 %patch31 -p1 -b .format~
 %patch33 -p0
 %patch35 -p0
+%patch36 -p0
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
@@ -617,8 +625,8 @@ export LDFLAGS="%{?ldflags}"
 %if ! %build_alsa
 	--disable-alsa \
 %endif
-%if %build_fribidi
-	--enable-fribidi \
+%if ! %build_fribidi
+	--disable-fribidi \
 %endif
 %if !%build_enca
 	--disable-enca \
