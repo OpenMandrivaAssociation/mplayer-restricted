@@ -13,7 +13,7 @@
 %define prerel		rc4
 %define version 1.0
 %define fversion %svn
-%define svn r30268
+%define svn r30392
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
