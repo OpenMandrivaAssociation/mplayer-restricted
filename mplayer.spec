@@ -13,7 +13,7 @@
 %define prerel		rc4
 %define version 1.0
 %define fversion %svn
-%define svn r30392
+%define svn r31086
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
@@ -113,7 +113,6 @@
 
 %{?_with_plf: %{expand: %%global build_plf 1}}
 %if %build_plf
-%define realpath %{_libdir}/real
 %define distsuffix plf
 %define build_amr 1
 %define build_twolame 1
@@ -128,8 +127,6 @@
 %define build_dirac 1
 %define build_schroedinger 1
 %endif
-%else
-%define realpath %{_libdir}/RealPlayer10GOLD/codecs
 %endif
 
 %{?_with_amr: %{expand: %%global build_amr 1}}
@@ -395,10 +392,10 @@ and DXR3/Hollywood+! And what about the nice big antialiased shaded
 subtitles (9 supported types!!!) with european/ISO 8859-1,2 (hungarian,
 english, czech, etc), cyrillic, korean fonts, and OSD?
 
-%if ! %build_plf
 Note: If you want to play Real content, you need to have the content
-of RealPlayer's Codecs directory in %realpath
-%else
+of RealPlayer's Codecs directory in %_libdir/codecs/
+%if %build_plf
+
 This package is in PLF because some included codecs are covered by
 patents.  It also includes support for reading DVDs encrypted with CSS
 which might be illegal in some countries.
@@ -592,15 +589,10 @@ export LDFLAGS="%{?ldflags}"
        --disable-dvb \
        --disable-dvbhead \
 %endif
-	--xanimcodecsdir=%{_prefix}/X11R6/lib/xanim/mods \
-	--realcodecsdir=%{realpath} \
 %if ! %build_ggi
 	--disable-ggi \
 %endif
-%ifarch %ix86
-	\
-	--win32codecsdir=%{_prefix}/lib/win32 \
-%endif
+	--codecsdir=%{_libdir}/codecs \
 %if ! %build_arts
 	--disable-arts \
 %endif
