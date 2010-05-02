@@ -15,7 +15,7 @@
 %define fversion %svn
 %define svn r31086
 %if %svn
-%define rel		1.%prerel.0.%svn.1
+%define rel		1.%prerel.0.%svn.2
 %else 
 %define rel 1.%prerel.2
 %endif
@@ -218,6 +218,8 @@ Source0:	%{Name}-%{fversion}.tar.bz2
 Source4:	Blue-1.5.tar.bz2
 Source5:	kernel-version.sh
 Patch0:		mplayer-mdvconfig.patch
+#anssi fix vp6f playback, patch okayed by ffmpeg upstream
+Patch1:		mplayer-fix-vp6f.patch
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
 Patch12:	mplayer-desktopentry.patch
@@ -466,6 +468,7 @@ find DOCS -name .svn|xargs rm -rf
 chmod 644 AUTHORS Changelog README Copyright
 rm -f Blue/README
 %patch0 -p0 -b .mdv
+%patch1 -p1 -b .vp6f
 #%patch3 -p1 -b .mp2
 #%patch7 -p1 -b .mga
 %patch12 -p1 -b .desktopentry
