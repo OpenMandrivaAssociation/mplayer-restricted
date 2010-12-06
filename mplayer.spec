@@ -345,6 +345,11 @@ BuildRequires: libxvmc-devel
 %if %build_vdpau
 BuildRequires: vdpau-devel
 %endif
+BuildRequires: libass-devel
+BuildRequires: gsm-devel
+BuildRequires: libmpg123-devel
+BuildRequires: libvpx-devel
+BuildRequires: rtmp-devel
 BuildRequires: bzip2-devel
 BuildRequires: libmng-devel
 BuildRequires: libmesagl-devel
