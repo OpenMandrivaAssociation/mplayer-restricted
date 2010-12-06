@@ -13,9 +13,9 @@
 %define prerel		rc4
 %define version 1.0
 %define fversion %svn
-%define svn r31086
+%define svn r32675
 %if %svn
-%define rel		1.%prerel.0.%svn.4
+%define rel		1.%prerel.0.%svn.1
 %else 
 %define rel 1.%prerel.3
 %endif
@@ -210,6 +210,7 @@ Version:	%{version}
 Release:	%{release}
 Summary:	%{Summary}
 %if %svn
+#gw generated using svn export
 Source0:	%{name}-%{svn}.tar.xz
 %else
 Source0:	%{Name}-%{fversion}.tar.bz2
@@ -219,13 +220,10 @@ Source4:	Blue-1.5.tar.bz2
 Source5:	kernel-version.sh
 Patch0:		mplayer-mdvconfig.patch
 #anssi fix vp6f playback, patch okayed by ffmpeg upstream
-Patch1:		mplayer-fix-vp6f.patch
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
 Patch12:	mplayer-desktopentry.patch
 Patch21:	mplayer-1.0rc2-compiz.patch
-#gw official security fixes:
-Patch26:	mplayer-1.0rc2-fribidi-0.19.patch
 # fixes for crashes found while fixing CVE-2008-1558
 Patch28:	mplayer-rtsp-extra-fixes.patch
 Patch31:       mplayer-format-string-literal.patch
@@ -233,7 +231,6 @@ Patch31:       mplayer-format-string-literal.patch
 Patch33:       mplayer-have-dlfcn_h.patch
 #gw fix crash: https://qa.mandriva.com/show_bug.cgi?id=55443
 Patch35: mplayer-fix-dvd-crash.patch
-Patch36: mplayer-fix-gif-check.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -461,26 +458,21 @@ rm -rf $RPM_BUILD_ROOT
 %else
 %setup -q -n MPlayer-%{version}%{prerel} -a 4
 %endif
-#gw fix permissions
-find DOCS -type d|xargs chmod 755
-find DOCS -type f|xargs chmod 644
+#gw as we have have used svn export:
+echo %svn|sed s/^r// > snapshot_version
 find DOCS -name .svn|xargs rm -rf
+#gw fix permissions
 chmod 644 AUTHORS Changelog README Copyright
 rm -f Blue/README
 %patch0 -p0 -b .mdv
-%patch1 -p1 -b .vp6f
 #%patch3 -p1 -b .mp2
 #%patch7 -p1 -b .mga
 %patch12 -p1 -b .desktopentry
 #%patch21 -p0 -b .compiz
-%if %mdvver >= 200900
-%patch26 -p1
-%endif
 %patch28 -p1 -b .rtsp-extra-fixes
 %patch31 -p1 -b .format~
 %patch33 -p0
 %patch35 -p0
-%patch36 -p0
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
@@ -535,6 +527,7 @@ export LDFLAGS="%{?ldflags}"
 	\
 %if ! %build_faad
 	--disable-faad-internal \
+	--disable-decoder=AAC \
 %endif
 	--disable-libdvdcss-internal \
 %if %build_lirc
