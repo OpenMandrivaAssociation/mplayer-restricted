@@ -71,6 +71,7 @@
 %define build_vdpau 1
 %define build_ivtv 0
 %define build_libass 1
+%define build_vpx 1
 
 %if %mdvver < 200900
 %define build_ivtv 1
@@ -90,6 +91,7 @@
 
 %if %mdvver < 201100
 %define build_libass 0
+%define build_vpx 0
 %endif
 
 %ifnarch %ix86
@@ -191,6 +193,9 @@
 %{?_without_xvmc: %{expand: %%global build_xvmc 0}}
 %{?_with_vdpau: %{expand: %%global build_vdpau 1}}
 %{?_without_vdpau: %{expand: %%global build_vdpau 0}}
+%{?_with_vpx: %{expand: %%global build_vpx 1}}
+%{?_without_vpx: %{expand: %%global build_vpx 0}}
+
 
 Name:		%{name}
 Version:	%{version}
@@ -334,7 +339,9 @@ BuildRequires: libass-devel
 %endif
 BuildRequires: gsm-devel
 BuildRequires: libmpg123-devel
+%if %build_vpx
 BuildRequires: libvpx-devel
+%endif
 BuildRequires: rtmp-devel
 BuildRequires: bzip2-devel
 BuildRequires: libmng-devel
