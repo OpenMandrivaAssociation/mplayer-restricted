@@ -221,9 +221,6 @@ Patch35: mplayer-fix-dvd-crash.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
-%if %build_dvb && %mdkversion < 1000
-BuildRequires:  kernel-source
-%endif
 BuildRequires:	libncurses-devel
 %if %build_aa
 BuildRequires:	libaa-devel
@@ -571,11 +568,7 @@ export LDFLAGS="%{?ldflags}"
 %if %build_smb
 	--enable-smb \
 %endif
-%if %build_dvb
-%if %mdkversion < 1000
-	--with-dvbincdir=/usr/src/linux/3rdparty/mod_dvb/include \
-%endif
-%else
+%if ! %build_dvb
        --disable-dvb \
        --disable-dvbhead \
 %endif
@@ -632,11 +625,7 @@ export LDFLAGS="%{?ldflags}"
 
 
 # Keep this line before empty end %%configure (ppc conditionnal pb)
-%if %mdkversion == 1000 && %build_optimization
-make CC=gcc" -fno-unit-at-a-time" EXESUF=%{pkgext}
-%else
 make EXESUF=%{pkgext}
-%endif
 #gw make sure we have our version string included:
 fgrep %release version.h
 
