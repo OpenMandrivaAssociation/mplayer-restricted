@@ -72,6 +72,7 @@
 %define build_ivtv 0
 %define build_libass 1
 %define build_vpx 1
+%define build_rtmp 1
 
 %if %mdvver < 200900
 %define build_ivtv 1
@@ -89,9 +90,10 @@
 %define build_smb       0
 %endif
 
-%if %mdvver < 201100
+%if %mdvver < 201100 && !%build_plf
 %define build_libass 0
 %define build_vpx 0
+%define build_rtmp 0
 %endif
 
 %ifnarch %ix86
@@ -187,6 +189,8 @@
 %{?_without_dts: %{expand: %%global build_dts 0}}
 %{?_with_directfb: %{expand: %%global build_directfb 1}}
 %{?_without_directfb: %{expand: %%global build_directfb 0}}
+%{?_with_rtmp: %{expand: %%global build_rtmp 1}}
+%{?_without_rtmp: %{expand: %%global build_rtmp 0}}
 %{?_with_v4l2: %{expand: %%global build_v4l2 1}}
 %{?_without_v4l2: %{expand: %%global build_v4l2 0}}
 %{?_with_xvmc: %{expand: %%global build_xvmc 1}}
@@ -342,7 +346,9 @@ BuildRequires: libmpg123-devel
 %if %build_vpx
 BuildRequires: libvpx-devel
 %endif
+%if %build_rtmp
 BuildRequires: rtmp-devel
+%endif
 BuildRequires: bzip2-devel
 BuildRequires: libmng-devel
 BuildRequires: libmesagl-devel
