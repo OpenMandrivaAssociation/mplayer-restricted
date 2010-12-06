@@ -70,26 +70,7 @@
 %define build_xvmc 1
 %define build_vdpau 1
 %define build_ivtv 0
-
-
-%if %mdkversion < 920
-%define build_smb 0
-%define build_jack 0
-%endif
-
-%if %mdkversion < 1000
-%define build_openal 0
-%define build_theora 0
-%define build_directfb 0
-%endif
-
-%if %mdkversion < 1020
-%define build_v4l2	0
-%endif
-
-%if %mdkversion < 200700
-%define build_pulse	0
-%endif
+%define build_libass 1
 
 %if %mdvver < 200900
 %define build_ivtv 1
@@ -105,6 +86,10 @@
 
 %if %mdkversion >= 200900
 %define build_smb       0
+%endif
+
+%if %mdvver < 201100
+%define build_libass 0
 %endif
 
 %ifnarch %ix86
@@ -176,6 +161,8 @@
 %{?_without_enca: %{expand: %%global build_enca 0}}
 %{?_with_jack: %{expand: %%global build_jack 1}}
 %{?_without_jack: %{expand: %%global build_jack 0}}
+%{?_with_libass: %{expand: %%global build_libass 1}}
+%{?_without_libass: %{expand: %%global build_libass 0}}
 %{?_with_pulse: %{expand: %%global build_pulse 1}}
 %{?_without_pulse: %{expand: %%global build_pulse 0}}
 %{?_with_openal: %{expand: %%global build_openal 1}}
@@ -345,7 +332,9 @@ BuildRequires: libxvmc-devel
 %if %build_vdpau
 BuildRequires: vdpau-devel
 %endif
+%if %build_libass
 BuildRequires: libass-devel
+%endif
 BuildRequires: gsm-devel
 BuildRequires: libmpg123-devel
 BuildRequires: libvpx-devel
