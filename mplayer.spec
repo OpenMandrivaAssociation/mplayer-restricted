@@ -300,7 +300,7 @@ BuildRequires:	libfaac-devel
 BuildRequires: libfaad2-devel
 %endif
 %if %build_x264
-BuildRequires:	libx264-devel >= 0.89
+BuildRequires:	libx264-devel >= 0.99
 %endif
 %if %build_xvid
 BuildRequires:	xvid-devel >= 1.0.0-0.beta2.1plf
