@@ -103,6 +103,10 @@
 %{?_with_plf: %{expand: %%global build_plf 1}}
 %if %build_plf
 %define distsuffix plf
+%if %mdvver >= 201100
+# make EVR of plf build higher than regular to allow update, needed with rpm5 mkrel
+%define extrarelsuffix plf
+%endif
 %define build_amr 1
 %define build_twolame 1
 %define build_lame 1
@@ -203,7 +207,7 @@
 
 Name:		%{name}
 Version:	%{version}
-Release:	%{release}
+Release:	%{release}%{?extrarelsuffix}
 Summary:	%{Summary}
 %if %svn
 #gw generated using svn export
