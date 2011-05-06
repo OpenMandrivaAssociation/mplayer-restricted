@@ -629,7 +629,7 @@ export LDFLAGS="%{?ldflags}"
 %if !%build_openal
 	--disable-openal \
 %endif
-	--enable-zr \
+	--disable-zr \
 %if %build_xvmc
 	--enable-xvmc \
 %endif
