@@ -15,7 +15,7 @@
 %define fversion %svn
 %define svn r32713
 %if %svn
-%define rel		1.%prerel.0.%svn.3
+%define rel		1.%prerel.0.%svn.4
 %else 
 %define rel 1.%prerel.4
 %endif
@@ -231,6 +231,8 @@ Patch31:       mplayer-format-string-literal.patch
 Patch33:       mplayer-have-dlfcn_h.patch
 #gw fix crash: https://qa.mandriva.com/show_bug.cgi?id=55443
 Patch35: mplayer-fix-dvd-crash.patch
+#(proyvind): fix high pitch hiss sound when playing mp3s
+Patch36:	mplayer-r32713-mp3lib-gcc-4.6-fix.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -481,6 +483,7 @@ rm -f Blue/README
 %patch31 -p1 -b .format~
 %patch33 -p0
 %patch35 -p0
+%patch36 -p1 -b .gcc46~
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
