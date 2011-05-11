@@ -15,7 +15,7 @@
 %define fversion %svn
 %define svn r32713
 %if %svn
-%define rel		1.%prerel.0.%svn.4
+%define rel		1.%prerel.0.%svn.5
 %else 
 %define rel 1.%prerel.4
 %endif
@@ -233,6 +233,7 @@ Patch33:       mplayer-have-dlfcn_h.patch
 Patch35: mplayer-fix-dvd-crash.patch
 #(proyvind): fix high pitch hiss sound when playing mp3s
 Patch36:	mplayer-r32713-mp3lib-gcc-4.6-fix.patch
+Patch37:	Fix-ff_imdct_calc_sse-on-gcc-4.6.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -484,6 +485,7 @@ rm -f Blue/README
 %patch33 -p0
 %patch35 -p0
 %patch36 -p1 -b .gcc46~
+%patch37 -p1
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
