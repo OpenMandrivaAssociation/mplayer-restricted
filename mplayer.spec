@@ -234,6 +234,7 @@ Patch35: mplayer-fix-dvd-crash.patch
 #(proyvind): fix high pitch hiss sound when playing mp3s
 Patch36:	mplayer-r32713-mp3lib-gcc-4.6-fix.patch
 Patch37:	Fix-ff_imdct_calc_sse-on-gcc-4.6.patch
+Patch38:	mplayer-libpng15.diff
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -486,6 +487,7 @@ rm -f Blue/README
 %patch35 -p0
 %patch36 -p1 -b .gcc46~
 %patch37 -p1
+%patch38 -p0 -b .libpng15
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
