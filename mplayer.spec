@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.7
 %else 
-%define rel 1.%prerel.5
+%define rel 1.%prerel.6
 %endif
 %define release		%mkrel %rel
 
@@ -235,6 +235,7 @@ Patch35: mplayer-fix-dvd-crash.patch
 Patch36:	mplayer-r32713-mp3lib-gcc-4.6-fix.patch
 Patch37:	Fix-ff_imdct_calc_sse-on-gcc-4.6.patch
 Patch38:	mplayer-libpng15.diff
+Patch39:	mplayer-dlopen-libfaac-libfaad-and-libx264.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -272,7 +273,6 @@ BuildRequires:	libschroedinger-devel
 BuildRequires:	libdv-devel
 %endif
 BuildRequires:	libdxr3-devel
-BuildRequires:	libesound-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	openjpeg-devel
 %if %build_lirc
@@ -488,6 +488,7 @@ rm -f Blue/README
 %patch36 -p1 -b .gcc46~
 %patch37 -p1
 %patch38 -p0 -b .libpng15
+%patch39 -p1 -b .dlopen~
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
@@ -543,6 +544,13 @@ export LDFLAGS="%{?ldflags}"
 %if ! %build_faad
 	--disable-faad-internal \
 	--disable-decoder=AAC \
+	--enable-faad-dlopen \
+%endif
+%if !%build_faac
+	--enable-faac-dlopen \
+%endif
+%if !%build_x264
+	--enable-x264-dlopen \
 %endif
 	--disable-libdvdcss-internal \
 %if %build_lirc
