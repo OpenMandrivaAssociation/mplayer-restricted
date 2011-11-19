@@ -370,8 +370,7 @@ Suggests:	libfaac.so.0%{_ext}
 Suggests:	libfaad.so.2%{_ext}
 Suggests:	libx264.so.115%{_ext}
 
-Provides:	mplayer%{pkgext}1.0
-Obsoletes:	mplayer%{pkgext}1.0
+%rename		mplayer%{pkgext}1.0
 
 
 %description
@@ -421,8 +420,7 @@ BuildRequires:	imagemagick
 Requires(post): desktop-file-utils
 Requires(postun): desktop-file-utils
 Requires: soundwrapper
-Provides:	mplayer%{pkgext}1.0-gui
-Obsoletes:	mplayer%{pkgext}1.0-gui
+%rename		mplayer%{pkgext}1.0-gui
 Conflicts:	mplayer-skins < 1.3-8mdk
 
 %description gui
@@ -434,8 +432,7 @@ This package contains a GUI for %{name}.
 Summary: MPlayer's movie encoder
 Group:		Video
 Requires:	%{name} = %version
-Provides:	mencoder%{pkgext}1.0
-Obsoletes:	mencoder%{pkgext}1.0
+%rename		mencoder%{pkgext}1.0
 
 %description -n mencoder%{pkgext}
 MEncoder a movie encoder and is a part of the MPlayer package.
