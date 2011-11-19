@@ -421,8 +421,6 @@ Group:		Video
 Requires:	%{name} = %{version}
 BuildRequires:	gtk+2-devel
 BuildRequires:	imagemagick
-Requires(post): desktop-file-utils
-Requires(postun): desktop-file-utils
 Requires: soundwrapper
 %rename		mplayer%{pkgext}1.0-gui
 Conflicts:	mplayer-skins < 1.3-8mdk
