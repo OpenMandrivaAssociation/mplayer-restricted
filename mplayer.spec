@@ -646,7 +646,7 @@ make EXESUF=%{pkgext}
 fgrep %release version.h
 
 # build HTML docs
-(cd DOCS/xml && make)
+cd DOCS/xml && make
 
 %install
 rm -rf $RPM_BUILD_ROOT
