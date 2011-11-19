@@ -379,6 +379,14 @@ BuildRequires: ungif-devel
 BuildRequires: yasm
 %endif
 BuildRequires: libbs2b-devel
+%if "%{_lib}" == "lib64"
+%global	_ext	()(64bit)
+%else
+%global	_ext	%{nil}
+%endif
+Suggests:	libfaac.so.0%{_ext}
+Suggests:	libfaad.so.2%{_ext}
+Suggests:	libx264.so.115%{_ext}
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 Provides:	mplayer%{pkgext}1.0
