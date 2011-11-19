@@ -681,7 +681,7 @@ install -d -m 755 %buildroot%_datadir/%name/Skin/
 cp -r Blue %buildroot%_datadir/%name/Skin/
 ln -s Blue %buildroot%_datadir/%name/Skin/default
 # gmplayer equals mplayer -gui
-(cd $RPM_BUILD_ROOT%{_bindir} && ln -s mplayer%{pkgext} gmplayer%{pkgext})
+ln -s mplayer%{pkgext} $RPM_BUILD_ROOT%{_bindir}/gmplayer%{pkgext})
 # icons
 mkdir -p $RPM_BUILD_ROOT{%_liconsdir,%_iconsdir,%{_miconsdir}}
 convert -transparent white Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_liconsdir}/mplayer%{pkgext}.png 
