@@ -74,22 +74,6 @@
 %define build_vpx 1
 %define build_rtmp 1
 
-%if %mdvver < 200900
-%define build_ivtv 1
-%define build_vdpau 0
-%endif
-
-%if %mdvver <= 200900
-# gw these were not in main before 2009.1
-%define build_dirac 0
-%define build_schroedinger 0
-%define build_yasm 0
-%endif
-
-%if %mdkversion >= 200900
-%define build_smb       0
-%endif
-
 %if %mdvver < 201100 && !%build_plf
 %define build_libass 0
 %define build_vpx 0
@@ -116,10 +100,8 @@
 %define build_xvid 1
 %define build_dts 1
 %define build_yasm 1
-%if %mdvver >= 200900
 %define build_dirac 1
 %define build_schroedinger 1
-%endif
 %endif
 
 %{?_with_amr: %{expand: %%global build_amr 1}}
@@ -388,7 +370,6 @@ Suggests:	libfaac.so.0%{_ext}
 Suggests:	libfaad.so.2%{_ext}
 Suggests:	libx264.so.115%{_ext}
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 Provides:	mplayer%{pkgext}1.0
 Obsoletes:	mplayer%{pkgext}1.0
 
@@ -471,8 +452,6 @@ be illegal in some countries.
 
 
 %prep
-rm -rf $RPM_BUILD_ROOT
-
 %if %svn
 %setup -q -n %name -a 4
 %else
@@ -734,37 +713,14 @@ fi
 %if %build_debug
 export DONT_STRIP=1
 %endif
-%if %mdkversion < 200900
-%post -p /sbin/ldconfig
-%endif
-%if %mdkversion < 200900
-%postun -p /sbin/ldconfig
-%endif
-
 %if %build_gui
 %pre gui
 if [ -d %_datadir/%name/Skin/default ]
   then rm -rf %_datadir/%name/Skin/default
 fi
-%if %mdkversion < 200900
-%post gui
-%{update_menus}
-%update_desktop_database
 %endif
-
-%if %mdkversion < 200900
-%postun gui
-%{clean_menus}
-%clean_desktop_database
-%endif
-%endif
-
-
-%clean
-rm -rf %{buildroot}
 
 %files
-%defattr(-,root,root)
 %doc AUTHORS Changelog README Copyright
 %dir %{_sysconfdir}/%name
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/mplayer.conf
@@ -782,12 +738,11 @@ rm -rf %{buildroot}
 %dir %{_datadir}/%{name}
 
 %files doc
-%defattr(-,root,root)
 %doc README.DOCS
 %doc DOCS/default.css DOCS/HTML DOCS/tech/
+
 %if %build_mencoder
 %files -n mencoder%{pkgext}
-%defattr(-,root,root)
 %{_bindir}/mencoder%{pkgext}
 %{_bindir}/divx2svcd%{pkgext}
 %{_bindir}/mencvcd%{pkgext}
@@ -804,7 +759,6 @@ rm -rf %{buildroot}
 
 %if %build_gui
 %files gui
-%defattr(-,root,root)
 %{_bindir}/gmplayer%{pkgext}
 %_datadir/applications/mplayer%{pkgext}.desktop
 %_datadir/%name/Skin/
@@ -812,5 +766,3 @@ rm -rf %{buildroot}
 %{_miconsdir}/mplayer%{pkgext}.png
 %{_liconsdir}/mplayer%{pkgext}.png
 %endif
-
-
