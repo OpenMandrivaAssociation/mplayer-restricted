@@ -74,6 +74,10 @@
 %define build_vpx 1
 %define build_rtmp 1
 
+%if %mdkversion >= 200900
+%define build_smb       0
+%endif
+
 %if %mdvver < 201100 && !%build_plf
 %define build_libass 0
 %define build_vpx 0
@@ -649,26 +653,22 @@ fgrep %release version.h
 cd DOCS/xml && make
 
 %install
-rm -rf $RPM_BUILD_ROOT
-install -d -m 755 $RPM_BUILD_ROOT%{_bindir}
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/%name
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/%name
-install -d -m 755 $RPM_BUILD_ROOT%{_mandir}/{de,fr,hu,pl,es,it,zh_CN,""}/man1
-install -m 755 mplayer%{pkgext} $RPM_BUILD_ROOT%{_bindir}
-install -m 644 DOCS/man/en/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/man1/mplayer%{pkgext}.1
-install -m 644 DOCS/man/de/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/de/man1/mplayer%{pkgext}.1
-install -m 644 DOCS/man/fr/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/fr/man1/mplayer%{pkgext}.1
-install -m 644 DOCS/man/hu/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/hu/man1/mplayer%{pkgext}.1
-install -m 644 DOCS/man/pl/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/pl/man1/mplayer%{pkgext}.1
-install -m 644 DOCS/man/zh_CN/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/zh_CN/man1/mplayer%{pkgext}.1
-install -m 644 DOCS/man/es/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/es/man1/mplayer%{pkgext}.1
-install -m 644 DOCS/man/it/mplayer.1 $RPM_BUILD_ROOT%{_mandir}/it/man1/mplayer%{pkgext}.1
- 
+install -m755 mplayer%{pkgext} -D $RPM_BUILD_ROOT%{_bindir}/mplayer%{pkgext}
+for lang in de fr hu pl es it zh_CN en; do
+    install -m644 DOCS/man/$lang/mplayer.1 -D $RPM_BUILD_ROOT%{_mandir}/$([ "$lang" != "en" ] && echo $lang)/man1/mplayer%{pkgext}.1
+done 
+%find_lang mplayer%{pkgext} --with-man
+
 %if %build_mencoder
-install -m 755 mencoder%{pkgext} $RPM_BUILD_ROOT%{_bindir}
-for man_dir in $RPM_BUILD_ROOT%{_mandir}/{de,fr,hu,pl,es,it,zh_CN,""}/man1; do
-(cd $man_dir && ln -s mplayer%{pkgext}.1 mencoder%{pkgext}.1)
-done
+install -m755 mencoder%{pkgext} -D $RPM_BUILD_ROOT%{_bindir}/mencoder%{pkgext}
+
+for lang in de fr hu pl es it zh_CN en; do
+    ln -s mplayer%{pkgext}.1 $RPM_BUILD_ROOT%{_mandir}/$([ "$lang" != "en" ] && echo $lang)/man1/mencoder%{pkgext}.1
+done 
+%find_lang mencoder%{pkgext} --with-man
+
 install -m 755 TOOLS/mencvcd.sh %buildroot%_bindir/mencvcd%{pkgext}
 install -m 755 TOOLS/divx2svcd.sh %buildroot%_bindir/divx2svcd%{pkgext}
 install -m 755 TOOLS/wma2ogg.pl %buildroot%_bindir/wma2ogg%{pkgext}.pl
@@ -717,7 +717,7 @@ if [ -d %_datadir/%name/Skin/default ]
 fi
 %endif
 
-%files
+%files -f mplayer%{pkgext}.lang
 %doc AUTHORS Changelog README Copyright
 %dir %{_sysconfdir}/%name
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/mplayer.conf
@@ -725,13 +725,6 @@ fi
 %{_bindir}/midentify%{pkgext}
 %{_bindir}/mplayer%{pkgext}
 %{_mandir}/man1/mplayer%{pkgext}.1*
-%lang(de) %{_mandir}/de/man1/mplayer%{pkgext}.1*
-%lang(fr) %{_mandir}/fr/man1/mplayer%{pkgext}.1*
-%lang(hu) %{_mandir}/hu/man1/mplayer%{pkgext}.1*
-%lang(pl) %{_mandir}/pl/man1/mplayer%{pkgext}.1*
-%lang(zh_CN) %{_mandir}/zh_CN/man1/mplayer%{pkgext}.1*
-%lang(es) %{_mandir}/es/man1/mplayer%{pkgext}.1*
-%lang(it) %{_mandir}/it/man1/mplayer%{pkgext}.1*
 %dir %{_datadir}/%{name}
 
 %files doc
@@ -739,19 +732,12 @@ fi
 %doc DOCS/default.css DOCS/HTML DOCS/tech/
 
 %if %build_mencoder
-%files -n mencoder%{pkgext}
+%files -n mencoder%{pkgext} -f mencoder%{pkgext}.lang
 %{_bindir}/mencoder%{pkgext}
 %{_bindir}/divx2svcd%{pkgext}
 %{_bindir}/mencvcd%{pkgext}
 %{_bindir}/wma2ogg%{pkgext}.pl
 %{_mandir}/man1/mencoder%{pkgext}.1*
-%lang(de) %{_mandir}/de/man1/mencoder%{pkgext}.1*
-%lang(fr) %{_mandir}/fr/man1/mencoder%{pkgext}.1*
-%lang(hu) %{_mandir}/hu/man1/mencoder%{pkgext}.1*
-%lang(pl) %{_mandir}/pl/man1/mencoder%{pkgext}.1*
-%lang(zh_CN) %{_mandir}/zh_CN/man1/mencoder%{pkgext}.1*
-%lang(es) %{_mandir}/es/man1/mencoder%{pkgext}.1*
-%lang(it) %{_mandir}/it/man1/mencoder%{pkgext}.1*
 %endif
 
 %if %build_gui
