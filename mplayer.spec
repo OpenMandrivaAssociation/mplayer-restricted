@@ -373,6 +373,10 @@ BuildRequires: libbs2b-devel
 Suggests:	libfaac.so.0%{_ext}
 Suggests:	libfaad.so.2%{_ext}
 Suggests:	libx264.so.115%{_ext}
+Suggests:	libopencore-amrnb.so.0%{_ext}
+Suggests:	libopencore-amrwb.so.0%{_ext}
+Suggests:	libtwolame.so.0%{_ext}
+Suggests:	libdca.so.0%{_ext}
 
 %rename		mplayer%{pkgext}1.0
 
@@ -507,6 +511,10 @@ export LDFLAGS="%{?ldflags}"
 %ifnarch x86_64
 	--enable-runtime-cpudetection \
 %endif
+%if !%build_dts
+	--disable-libdca \
+	--enable-libdca-dlopen \
+%endif
 %ifarch %ix86
         --enable-mmx \
         --enable-3dnow \
@@ -534,6 +542,10 @@ export LDFLAGS="%{?ldflags}"
 %endif
 %if !%build_faac
 	--enable-faac-dlopen \
+%endif
+%if !%build_twolame
+	--disable-twolame \
+	--enable-twolame-dlopen \
 %endif
 %if !%build_x264
 	--enable-x264-dlopen \
@@ -638,7 +650,13 @@ export LDFLAGS="%{?ldflags}"
 	--disable-ivtv \
 %endif
 %if ! %build_vdpau
-	--disable-vdpau
+	--disable-vdpau \
+%endif
+%if ! %build_amr
+	--disable-libopencore_amrnb \
+	--disable-libopencore_amrwb \
+	--enable-libopencore_amrnb-dlopen \
+	--enable-libopencore_amrwb-dlopen \
 %endif
 
 
