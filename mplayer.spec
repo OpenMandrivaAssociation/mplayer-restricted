@@ -508,9 +508,7 @@ export LDFLAGS="%{?ldflags}"
 	--libdir=%_libdir \
 	--enable-largefiles \
 %if !%build_optimization
-%ifnarch x86_64
 	--enable-runtime-cpudetection \
-%endif
 %if !%build_dts
 	--disable-libdca \
 	--enable-libdca-dlopen \
