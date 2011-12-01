@@ -667,19 +667,19 @@ fgrep %release version.h
 cd DOCS/xml && make
 
 %install
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/%name
-install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/%name
-install -m755 mplayer%{pkgext} -D $RPM_BUILD_ROOT%{_bindir}/mplayer%{pkgext}
+install -d -m 755 %{buildroot}%{_datadir}/%name
+install -d -m 755 %{buildroot}%{_sysconfdir}/%name
+install -m755 mplayer%{pkgext} -D %{buildroot}%{_bindir}/mplayer%{pkgext}
 for lang in de fr hu pl es it zh_CN en; do
-    install -m644 DOCS/man/$lang/mplayer.1 -D $RPM_BUILD_ROOT%{_mandir}/$([ "$lang" != "en" ] && echo $lang)/man1/mplayer%{pkgext}.1
+    install -m644 DOCS/man/$lang/mplayer.1 -D %{buildroot}%{_mandir}/$([ "$lang" != "en" ] && echo $lang)/man1/mplayer%{pkgext}.1
 done 
 %find_lang mplayer%{pkgext} --with-man
 
 %if %build_mencoder
-install -m755 mencoder%{pkgext} -D $RPM_BUILD_ROOT%{_bindir}/mencoder%{pkgext}
+install -m755 mencoder%{pkgext} -D %{buildroot}%{_bindir}/mencoder%{pkgext}
 
 for lang in de fr hu pl es it zh_CN en; do
-    ln -s mplayer%{pkgext}.1 $RPM_BUILD_ROOT%{_mandir}/$([ "$lang" != "en" ] && echo $lang)/man1/mencoder%{pkgext}.1
+    ln -s mplayer%{pkgext}.1 %{buildroot}%{_mandir}/$([ "$lang" != "en" ] && echo $lang)/man1/mencoder%{pkgext}.1
 done 
 %find_lang mencoder%{pkgext} --with-man
 
@@ -688,8 +688,8 @@ install -m 755 TOOLS/divx2svcd.sh %buildroot%_bindir/divx2svcd%{pkgext}
 install -m 755 TOOLS/wma2ogg.pl %buildroot%_bindir/wma2ogg%{pkgext}.pl
 install -m 755 TOOLS/midentify.sh %buildroot%_bindir/midentify%{pkgext}
 %endif
-install -m 644 etc/example.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/mplayer.conf
-install -m 644 etc/menu.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
+install -m 644 etc/example.conf %{buildroot}%{_sysconfdir}/%{name}/mplayer.conf
+install -m 644 etc/menu.conf %{buildroot}%{_sysconfdir}/%{name}
 
 %if %build_gui
 # default Skin
@@ -697,12 +697,12 @@ install -d -m 755 %buildroot%_datadir/%name/Skin/
 cp -r Blue %buildroot%_datadir/%name/Skin/
 ln -s Blue %buildroot%_datadir/%name/Skin/default
 # gmplayer equals mplayer -gui
-ln -s mplayer%{pkgext} $RPM_BUILD_ROOT%{_bindir}/gmplayer%{pkgext}
+ln -s mplayer%{pkgext} %{buildroot}%{_bindir}/gmplayer%{pkgext}
 # icons
-mkdir -p $RPM_BUILD_ROOT{%_liconsdir,%_iconsdir,%{_miconsdir}}
-convert -transparent white Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_liconsdir}/mplayer%{pkgext}.png 
-convert -transparent white Blue/icons/icon32x32.png $RPM_BUILD_ROOT%{_iconsdir}/mplayer%{pkgext}.png 
-convert -transparent white -scale 16x16 Blue/icons/icon48x48.png $RPM_BUILD_ROOT%{_miconsdir}/mplayer%{pkgext}.png
+mkdir -p %{buildroot}{%_liconsdir,%_iconsdir,%{_miconsdir}}
+convert -transparent white Blue/icons/icon48x48.png %{buildroot}%{_liconsdir}/mplayer%{pkgext}.png 
+convert -transparent white Blue/icons/icon32x32.png %{buildroot}%{_iconsdir}/mplayer%{pkgext}.png 
+convert -transparent white -scale 16x16 Blue/icons/icon48x48.png %{buildroot}%{_miconsdir}/mplayer%{pkgext}.png
 install -D -m 644 etc/mplayer.desktop %buildroot%_datadir/applications/mplayer%{pkgext}.desktop
 perl -pi -e 's@mplayer$@mplayer%{pkgext}@g' %buildroot%_datadir/applications/mplayer%{pkgext}.desktop
 %endif
