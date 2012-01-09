@@ -13,9 +13,9 @@
 %define prerel		rc4
 %define version 1.0
 %define fversion %svn
-%define svn r32713
+%define svn r34537
 %if %svn
-%define rel		1.%prerel.0.%svn.8
+%define rel		1.%prerel.0.%svn.1
 %else 
 %define rel 1.%prerel.6
 %endif
@@ -208,7 +208,6 @@ Patch0:		mplayer-mdvconfig.patch
 #anssi fix vp6f playback, patch okayed by ffmpeg upstream
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
-Patch12:	mplayer-desktopentry.patch
 Patch21:	mplayer-1.0rc2-compiz.patch
 # fixes for crashes found while fixing CVE-2008-1558
 Patch28:	mplayer-rtsp-extra-fixes.patch
@@ -217,10 +216,6 @@ Patch31:       mplayer-format-string-literal.patch
 Patch33:       mplayer-have-dlfcn_h.patch
 #gw fix crash: https://qa.mandriva.com/show_bug.cgi?id=55443
 Patch35: mplayer-fix-dvd-crash.patch
-#(proyvind): fix high pitch hiss sound when playing mp3s
-Patch36:	mplayer-r32713-mp3lib-gcc-4.6-fix.patch
-Patch37:	Fix-ff_imdct_calc_sse-on-gcc-4.6.patch
-Patch38:	mplayer-libpng15.diff
 Patch39:	mplayer-dlopen-libfaac-libfaad-and-libx264.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
@@ -294,7 +289,7 @@ BuildRequires:	libfaac-devel
 BuildRequires:	libfaad2-devel
 %endif
 %if %build_x264
-BuildRequires:	pkgconfig(x264) >= 0.99
+BuildRequires:	pkgconfig(x264) >= 0.120
 %endif
 %if %build_xvid
 BuildRequires:	xvid-devel >= 1.0.0-0.beta2.1plf
@@ -454,6 +449,8 @@ be illegal in some countries.
 %endif
 
 
+#' close.. vim syntax highlight workaround.. ;p
+
 %prep
 %if %svn
 %setup -q -n %name -a 4
@@ -466,18 +463,14 @@ find DOCS -name .svn|xargs rm -rf
 #gw fix permissions
 chmod 644 AUTHORS Changelog README Copyright
 rm -f Blue/README
-%patch0 -p0 -b .mdv
+%patch0 -p1 -b .mdv~
 #%patch3 -p1 -b .mp2
 #%patch7 -p1 -b .mga
-%patch12 -p1 -b .desktopentry
 #%patch21 -p0 -b .compiz
 %patch28 -p1 -b .rtsp-extra-fixes
 %patch31 -p1 -b .format~
 %patch33 -p0
 %patch35 -p0
-%patch36 -p1 -b .gcc46~
-%patch37 -p1
-%patch38 -p0 -b .libpng15
 %patch39 -p1 -b .dlopen~
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
@@ -506,7 +499,6 @@ export LDFLAGS="%{?ldflags}"
 	--datadir=%{_datadir}/%{name} \
 	--confdir=%{_sysconfdir}/%{name} \
 	--libdir=%_libdir \
-	--enable-largefiles \
 %if !%build_optimization
 	--enable-runtime-cpudetection \
 %if !%build_dts
@@ -534,7 +526,7 @@ export LDFLAGS="%{?ldflags}"
 	--language=all \
 	\
 %if ! %build_faad
-	--disable-faad-internal \
+	--disable-faad \
 	--disable-decoder=AAC \
 	--enable-faad-dlopen \
 %endif
@@ -663,9 +655,6 @@ make EXESUF=%{pkgext}
 #gw make sure we have our version string included:
 fgrep %release version.h
 
-# build HTML docs
-cd DOCS/xml && make
-
 %install
 install -d -m 755 %{buildroot}%{_datadir}/%name
 install -d -m 755 %{buildroot}%{_sysconfdir}/%name
@@ -743,7 +732,7 @@ fi
 
 %files doc
 %doc README.DOCS
-%doc DOCS/default.css DOCS/HTML DOCS/tech/
+%doc DOCS/default.css DOCS/xml DOCS/tech/
 
 %if %build_mencoder
 %files -n mencoder%{pkgext} -f mencoder%{pkgext}.lang
