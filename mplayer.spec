@@ -225,57 +225,57 @@ Patch39:	mplayer-dlopen-libfaac-libfaad-and-libx264.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
-BuildRequires:	libncurses-devel
+BuildRequires:	pkconfig(ncurses)
 %if %build_aa
-BuildRequires:	libaa-devel
+BuildRequires:	aalib-devel
 %endif
 BuildRequires:  a52dec-devel
 %if %build_arts
-BuildRequires:  libarts-devel
+BuildRequires:  arts-devel
 %endif
 %if %build_amr
-BuildRequires:  opencore-amr-devel
+BuildRequires:  pkgconfig(opencore-amrnb) pkgconfig(opencore-amrnw)
 %endif
 
 %if %build_jack
-BuildRequires:  libjack-devel
+BuildRequires:  pkgconfig(jack)
 %endif
 %if %build_pulse
-BuildRequires:  libpulseaudio-devel
+BuildRequires:  pkgconfig(libpulse)
 %endif
 %if %build_openal
-BuildRequires:  libopenal-devel
+BuildRequires:  pkconfig(openal)
 %endif
 %if %build_cdda
-BuildRequires:	libcdda-devel
+BuildRequires:	cdda-devel
 %endif
 %if %build_dirac
-BuildRequires:	libdirac-devel >= 0.9.0
+BuildRequires:	pkgconfig(dirac)  >= 0.9.0
 %endif
 %if %build_schroedinger
-BuildRequires:	libschroedinger-devel
+BuildRequires:	pkgconfig(schroedinger-1.0)
 %endif
 %if %build_dv
-BuildRequires:	libdv-devel
+BuildRequires:	pkgconfig(libdv)
 %endif
 BuildRequires:	libdxr3-devel
-BuildRequires:	libjpeg-devel
+BuildRequires:	jpeg-devel
 BuildRequires:	openjpeg-devel
 %if %build_lirc
-BuildRequires:	liblirc-devel
+BuildRequires:	pkgconfig(liblircclient0)
 %endif
 %if %build_lzo
 BuildRequires:	liblzo-devel
 %endif
-BuildRequires:  libmad-devel
-BuildRequires:  libnas-devel
-BuildRequires:	libpng-devel
+BuildRequires:  pkgconfig(mad)
+BuildRequires:  nas-devel
+BuildRequires:	pkgconfig(libpng15)
 %if %build_sdl
-BuildRequires:	libSDL-devel >= 1.1.8
+BuildRequires:	pkgconfig(sdl) >= 1.1.8
 %endif
-BuildRequires:	libtermcap-devel
+BuildRequires:	termcap-devel
 %if %build_xmms
-BuildRequires:  libxmms-devel
+BuildRequires:  xmms-devel
 %endif
 %if %build_ggi
 BuildRequires:	libggiwmh-devel
@@ -285,86 +285,86 @@ BuildRequires:	libggiwmh-devel
 BuildRequires:	libsmbclient-devel < 3.2.0
 %endif
 %if %build_twolame
-BuildRequires:	libtwolame-devel
+BuildRequires:	pkgconfig(twolame)
 %endif
 %if %build_faac
 BuildRequires:	libfaac-devel
 %endif
 %if %build_faad
-BuildRequires: libfaad2-devel
+BuildRequires:	libfaad2-devel
 %endif
 %if %build_x264
-BuildRequires:	libx264-devel >= 0.99
+BuildRequires:	pkgconfig(x264) >= 0.99
 %endif
 %if %build_xvid
 BuildRequires:	xvid-devel >= 1.0.0-0.beta2.1plf
 %endif
 %if %build_dts
-BuildRequires: dtsdec-devel
+BuildRequires:	pkgconfig(libdts)
 %endif
 %if %build_lame
-BuildRequires: liblame-devel
+BuildRequires:	lame-devel
 %endif
 %if %build_plf
-Requires: %mklibname dvdcss 2
+Requires:	%mklibname dvdcss 2
 %endif
 %if %build_live
-BuildRequires: live-devel
+BuildRequires:	live-devel
 %endif
 %if %build_vesa
-BuildRequires: libvbe-devel liblrmi-devel
+BuildRequires:	libvbe-devel liblrmi-devel
 %endif
 %if %build_theora
-BuildRequires: libtheora-devel
+BuildRequires:	pkgconfig(theora)
 %endif
 %if %build_fribidi
-BuildRequires: libfribidi-devel >= 0.10.4
+BuildRequires:	pkgconfig(fribidi) >= 0.10.4
 %endif
 %if %build_enca
-BuildRequires: libenca-devel
+BuildRequires:	pkgconfig(enca)
 %endif
 %if %build_directfb
-BuildRequires: libdirectfb-devel
+BuildRequires:	pkgconfig(directfb)
 %endif
 %if %build_xvmc
-BuildRequires: libxvmc-devel
+BuildRequires:	pkgconfig(xvmc)
 %endif
 %if %build_vdpau
-BuildRequires: vdpau-devel
+BuildRequires:	pkgconfig(vdpau)
 %endif
 %if %build_libass
-BuildRequires: libass-devel
+BuildRequires:	pkgconfig(libass)
 %endif
-BuildRequires: gsm-devel
-BuildRequires: libmpg123-devel
+BuildRequires:	gsm-devel
+BuildRequires:	pkgconfig(libmpg123)
 %if %build_vpx
-BuildRequires: libvpx-devel
+BuildRequires:	pkgconfig(vpx)
 %endif
 %if %build_rtmp
-BuildRequires: rtmp-devel
+BuildRequires:	pkgconfig(librtmp)
 %endif
-BuildRequires: bzip2-devel
-BuildRequires: libmng-devel
-BuildRequires: libmesagl-devel
-BuildRequires: libxxf86vm-devel
-BuildRequires: libxxf86dga-devel
-BuildRequires: libxscrnsaver-devel
-BuildRequires: libspeex-devel
-BuildRequires: libmpcdec-devel
-BuildRequires: ladspa-devel
-BuildRequires: libxslt-proc
-BuildRequires: docbook-style-xsl
-BuildRequires: docbook-dtd412-xml
-BuildRequires: libcaca-devel
+BuildRequires:	bzip2-devel
+BuildRequires:	mng-devel
+BuildRequires:	pkgconfig(gl)
+BuildRequires:	pkgconfig(xxf86vm)
+BuildRequires:	pkgconfig(xxf86dga)
+BuildRequires:	pkgconfig(xscrnsaver)
+BuildRequires:	pkgconfig(speex)
+BuildRequires:	libmpcdec-devel
+BuildRequires:	ladspa-devel
+BuildRequires:	xsltproc
+BuildRequires:	docbook-style-xsl
+BuildRequires:	docbook-dtd412-xml
+BuildRequires:	pkgconfig(caca)
 %if %mdvver >= 201010
-BuildRequires: giflib-devel
+BuildRequires:	giflib-devel
 %else
-BuildRequires: ungif-devel
+BuildRequires:	ungif-devel
 %endif
 %if %build_yasm
-BuildRequires: yasm
+BuildRequires:	yasm
 %endif
-BuildRequires: libbs2b-devel
+BuildRequires:	pkgconfig(libbs2b)
 %if "%{_lib}" == "lib64"
 %global	_ext	()(64bit)
 %else
