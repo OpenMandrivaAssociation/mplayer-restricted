@@ -225,7 +225,7 @@ Patch39:	mplayer-dlopen-libfaac-libfaad-and-libx264.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
-BuildRequires:	pkconfig(ncurses)
+BuildRequires:	pkgconfig(ncurses)
 %if %build_aa
 BuildRequires:	aalib-devel
 %endif
@@ -244,7 +244,7 @@ BuildRequires:  pkgconfig(jack)
 BuildRequires:  pkgconfig(libpulse)
 %endif
 %if %build_openal
-BuildRequires:  pkconfig(openal)
+BuildRequires:  pkgconfig(openal)
 %endif
 %if %build_cdda
 BuildRequires:	cdda-devel
