@@ -367,7 +367,7 @@ BuildRequires:	pkgconfig(libbs2b)
 %endif
 Suggests:	libfaac.so.0%{_ext}
 Suggests:	libfaad.so.2%{_ext}
-Suggests:	libx264.so.115%{_ext}
+Suggests:	libx264.so.120%{_ext}
 Suggests:	libopencore-amrnb.so.0%{_ext}
 Suggests:	libopencore-amrwb.so.0%{_ext}
 Suggests:	libtwolame.so.0%{_ext}
