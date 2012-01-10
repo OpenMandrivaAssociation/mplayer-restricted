@@ -300,9 +300,6 @@ BuildRequires:	pkgconfig(libdts)
 %if %build_lame
 BuildRequires:	lame-devel
 %endif
-%if %build_plf
-Requires:	%mklibname dvdcss 2
-%endif
 %if %build_live
 BuildRequires:	live-devel
 %endif
@@ -372,6 +369,7 @@ Suggests:	libopencore-amrnb.so.0%{_ext}
 Suggests:	libopencore-amrwb.so.0%{_ext}
 Suggests:	libtwolame.so.0%{_ext}
 Suggests:	libdca.so.0%{_ext}
+Suggests:	libdvdcss.so.2%{_ext}
 
 %rename		mplayer%{pkgext}1.0
 
