@@ -731,6 +731,7 @@ fi
 %dir %{_datadir}/%{name}
 
 %files doc
+%defattr(-,root,root,755)
 %doc README.DOCS
 %doc DOCS/default.css DOCS/xml DOCS/tech/
 
