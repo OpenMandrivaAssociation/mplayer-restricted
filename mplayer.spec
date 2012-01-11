@@ -15,9 +15,9 @@
 %define fversion %svn
 %define svn r34537
 %if %svn
-%define rel		1.%prerel.0.%svn.1
+%define rel		1.%prerel.0.%svn.2
 %else 
-%define rel 1.%prerel.7
+%define rel 1.%prerel.6
 %endif
 %define release		%mkrel %rel
 
