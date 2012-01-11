@@ -15,7 +15,7 @@
 %define fversion %svn
 %define svn r34537
 %if %svn
-%define rel		1.%prerel.0.%svn.2
+%define rel		1.%prerel.0.%svn.3
 %else 
 %define rel 1.%prerel.6
 %endif
@@ -536,7 +536,7 @@ export LDFLAGS="%{?ldflags}"
 	--enable-twolame-dlopen \
 %endif
 %if !%build_x264
-	--enable-x264-dlopen \
+	--enable-libx264-dlopen \
 %endif
 	--disable-libdvdcss-internal \
 %if %build_lirc
