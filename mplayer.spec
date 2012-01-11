@@ -229,7 +229,7 @@ BuildRequires:  a52dec-devel
 BuildRequires:  arts-devel
 %endif
 %if %build_amr
-BuildRequires:  pkgconfig(opencore-amrnb) pkgconfig(opencore-amrnw)
+BuildRequires:  pkgconfig(opencore-amrnb) pkgconfig(opencore-amrwb)
 %endif
 
 %if %build_jack
