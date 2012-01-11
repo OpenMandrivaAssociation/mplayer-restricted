@@ -536,7 +536,7 @@ export LDFLAGS="%{?ldflags}"
 	--enable-twolame-dlopen \
 %endif
 %if !%build_x264
-	--enable-libx264-dlopen \
+	--enable-x264-dlopen \
 %endif
 	--disable-libdvdcss-internal \
 %if %build_lirc
