@@ -17,7 +17,7 @@
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
-%define rel 1.%prerel.6
+%define rel 1.%prerel.7
 %endif
 %define release		%mkrel %rel
 
@@ -680,9 +680,9 @@ install -m 644 etc/menu.conf %{buildroot}%{_sysconfdir}/%{name}
 
 %if %build_gui
 # default Skin
-install -d -m 755 %buildroot%_datadir/%name/Skin/
-cp -r Blue %buildroot%_datadir/%name/Skin/
-ln -s Blue %buildroot%_datadir/%name/Skin/default
+install -d -m 755 %buildroot%_datadir/%name/skins/
+cp -r Blue %buildroot%_datadir/%name/skins/
+ln -s Blue %buildroot%_datadir/%name/skins/default
 # gmplayer equals mplayer -gui
 ln -s mplayer%{pkgext} %{buildroot}%{_bindir}/gmplayer%{pkgext}
 # icons
@@ -713,8 +713,8 @@ export DONT_STRIP=1
 %endif
 %if %build_gui
 %pre gui
-if [ -d %_datadir/%name/Skin/default ]
-  then rm -rf %_datadir/%name/Skin/default
+if [ -d %_datadir/%name/skins/default ]
+  then rm -rf %_datadir/%name/skins/default
 fi
 %endif
 
@@ -746,7 +746,7 @@ fi
 %files gui
 %{_bindir}/gmplayer%{pkgext}
 %_datadir/applications/mplayer%{pkgext}.desktop
-%_datadir/%name/Skin/
+%_datadir/%name/skins
 %{_iconsdir}/mplayer%{pkgext}.png
 %{_miconsdir}/mplayer%{pkgext}.png
 %{_liconsdir}/mplayer%{pkgext}.png
