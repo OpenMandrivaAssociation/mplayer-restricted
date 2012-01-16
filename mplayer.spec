@@ -205,7 +205,6 @@ Source0:	%{Name}-%{fversion}.tar.bz2
 Source4:	Blue-1.5.tar.bz2
 Source5:	kernel-version.sh
 Patch0:		mplayer-mdvconfig.patch
-#anssi fix vp6f playback, patch okayed by ffmpeg upstream
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
 Patch7:		mplayer-1.0pre1-nomgafirst.patch
 Patch21:	mplayer-1.0rc2-compiz.patch
