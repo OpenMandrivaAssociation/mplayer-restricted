@@ -26,6 +26,7 @@
 %define build_debug 0
 %define build_mencoder 1
 %define build_gui 1
+%define	build_system_ffmpeg 1
 
 %define kernel_version	%(/bin/bash %{SOURCE5})
 %define kver 		%(/bin/bash %{SOURCE5} | sed -e 's/-/./')
@@ -108,6 +109,14 @@
 %define build_schroedinger 1
 %endif
 
+%if %build_system_ffmpeg
+%define build_amr 0
+%define build_dirac 0
+%define build_schroedinger 0
+%define build_vpx 0
+%define build_zr 0
+%endif
+
 %{?_with_amr: %{expand: %%global build_amr 1}}
 %{?_without_amr: %{expand: %%global build_amr 0}}
 %{?_with_live: %{expand: %%global build_live 1}}
@@ -123,6 +132,8 @@
 %{?_without_mencoder: %{expand: %%global build_mencoder 0}}
 %{?_with_gui: %{expand: %%global build_gui 1}}
 %{?_without_gui: %{expand: %%global build_gui 0}}
+%{?_with_system_ffmpeg: %{expand: %%global build_system_ffmpeg 1}}
+%{?_without_system_ffmpeg: %{expand: %%global build_system_ffmpeg 0}}
 %{?_with_theora: %{expand: %%global build_theora 1}}
 %{?_without_theora: %{expand: %%global build_theora 0}}
 %{?_with_smb: %{expand: %%global build_smb 1}}
@@ -356,6 +367,10 @@ BuildRequires:	ungif-devel
 BuildRequires:	yasm
 %endif
 BuildRequires:	pkgconfig(libbs2b)
+%if %build_system_ffmpeg
+BuildRequires: ffmpeg-devel
+%endif
+
 %if "%{_lib}" == "lib64"
 %global	_ext	()(64bit)
 %else
@@ -520,8 +535,10 @@ export LDFLAGS="%{?ldflags}"
 %if %build_gui
 	--enable-gui \
 %endif
+%if %build_system_ffmpeg
+	--disable-ffmpeg_a \
+%endif
 	--language=all \
-	\
 %if ! %build_faad
 	--disable-faad \
 	--disable-decoder=AAC \
