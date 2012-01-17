@@ -13,9 +13,9 @@
 %define prerel		rc4
 %define version 1.0
 %define fversion %svn
-%define svn r34537
+%define svn r34578
 %if %svn
-%define rel		1.%prerel.0.%svn.4
+%define rel		1.%prerel.0.%svn.1
 %else 
 %define rel 1.%prerel.6
 %endif
