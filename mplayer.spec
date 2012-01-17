@@ -444,7 +444,7 @@ This package contains a GUI for %{name}.
 %package -n mencoder%{pkgext}
 Summary: MPlayer's movie encoder
 Group:		Video
-Requires:	%{name} = %version
+Requires:	%{name}
 %rename		mencoder%{pkgext}1.0
 
 %description -n mencoder%{pkgext}
