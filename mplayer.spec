@@ -368,8 +368,10 @@ BuildRequires:	yasm
 %endif
 BuildRequires:	pkgconfig(libbs2b)
 %if %build_system_ffmpeg
-BuildRequires: ffmpeg-devel
+BuildRequires:	ffmpeg-devel
 %endif
+BuildRequires:	pkgconfig(dvdread)
+BuildRequires:	pkgconfig(dvdnavmini)
 
 %if "%{_lib}" == "lib64"
 %global	_ext	()(64bit)
@@ -556,6 +558,9 @@ export LDFLAGS="%{?ldflags}"
 	--enable-x264-dlopen \
 %endif
 	--disable-libdvdcss-internal \
+	--enable-dvdnav \
+	--disable-dvdread-internal \
+	--enable-dvdread \
 %if %build_lirc
 	--enable-lirc \
 %else
