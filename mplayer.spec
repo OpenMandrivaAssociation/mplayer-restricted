@@ -421,6 +421,7 @@ win32-codecs, real-codecs and xanim-codecs.
 %package doc
 Summary: %{Name} documentation
 Group: Books/Computer books
+BuildArch:	noarch
 
 %description doc
 This package contains documentation for %{Name}.
