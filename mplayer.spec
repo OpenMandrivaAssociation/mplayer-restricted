@@ -489,10 +489,8 @@ rm -f Blue/README
 %patch33 -p0
 %patch35 -p0
 %patch39 -p1 -b .dlopen~
-%patch40 -p1 -b .ffmpeg~
 rm -rf ffmpeg
-# get around buildsystem weirdness
-ln -s /usr/includfe ffmpeg
+%patch40 -p1 -b .ffmpeg~
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
