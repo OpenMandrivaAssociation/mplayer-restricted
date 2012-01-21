@@ -15,7 +15,7 @@
 %define fversion %svn
 %define svn r34578
 %if %svn
-%define rel		1.%prerel.0.%svn.1
+%define rel		1.%prerel.0.%svn.2
 %else 
 %define rel 1.%prerel.6
 %endif
@@ -225,8 +225,10 @@ Patch31:       mplayer-format-string-literal.patch
 #gw HAVE_DLFCN_H isn't defined
 Patch33:       mplayer-have-dlfcn_h.patch
 #gw fix crash: https://qa.mandriva.com/show_bug.cgi?id=55443
-Patch35: mplayer-fix-dvd-crash.patch
+Patch35:	mplayer-fix-dvd-crash.patch
 Patch39:	mplayer-dlopen-libfaac-libfaad-and-libx264.patch
+Patch40:	mplayer-r34578-fix-use-of-system-ffmpeg.patch
+
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -487,6 +489,8 @@ rm -f Blue/README
 %patch33 -p0
 %patch35 -p0
 %patch39 -p1 -b .dlopen~
+%patch40 -p1 -b .ffmpeg~
+rm -rf ffmpeg
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
