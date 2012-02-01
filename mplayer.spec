@@ -227,7 +227,7 @@ Patch33:       mplayer-have-dlfcn_h.patch
 #gw fix crash: https://qa.mandriva.com/show_bug.cgi?id=55443
 Patch35:	mplayer-fix-dvd-crash.patch
 Patch39:	mplayer-dlopen-libfaac-libfaad-and-libx264.patch
-Patch40:	mplayer-r34578-fix-use-of-system-ffmpeg.patch
+Patch40:	mplayer-r34578-local-copy-of-internal-ffmpeg-type-definition.patch
 Patch41:	mplayer-lavcac3enc-build-with-shared.patch
 Patch42:	mplayer-filters-hack-with-shared.patch
 URL:		http://www.mplayerhq.hu
@@ -493,7 +493,7 @@ rm -f Blue/README
 rm -rf ffmpeg
 %patch40 -p1 -b .ffmpeg~
 %patch41 -p1 -b .lavcac3enc~
-%patch41 -p1 -b .internal_filters~
+%patch42 -p1 -b .internal_filters~
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
