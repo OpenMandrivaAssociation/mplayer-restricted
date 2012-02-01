@@ -228,7 +228,8 @@ Patch33:       mplayer-have-dlfcn_h.patch
 Patch35:	mplayer-fix-dvd-crash.patch
 Patch39:	mplayer-dlopen-libfaac-libfaad-and-libx264.patch
 Patch40:	mplayer-r34578-fix-use-of-system-ffmpeg.patch
-
+Patch41:	mplayer-lavcac3enc-build-with-shared.patch
+Patch42:	mplayer-filters-hack-with-shared.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
@@ -491,6 +492,8 @@ rm -f Blue/README
 %patch39 -p1 -b .dlopen~
 rm -rf ffmpeg
 %patch40 -p1 -b .ffmpeg~
+%patch41 -p1 -b .lavcac3enc~
+%patch41 -p1 -b .internal_filters~
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
 
