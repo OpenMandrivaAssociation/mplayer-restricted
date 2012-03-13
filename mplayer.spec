@@ -15,7 +15,7 @@
 %define fversion %svn
 %define svn r34578
 %if %svn
-%define rel		1.%prerel.0.%svn.3
+%define rel		1.%prerel.0.%svn.4
 %else 
 %define rel 1.%prerel.6
 %endif
@@ -213,7 +213,7 @@ Source0:	%{name}-%{svn}.tar.xz
 Source0:	%{Name}-%{fversion}.tar.bz2
 %endif
 #gw default skin
-Source4:	Blue-1.5.tar.bz2
+Source4:	Blue-1.8.tar.bz2
 Source5:	kernel-version.sh
 Patch0:		mplayer-mdvconfig.patch
 Patch3:		mplayer-mp3lib-no-strict-aliasing.patch
