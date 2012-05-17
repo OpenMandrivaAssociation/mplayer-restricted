@@ -13,9 +13,9 @@
 %define prerel		rc4
 %define version 1.0
 %define fversion %svn
-%define svn r34578
+%define svn r34911
 %if %svn
-%define rel		1.%prerel.0.%svn.5
+%define rel		1.%prerel.0.%svn.1
 %else 
 %define rel 1.%prerel.6
 %endif
@@ -486,13 +486,13 @@ rm -f Blue/README
 #%patch7 -p1 -b .mga
 #%patch21 -p0 -b .compiz
 %patch28 -p1 -b .rtsp-extra-fixes
-%patch31 -p1 -b .format~
+#patch31 -p1 -b .format~
 %patch33 -p0
 %patch35 -p0
 %patch39 -p1 -b .dlopen~
 rm -rf ffmpeg
 %patch40 -p1 -b .ffmpeg~
-%patch41 -p1 -b .lavcac3enc~
+#patch41 -p1 -b .lavcac3enc~
 %patch42 -p1 -b .internal_filters~
 
 perl -pi -e 's^r\$svn_revision^%release^' version.sh
