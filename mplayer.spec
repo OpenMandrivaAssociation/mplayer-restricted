@@ -487,7 +487,7 @@ rm -f Blue/README
 #%patch7 -p1 -b .mga
 #%patch21 -p0 -b .compiz
 %patch28 -p1 -b .rtsp-extra-fixes
-#patch31 -p1 -b .format~
+%patch31 -p1 -b .format~
 %patch33 -p0
 %patch35 -p0
 %patch39 -p1 -b .dlopen~
