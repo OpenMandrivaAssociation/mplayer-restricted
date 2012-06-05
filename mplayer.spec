@@ -12,8 +12,8 @@
 %define Summary		Movie player for linux
 %define prerel		rc4
 %define version 1.0
-%define fversion %svn
-%define svn r34911
+%define fversion %{svn}
+%define svn r34991
 %if %svn
 %define rel		1.%prerel.0.%svn.1
 %else 
