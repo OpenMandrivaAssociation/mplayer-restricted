@@ -10,14 +10,26 @@
 %define name		mplayer%{pkgext}
 %define Name		MPlayer
 %define Summary		Movie player for linux
-%define prerel		rc4
-%define version 1.0
+%define prerel		%nil
+%define version 1.1
+%define svn %nil
+%if "%svn" != ""
 %define fversion %{svn}
-%define svn r34991
-%if %svn
+%else
+%define fversion %version
+%endif
+%if "%prerel" != ""
+%if "%svn" != ""
 %define rel		1.%prerel.0.%svn.1
 %else 
 %define rel 1.%prerel.6
+%endif
+%else
+%if "%svn" != ""
+%define rel 0.%svn.1
+%else
+%define rel 1
+%endif
 %endif
 %define release		%mkrel %rel
 
@@ -206,11 +218,11 @@ Name:		%{name}
 Version:	%{version}
 Release:	%{release}%{?extrarelsuffix}
 Summary:	%{Summary}
-%if %svn
+%if "%svn" != ""
 #gw generated using svn export
 Source0:	%{name}-%{svn}.tar.xz
 %else
-Source0:	%{Name}-%{fversion}.tar.bz2
+Source0:	ftp://ftp1.mplayerhq.hu/MPlayer/releases/%{Name}-%{fversion}.tar.xz
 %endif
 #gw default skin
 Source4:	Blue-1.8.tar.bz2
@@ -471,7 +483,7 @@ be illegal in some countries.
 #' close.. vim syntax highlight workaround.. ;p
 
 %prep
-%if %svn
+%if "%svn" != ""
 %setup -q -n %name -a 4
 %else
 %setup -q -n MPlayer-%{version}%{prerel} -a 4
