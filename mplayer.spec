@@ -28,7 +28,7 @@
 %if "%svn" != ""
 %define rel 0.%svn.1
 %else
-%define rel 1
+%define rel 2
 %endif
 %endif
 %define release		%mkrel %rel
