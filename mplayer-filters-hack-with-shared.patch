@@ -1,0 +1,47 @@
+From 12c4249c57829e2ccf1ef4f00c2bee6addd0763c Mon Sep 17 00:00:00 2001
+From: Anssi Hannula <anssi.hannula@iki.fi>
+Date: Fri, 27 Jan 2012 15:10:22 +0200
+Subject: [PATCH 2/2] hack: build filters that use internal headers even with
+ shared FFmpeg
+
+This depends on the internal headers being available during build - the
+filters in question only use visible symbols from FFmpeg, however.
+---
+ Makefile         |    2 +-
+ libmpcodecs/vf.c |    2 --
+ 2 files changed, 1 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index b5fedcb..003337e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -87,7 +87,7 @@ SRCS_COMMON-$(FFMPEG)                += av_helpers.c                \
+ SRCS_COMMON-$(CONFIG_VF_LAVFI)      +=  libmpcodecs/vf_lavfi.c
+ 
+ # These filters use private headers and do not work with shared FFmpeg.
+-SRCS_COMMON-$(FFMPEG_A)              += libmpcodecs/vf_fspp.c    \
++SRCS_COMMON-$(FFMPEG)                += libmpcodecs/vf_fspp.c    \
+                                         libmpcodecs/vf_mcdeint.c \
+                                         libmpcodecs/vf_qp.c      \
+                                         libmpcodecs/vf_spp.c     \
+diff --git a/libmpcodecs/vf.c b/libmpcodecs/vf.c
+index dd58aae..a694452 100644
+--- a/libmpcodecs/vf.c
++++ b/libmpcodecs/vf.c
+@@ -192,13 +192,11 @@ static const vf_info_t* const filter_list[]={
+     &vf_info_delogo,
+     &vf_info_remove_logo,
+     &vf_info_hue,
+-#ifdef CONFIG_FFMPEG_A
+     &vf_info_spp,
+     &vf_info_uspp,
+     &vf_info_fspp,
+     &vf_info_qp,
+     &vf_info_mcdeint,
+-#endif
+     &vf_info_yuvcsp,
+     &vf_info_kerndeint,
+     &vf_info_rgbtest,
+-- 
+1.7.7.2
+

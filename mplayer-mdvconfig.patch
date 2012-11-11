@@ -1,0 +1,59 @@
+--- mplayer/etc/example.conf.mdv	2011-01-05 15:55:45.000000000 +0100
++++ mplayer/etc/example.conf	2012-01-09 23:03:29.040938647 +0100
+@@ -20,7 +20,7 @@
+ ##################
+ 
+ # Specify default video driver (see -vo help for a list).
+-#vo=xv
++vo=xv,x11,
+ 
+ # Use SDL video with the aalib subdriver by default.
+ #vo = sdl:aalib
+@@ -47,7 +47,7 @@
+ #monitor-dotclock = 30M-300M
+ 
+ # Start in fullscreen mode by default.
+-#fs=yes
++fs=no
+ 
+ # Change to a different videomode when going fullscreen.
+ #vm=yes
+@@ -57,7 +57,7 @@
+ 
+ # Enable software scaling (powerful CPU needed) for video output
+ # drivers that do not support hardware scaling.
+-#zoom=yes
++zoom=yes
+ 
+ # standard monitor size, with square pixels
+ #monitoraspect=4:3
+@@ -74,7 +74,7 @@
+ ##################
+ 
+ # Specify default audio driver (see -ao help for a list).
+-#ao=oss
++ao=pulse,alsa,oss,esd,arts,
+ 
+ # Use SDL audio driver with the esd subdriver by default.
+ #ao = sdl:esd
+@@ -163,3 +163,20 @@
+ 
+ # You can also include other configuration files.
+ #include = /path/to/the/file/you/want/to/include
++
++afm=libmad
++
++# get a default OSD font from fontconfig
++fontconfig=yes
++font="Sans"
++subfont-text-scale=3
++subfont-osd-scale=4
++
++# disable joystick by default as it interferes with notebook motion sensors
++nojoystick=yes
++
++# uncomment this for tv support
++#tv=driver=v4l2:device=/dev/video0:input=0:audiorate=48000:audioid=1:norm=secam:chanlist=europe-west:channels=49-arte,52-m6
++
++# disable the running screen saver
++stop-xscreensaver=1

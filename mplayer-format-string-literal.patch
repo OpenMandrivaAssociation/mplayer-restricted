@@ -1,0 +1,22 @@
+--- mplayer/gui/interface.c.format~	2012-03-03 17:48:08.000000000 +0100
++++ mplayer/gui/interface.c	2012-05-17 01:44:24.522344422 +0200
+@@ -1165,7 +1165,7 @@ void gmp_msg(int mod, int lev, const cha
+     vsnprintf(msg, sizeof(msg), format, va);
+     va_end(va);
+ 
+-    mp_msg(mod, lev, msg);
++    mp_msg(mod, lev, "%s", msg);
+ 
+     if (mp_msg_test(mod, lev))
+         gtkMessageBox(GTK_MB_FATAL, msg);
+--- mplayer/mplayer.c.format~	2012-05-15 22:56:53.000000000 +0200
++++ mplayer/mplayer.c	2012-05-17 01:44:24.525344440 +0200
+@@ -2918,7 +2918,7 @@ int main(int argc, char *argv[])
+ 
+     if (!filename && !player_idle_mode && !use_gui) {
+         // no file/vcd/dvd -> show HELP:
+-        mp_msg(MSGT_CPLAYER, MSGL_INFO, help_text);
++        mp_msg(MSGT_CPLAYER, MSGL_INFO, "%s", help_text);
+         exit_player_with_rc(EXIT_NONE, 0);
+     }
+ 

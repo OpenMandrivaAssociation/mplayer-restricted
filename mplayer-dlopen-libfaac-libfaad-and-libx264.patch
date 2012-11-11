@@ -1,0 +1,3453 @@
+--- mplayer/configure.dlopen~	2012-01-05 16:41:59.000000000 +0100
++++ mplayer/configure	2012-01-13 16:20:17.177740899 +0100
+@@ -729,6 +729,7 @@ _mp3lame=auto
+ _mp3lame_lavc=auto
+ _toolame=auto
+ _twolame=auto
++_twolame_dlopen=no
+ _tremor=auto
+ _tremor_internal=yes
+ _tremor_low=no
+@@ -740,10 +741,13 @@ _mpg123=auto
+ _mp3lib=auto
+ _liba52=auto
+ _libdca=auto
++_libdca_dlopen=no
+ _libmpeg2=auto
+ _libmpeg2_internal=auto
+ _faad=auto
++_faad_dlopen=no
+ _faac=auto
++_faac_dlopen=no
+ _faac_lavc=auto
+ _ladspa=auto
+ _libbs2b=auto
+@@ -802,6 +806,7 @@ crystalhd=auto
+ _xvid=auto
+ _xvid_lavc=auto
+ _x264=auto
++_x264_dlopen=no
+ _x264_lavc=auto
+ _libdirac_lavc=auto
+ _libschroedinger_lavc=auto
+@@ -1114,6 +1119,8 @@ for ac_option do
+   --disable-toolame)    _toolame=no     ;;
+   --enable-twolame)     _twolame=yes    ;;
+   --disable-twolame)    _twolame=no     ;;
++  --enable-twolame-dlopen)         _twolame_dlopen=yes        ;;
++  --disable-twolame-dlopen)        _twolame_dlopen=no         ;;
+   --enable-libcdio)     _libcdio=yes    ;;
+   --disable-libcdio)    _libcdio=no     ;;
+   --enable-liblzo)      _liblzo=yes     ;;
+@@ -1140,6 +1147,8 @@ for ac_option do
+   --disable-liba52)     _liba52=no      ;;
+   --enable-libdca)      _libdca=yes     ;;
+   --disable-libdca)     _libdca=no      ;;
++  --enable-libdca-dlopen)         _libdca_dlopen=yes        ;;
++  --disable-libdca-dlopen)        _libdca_dlopen=no         ;;
+   --enable-libmpeg2)    _libmpeg2=yes   ;;
+   --disable-libmpeg2)   _libmpeg2=no    ;;
+   --enable-libmpeg2-internal)    _libmpeg2_internal=yes   ;;
+@@ -1148,8 +1157,12 @@ for ac_option do
+   --disable-musepack)   _musepack=no    ;;
+   --enable-faad)        _faad=yes       ;;
+   --disable-faad)       _faad=no        ;;
++  --enable-faad-dlopen)         _faad_dlopen=yes        ;;
++  --disable-faad-dlopen)        _faad_dlopen=no         ;;
+   --enable-faac)        _faac=yes       ;;
+   --disable-faac)       _faac=no        ;;
++  --enable-faac-dlopen)          _faac_dlopen=yes       ;;
++  --disable-faac-dlopen)         _faac_dlopen=no         ;;
+   --enable-faac-lavc)   _faac_lavc=yes  ;;
+   --disable-faac-lavc)  _faac_lavc=no   ;;
+   --enable-ladspa)      _ladspa=yes     ;;
+@@ -1250,6 +1263,8 @@ for ac_option do
+   --disable-xvid-lavc)  _xvid_lavc=no   ;;
+   --enable-x264)        _x264=yes       ;;
+   --disable-x264)       _x264=no        ;;
++  --enable-x264-dlopen)         _x264_dlopen=yes        ;;
++  --disable-x264-dlopen)        _x264_dlopen=no         ;;
+   --enable-x264-lavc)   _x264_lavc=yes  ;;
+   --disable-x264-lavc)  _x264_lavc=no   ;;
+   --enable-libdirac-lavc)   _libdirac_lavc=yes  ;;
+@@ -1262,8 +1277,12 @@ for ac_option do
+   --disable-libnut)     _libnut=no      ;;
+   --enable-libopencore_amrnb)   _libopencore_amrnb=yes  ;;
+   --disable-libopencore_amrnb)  _libopencore_amrnb=no   ;;
++  --enable-libopencore_amrnb-dlopen)   _libopencore_amrnb_dlopen=yes  ;;
++  --disable-libopencore_amrnb-dlopen)  _libopencore_amrnb_dlopen=no   ;;
+   --enable-libopencore_amrwb)   _libopencore_amrwb=yes  ;;
+   --disable-libopencore_amrwb)  _libopencore_amrwb=no   ;;
++  --enable-libopencore_amrwb-dlopen)   _libopencore_amrwb_dlopen=yes  ;;
++  --disable-libopencore_amrwb-dlopen)  _libopencore_amrwb_dlopen=no   ;;
+   --enable-decoder=*)  libavdecoders="$libavdecoders $(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')" ;;
+   --disable-decoder=*) libavdecoders=$(echo $libavdecoders | sed "s/$(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')//g") ;;
+   --enable-encoder=*)  libavencoders="$libavencoders $(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')" ;;
+@@ -6118,12 +6137,20 @@ if test "$_twolame" = auto ; then
+   _twolame=no
+   statement_check twolame.h 'twolame_init()' -ltwolame && _twolame=yes
+ fi
+-if test "$_twolame" = yes ; then
++if test "$_twolame_dlopen" = yes ; then
++  def_twolame="#define CONFIG_TWOLAME 1"
++  def_twolame_dlopen="#define CONFIG_TWOLAME_DLOPEN 1"
++  _twolame=yes
++  _twolame_dlopen=yes
++  codecmodules="twolame $codecmodules"
++elif test "$_twolame" = yes ; then
+   def_twolame='#define CONFIG_TWOLAME 1'
++  def_twolame_dlopen='#undef CONFIG_TWOLAME_DLOPEN'
+   libs_mencoder="$libs_mencoder -ltwolame"
+   codecmodules="twolame $codecmodules"
+ else
+   def_twolame='#undef CONFIG_TWOLAME'
++  def_twolame_dlopen='#undef CONFIG_TWOLAME_DLOPEN'
+   nocodecmodules="twolame $nocodecmodules"
+ fi
+ echores "$_twolame"
+@@ -6348,7 +6375,13 @@ if test "$_libdca" = auto ; then
+       extra_ldflags="$extra_ldflags $ld_dca" && _libdca=yes && break
+   done
+ fi
+-if test "$_libdca" = yes ; then
++if test "$_libdca_dlopen" = yes ; then
++  def_libdca="#define CONFIG_LIBDCA 1"
++  def_libdca_dlopen="#define CONFIG_LIBDCA_DLOPEN 1"
++  _libdca=yes
++  _libdca_dlopen=yes
++  codecmodules="libdca $codecmodules"
++elif test "$_libdca" = yes ; then
+   def_libdca='#define CONFIG_LIBDCA 1'
+   codecmodules="libdca $codecmodules"
+ else
+@@ -6392,9 +6425,17 @@ if test "$_faac" = auto && test "$_menco
+ int main(void) { unsigned long x, y; faacEncOpen(48000, 2, &x, &y); return 0; }
+ EOF
+   _faac=no
++if test "$_faac_dlopen" = yes ; then
++  def_faac="#define CONFIG_FAAC 1"
++  def_faac_dlopen="#define CONFIG_FAAC_DLOPEN 1"
++  _faac=yes
++  _faac_dlopen=yes
++else
++  def_faac_dlopen="#undef CONFIG_FAAC_DLOPEN"
+   for ld_faac in "-lfaac" "-lfaac -lmp4v2 -lstdc++" ; do
+     cc_check $ld_faac && libs_mencoder="$libs_mencoder $ld_faac" && _faac=yes && break
+   done
++  fi
+ fi
+ if test "$_faac" = yes ; then
+   def_faac="#define CONFIG_FAAC 1"
+@@ -6430,7 +6471,17 @@ EOF
+ fi
+ 
+ def_faad='#undef CONFIG_FAAD'
+-if test "$_faad" = yes ; then
++def_faad_dlopen='#undef CONFIG_FAAD_DLOPEN'
++if test "$_faad_dlopen" = yes ; then
++  def_faad="#define CONFIG_FAAD 1"
++  def_faad_dlopen="#define CONFIG_FAAD_DLOPEN 1"
++  _faad=yes
++  _faad_dlopen=yes
++else
++  def_faad_dlopen="#undef CONFIG_FAAD_DLOPEN"
++fi
++
++if test "$_faad" = yes && test "$_faad_dlopen" == no; then
+   def_faad='#define CONFIG_FAAD 1'
+   extra_ldflags="$extra_ldflags -lfaad"
+   codecmodules="faad2 $codecmodules"
+@@ -6736,7 +6787,14 @@ if test "$_libopencore_amrnb" = auto ; t
+     res_comment="ffmpeg (static) is required by libopencore_amrnb, sorry"
+   fi
+ fi
+-if test "$_libopencore_amrnb" = yes ; then
++if test "$_libopencore_amrnb_dlopen" = yes ; then
++  _libopencore_amr=yes
++  def_libopencore_amrnb='#define CONFIG_LIBOPENCORE_AMRNB 1'
++  def_libopencore_amrnb_dlopen='#define CONFIG_LIBOPENCORE_AMRNB_DLOPEN 1'
++  libavdecoders="$libavdecoders LIBOPENCORE_AMRNB_DECODER"
++  libavencoders="$libavencoders LIBOPENCORE_AMRNB_ENCODER"
++  codecmodules="libopencore_amrnb $codecmodules"
++elif test "$_libopencore_amrnb" = yes ; then
+   _libopencore_amr=yes
+   extra_ldflags="$extra_ldflags -lopencore-amrnb"
+   def_libopencore_amrnb='#define CONFIG_LIBOPENCORE_AMRNB 1'
+@@ -6759,7 +6817,13 @@ if test "$_libopencore_amrwb" = auto ; t
+     res_comment="ffmpeg (static) is required by libopencore_amrwb, sorry"
+   fi
+ fi
+-if test "$_libopencore_amrwb" = yes ; then
++if test "$_libopencore_amrwb_dlopen" = yes ; then
++  _libopencore_amr=yes
++  def_libopencore_amrwb='#define CONFIG_LIBOPENCORE_AMRWB 1'
++  def_libopencore_amrwb_dlopen='#define CONFIG_LIBOPENCORE_AMRWB_DLOPEN 1'
++  libavdecoders="$libavdecoders LIBOPENCORE_AMRWB_DECODER"
++  codecmodules="libopencore_amrwb $codecmodules"
++elif test "$_libopencore_amrwb" = yes ; then
+   _libopencore_amr=yes
+   extra_ldflags="$extra_ldflags -lopencore-amrwb"
+   def_libopencore_amrwb='#define CONFIG_LIBOPENCORE_AMRWB 1'
+@@ -6846,11 +6910,23 @@ if test "$_x264" = auto && test "$_menco
+ #endif
+ int main(void) { x264_encoder_open((void*)0); return 0; }
+ EOF
++
++if test "$_x264_dlopen" = yes ; then
++  def_x264='#define CONFIG_X264 1'
++  def_x264_dlopen='#define CONFIG_X264_DLOPEN 1'
++  codecmodules="x264 $codecmodules"
++  _x264=yes
++  _x264_dlopen=yes
++else
++  _x264_dlopen=no
++  def_x264='#undef CONFIG_X264_DLOPEN'
++  nocodecmodules="x264 $nocodecmodules"
+   _x264=no
+   for ld_x264 in "-lx264 $ld_pthread" "-lx264 $ld_pthread" ; do
+     cc_check $ld_x264 && libs_mencoder="$libs_mencoder $ld_x264" && _x264=yes && break
+   done
+ fi
++fi
+ 
+ if test "$_x264" = yes ; then
+   def_x264='#define CONFIG_X264 1'
+@@ -6870,7 +6946,6 @@ fi
+ res_comment="in FFmpeg: $_x264_lavc"
+ echores "$_x264"
+ 
+-
+ echocheck "libdirac"
+ if test "$_libdirac_lavc" = auto; then
+   _libdirac_lavc=no
+@@ -7996,7 +8071,9 @@ DXR2 = $_dxr2
+ DXR3 = $_dxr3
+ ESD = $_esd
+ FAAC=$_faac
++FAAC_DLOPEN=$_faac_dlopen
+ FAAD = $_faad
++FAAD_DLOPEN=$_faad_dlopen
+ FASTMEMCPY = $_fastmemcpy
+ FBDEV = $_fbdev
+ FREETYPE = $_freetype
+@@ -8027,6 +8104,7 @@ LIBASS_INTERNAL = $ass_internal
+ LIBBLURAY = $_bluray
+ LIBBS2B = $_libbs2b
+ LIBDCA = $_libdca
++LIBDCA_DLOPEN = $_libdca_dlopen
+ LIBDV = $_libdv
+ LIBDVDCSS_INTERNAL = $_libdvdcss_internal
+ LIBLZO = $_liblzo
+@@ -8086,6 +8164,7 @@ TV_V4L  = $_tv_v4l
+ TV_V4L1 = $_tv_v4l1
+ TV_V4L2 = $_tv_v4l2
+ TWOLAME=$_twolame
++TWOLAME_DLOPEN=$_twolame_dlopen
+ UNRAR_EXEC = $_unrar_exec
+ V4L2 = $_v4l2
+ VCD = $_vcd
+@@ -8116,6 +8195,7 @@ WIN32_EMULATION = $_win32_emulation
+ WINVIDIX = $winvidix
+ X11 = $_x11
+ X264 = $_x264
++X264_DLOPEN = $_x264_dlopen
+ XANIM_CODECS = $_xanim
+ XMGA = $_xmga
+ XMMS_PLUGINS = $_xmms
+@@ -8401,10 +8481,12 @@ $def_vcd
+ 
+ /* codec libraries */
+ $def_faac
++$def_faac_dlopen
+ $def_faad
++$def_faad_dlopen
+ $def_liba52
+ $def_libdca
+-$def_libdv
++$def_libdca_dlopen
+ $def_liblzo
+ $def_libmpeg2
+ $def_libmpeg2_internal
+@@ -8420,8 +8502,10 @@ $def_theora
+ $def_toolame
+ $def_tremor
+ $def_twolame
++$def_twolame_dlopen
+ $def_vorbis
+ $def_x264
++$def_x264_dlopen
+ $def_xvid
+ $def_zlib
+ 
+@@ -8719,7 +8803,9 @@ $def_faac_lavc
+ $def_libdirac_lavc
+ $def_libgsm
+ $def_libopencore_amrnb
++$def_libopencore_amrnb_dlopen
+ $def_libopencore_amrwb
++$def_libopencore_amrwb_dlopen
+ $def_libopenjpeg
+ $def_librtmp
+ $def_libschroedinger_lavc
+--- mplayer/libmpcodecs/ad_faad.c.dlopen~	2011-10-26 17:12:35.000000000 +0200
++++ mplayer/libmpcodecs/ad_faad.c	2012-01-13 16:20:17.179740895 +0100
+@@ -23,10 +23,101 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+-#include <faad.h>
+-
+ #include "config.h"
+ #include "mp_msg.h"
++
++#ifdef CONFIG_FAAD_DLOPEN
++#include "../localinc/neaacdec.h"
++#include "../localinc/dlopen.h"
++
++static NeAACDecHandle (*dl_NeAACDecOpen) (void);
++static NeAACDecConfigurationPtr (*dl_NeAACDecGetCurrentConfiguration) (NeAACDecHandle hDecoder);
++static NeAACDecConfigurationPtr (*dl_NeAACDecGetCurrentConfiguration) (NeAACDecHandle hDecoder);
++static char (*dl_NeAACDecInit2) (NeAACDecHandle hDecoder,
++                               unsigned char *pBuffer,
++                               unsigned long SizeOfDecoderSpecificInfo,
++                               unsigned long *samplerate,
++                               unsigned char *channels);
++static unsigned char (*dl_NeAACDecSetConfiguration) (NeAACDecHandle hDecoder,
++                                                   NeAACDecConfigurationPtr config);
++static long (*dl_NeAACDecInit) (NeAACDecHandle hDecoder,
++                              unsigned char *buffer,
++                              unsigned long buffer_size,
++                              unsigned long *samplerate,
++                              unsigned char *channels);
++static void (*dl_NeAACDecClose) (NeAACDecHandle hDecoder);
++static void* (*dl_NeAACDecDecode) (NeAACDecHandle hDecoder,
++                                 NeAACDecFrameInfo *hInfo,
++                                 unsigned char *buffer,
++                                 unsigned long buffer_size);
++static char* (*dl_NeAACDecGetErrorMessage) (unsigned char errcode);
++#define NeAACDecOpen			dl_NeAACDecOpen
++#define NeAACDecGetCurrentConfiguration	dl_NeAACDecGetCurrentConfiguration
++#define	NeAACDecInit2			dl_NeAACDecInit2
++#define	NeAACDecGetCurrentConfiguration	dl_NeAACDecGetCurrentConfiguration
++#define	NeAACDecSetConfiguration	dl_NeAACDecSetConfiguration
++#define	NeAACDecInit			dl_NeAACDecInit
++#define	NeAACDecClose			dl_NeAACDecClose
++#define	NeAACDecDecode			dl_NeAACDecDecode
++#define	NeAACDecGetErrorMessage		dl_NeAACDecGetErrorMessage
++#define	FAAD_LIB			"libfaad.so.2"
++
++static int loadLibFAAD() {
++    void *libfaad = NULL;
++    const char *err = NULL;
++
++    libfaad = dlopen(FAAD_LIB, RTLD_LAZY);
++    if ((err = dlerror())) {
++	mp_msg(MSGT_OSDEP, MSGL_FATAL, "%s\n%s is missing, faad support will be disabled\n", err, FAAD_LIB);
++
++	if (libfaad)
++	    dlclose(libfaad);
++	return 1;
++    }
++
++  dl_sym(NeAACDecOpen, (NeAACDecHandle (*) (void)), libfaad);
++
++  dl_sym(NeAACDecGetCurrentConfiguration, (NeAACDecConfigurationPtr (*) (NeAACDecHandle hDecoder)), libfaad);
++
++  dl_sym(NeAACDecGetCurrentConfiguration, (NeAACDecConfigurationPtr (*) (NeAACDecHandle hDecoder)), libfaad);
++
++  dl_sym(NeAACDecInit2, (char (*) (NeAACDecHandle hDecoder,
++			  unsigned char *pBuffer,
++			  unsigned long SizeOfDecoderSpecificInfo,
++			  unsigned long *samplerate,
++			  unsigned char *channels)), libfaad);
++
++  dl_sym(NeAACDecSetConfiguration, (unsigned char (*) (NeAACDecHandle hDecoder,
++			  NeAACDecConfigurationPtr config)), libfaad);
++
++  dl_sym(NeAACDecInit, (long (*) (NeAACDecHandle hDecoder,
++			  unsigned char *buffer,
++			  unsigned long buffer_size,
++			  unsigned long *samplerate,
++			  unsigned char *channels)), libfaad);
++
++  dl_sym(NeAACDecClose, (void (*) (NeAACDecHandle hDecoder)), libfaad);
++
++  dl_sym(NeAACDecDecode, (void* (*) (NeAACDecHandle hDecoder,
++			  NeAACDecFrameInfo *hInfo,
++			  unsigned char *buffer,
++			  unsigned long buffer_size)), libfaad);
++  dl_sym(NeAACDecGetErrorMessage, (char * (*) (unsigned char errcode)), libfaad);
++
++  return 0;
++
++error:
++  mp_msg(MSGT_OSDEP, MSGL_FATAL, "libfaad: Missing symbols in %s: %s\n "
++	  "faad support disabled\n", FAAD_LIB, err);
++  dlclose(libfaad);
++
++  return 1;
++}
++#else
++#include <faad.h>
++#include <neaacdec.h>
++#endif
++
+ #include "ad_internal.h"
+ #include "dec_audio.h"
+ #include "libaf/reorder_ch.h"
+@@ -83,6 +174,12 @@ static int init(sh_audio_t *sh)
+   unsigned long faac_samplerate;
+   unsigned char faac_channels;
+   int faac_init, pos = 0;
++
++#if CONFIG_FAAD_DLOPEN
++  if (loadLibFAAD())
++      return 0;
++#endif
++
+   faac_hdec = faacDecOpen();
+ 
+   // If we don't get the ES descriptor, try manual config
+--- mplayer/libmpcodecs/ad_libdca.c.dlopen~	2010-09-08 19:38:52.000000000 +0200
++++ mplayer/libmpcodecs/ad_libdca.c	2012-01-13 16:20:17.179740895 +0100
+@@ -31,7 +31,76 @@
+ #include "ad_internal.h"
+ #include "dec_audio.h"
+ 
++#define CONFIG_LIBDCA_DLOPEN 1
++#ifndef CONFIG_LIBDCA_DLOPEN
+ #include <dts.h>
++#else
++#include "localinc/dts.h"
++#include <dlfcn.h>
++
++static dca_state_t * (*dl_dca_init) (uint32_t mm_accel);
++static int (*dl_dca_syncinfo) (dca_state_t *state, uint8_t * buf, int * flags,
++                  int * sample_rate, int * bit_rate, int *frame_length);
++static int (*dl_dca_frame) (dca_state_t * state, uint8_t * buf, int * flags,
++               level_t * level, sample_t bias);
++static int (*dl_dca_blocks_num) (dca_state_t * state);
++static int (*dl_dca_block) (dca_state_t * state);
++static sample_t * (*dl_dca_samples) (dca_state_t * state);
++static void (*dl_dca_free) (dca_state_t * state);
++
++#define	dca_init	dl_dca_init
++#define dca_syncinfo	dl_dca_syncinfo
++#define	dca_frame	dl_dca_frame
++#define	dca_blocks_num	dl_dca_blocks_num
++#define	dca_block	dl_dca_block
++#define	dca_samples	dl_dca_samples
++#define	dca_free	dl_dca_free
++
++#define	DCA_LIB		"libdca.so.0"
++
++#define dl_sym(func, args, lib) \
++	dl_##func = args dlsym(lib, #func); \
++	if ((err = dlerror())) \
++		goto error;
++
++static int loadLibDCA() {
++    void *libdca = NULL;
++    const char *err = NULL;
++
++    libdca = dlopen(DCA_LIB, RTLD_LAZY);
++    if ((err = dlerror())) {
++        mp_msg(MSGT_OSDEP, MSGL_FATAL, "%s\n%s is missing, dca support will be disabled\n", err, DCA_LIB);
++	if (libdca)
++	    dlclose(libdca);
++	return 1;
++    }
++
++    dl_sym(dca_init, (dca_state_t * (*) (uint32_t mm_accel)), libdca);
++
++    dl_sym(dca_syncinfo, (int (*) (dca_state_t *state, uint8_t * buf, int * flags,
++                  int * sample_rate, int * bit_rate, int *frame_length)), libdca);
++
++    dl_sym(dca_frame, (int (*) (dca_state_t * state, uint8_t * buf, int * flags,
++               level_t * level, sample_t bias)), libdca);
++
++    dl_sym(dca_blocks_num, (int (*) (dca_state_t * state)), libdca);
++
++    dl_sym(dca_block, (int (*) (dca_state_t * state)), libdca);
++
++    dl_sym(dca_samples, (sample_t* (*) (dca_state_t * state)), libdca);
++
++    dl_sym(dca_free, (void (*) (dca_state_t * state)), libdca);
++
++    return 0;
++
++error:
++    mp_msg(MSGT_OSDEP, MSGL_FATAL, "libdca: Missing symbols in %s: %s\n "
++	  "dca support disabled\n", DCA_LIB, err);
++    dlclose(libdca);
++    return 1;
++
++}
++#endif
+ 
+ static const ad_info_t info =
+ {
+@@ -295,6 +364,11 @@ static int init(sh_audio_t *sh)
+     int flags;
+     int decoded_bytes;
+ 
++#ifdef CONFIG_LIBDCA_DLOPEN
++    if(loadLibDCA())
++	return 0;
++#endif
++
+     s = dts_init(0);
+     if(s == NULL) {
+         mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dts_init() failed\n");
+--- mplayer/libmpcodecs/ae_faac.c.dlopen~	2011-07-27 17:33:03.000000000 +0200
++++ mplayer/libmpcodecs/ae_faac.c	2012-01-13 16:20:17.179740895 +0100
+@@ -30,10 +30,77 @@
+ #include "libmpdemux/ms_hdr.h"
+ #include "stream/stream.h"
+ #include "libmpdemux/muxer.h"
+-#include <faac.h>
+ #include "ae.h"
+ #include "ae_faac.h"
+ 
++#ifndef CONFIG_FAAC_DLOPEN
++#include <faac.h>
++#else
++#include "localinc/faac.h"
++#include "localinc/dlopen.h"
++
++static int (*dl_faacEncGetDecoderSpecificInfo) (faacEncHandle hEncoder, unsigned char **ppBuffer,
++					  unsigned long *pSizeOfDecoderSpecificInfo);
++static int (*dl_faacEncSetConfiguration) (faacEncHandle hEncoder,
++				    faacEncConfigurationPtr config);
++
++static faacEncConfigurationPtr (*dl_faacEncGetCurrentConfiguration) (faacEncHandle hEncoder);
++static faacEncHandle (*dl_faacEncOpen) (unsigned long sampleRate,
++				  unsigned int numChannels,
++				  unsigned long *inputSamples,
++				  unsigned long *maxOutputBytes);
++static int (*dl_faacEncEncode) (faacEncHandle hEncoder, int32_t * inputBuffer, unsigned int samplesInput,
++			 unsigned char *outputBuffer,
++			 unsigned int bufferSize);
++static int (*dl_faacEncClose) (faacEncHandle hEncoder);
++
++#define faacEncGetDecoderSpecificInfo	dl_faacEncGetDecoderSpecificInfo
++#define faacEncSetConfiguration		dl_faacEncSetConfiguration
++#define	faacEncGetCurrentConfiguration	dl_faacEncGetCurrentConfiguration
++#define	faacEncOpen			dl_faacEncOpen
++#define	faacEncEncode			dl_faacEncEncode
++#define	faacEncClose			dl_faacEncClose
++#define	FAAC_LIB			"libfaac.so.0"
++
++static int loadLibFAAC() {
++	void *libfaac = NULL;
++	const char *err = NULL;
++
++	libfaac = dlopen(FAAC_LIB, RTLD_LAZY);
++	if ((err = dlerror())) {
++		mp_msg(MSGT_OSDEP, MSGL_FATAL, "%s\n%s is missing, faac support will be disabled\n", err, FAAC_LIB);
++		if (libfaac)
++			dlclose(libfaac);
++		return 1;
++	}
++
++	dl_sym(faacEncGetDecoderSpecificInfo, (int (*) (faacEncHandle hEncoder, unsigned char **ppBuffer,
++				unsigned long *pSizeOfDecoderSpecificInfo)), libfaac);
++
++	dl_sym(faacEncSetConfiguration, (int (*) (faacEncHandle hEncoder,
++				faacEncConfigurationPtr config)), libfaac);
++
++	dl_sym(faacEncGetCurrentConfiguration, (faacEncConfigurationPtr (*) (faacEncHandle hEncoder)), libfaac);
++
++	dl_sym(faacEncOpen, (faacEncHandle (*) (unsigned long sampleRate,
++				unsigned int numChannels,
++				unsigned long *inputSamples,
++				unsigned long *maxOutputBytes)), libfaac);
++	dl_sym(faacEncEncode, (int (*) (faacEncHandle hEncoder, int32_t * inputBuffer, unsigned int samplesInput,
++				unsigned char *outputBuffer,
++				unsigned int bufferSize)), libfaac);
++
++	dl_sym(faacEncClose, (int (*) (faacEncHandle hEncoder)), libfaac);
++
++	return 0;
++
++error:
++	mp_msg(MSGT_OSDEP, MSGL_FATAL, "libfaac: Missing symbols in %s: %s "
++			"faac support disabled\n", FAAC_LIB, dlerror());
++	dlclose(libfaac);
++	return 1;
++}
++#endif
+ 
+ static faacEncHandle faac;
+ static faacEncConfigurationPtr config = NULL;
+@@ -137,6 +204,10 @@ static int close_faac(audio_encoder_t *e
+ 
+ int mpae_init_faac(audio_encoder_t *encoder)
+ {
++#if CONFIG_FAAC_DLOPEN
++	if (loadLibFAAC())
++		return 0;
++#endif
+ 	if(encoder->params.channels < 1 || encoder->params.channels > 6 || (param_mpeg != 2 && param_mpeg != 4))
+ 	{
+ 		mp_msg(MSGT_MENCODER, MSGL_FATAL, "AE_FAAC, unsupported number of channels: %d, or mpeg version: %d, exit\n", encoder->params.channels, param_mpeg);
+--- mplayer/libmpcodecs/ae_twolame.c.dlopen~	2010-09-12 17:55:47.000000000 +0200
++++ mplayer/libmpcodecs/ae_twolame.c	2012-01-13 16:20:17.179740895 +0100
+@@ -22,7 +22,6 @@
+ #include <unistd.h>
+ #include <string.h>
+ #include <sys/types.h>
+-#include <twolame.h>
+ 
+ #include "m_option.h"
+ #include "mp_msg.h"
+@@ -34,6 +33,137 @@
+ #include "ae_twolame.h"
+ #include "libmpdemux/mp3_hdr.h"
+ 
++#ifndef CONFIG_TWOLAME_DLOPEN
++#include <twolame.h>
++#else
++#include "localinc/twolame.h"
++#include "localinc/dlopen.h"
++
++static int (*dl_twolame_encode_buffer_float32_interleaved) (twolame_options * glopts,
++                                                  const float pcm[],
++                                                  int num_samples,
++						  unsigned char *mp2buffer, int mp2buffer_size);
++static twolame_options* (*dl_twolame_init) (void);
++static int (*dl_twolame_init_params) (twolame_options * glopts);
++static int (*dl_twolame_encode_buffer_interleaved) (twolame_options * glopts,
++                                                     const short int pcm[],
++                                                     int num_samples,
++                                                     unsigned char *mp2buffer, int mp2buffer_size);
++static int (*dl_twolame_set_num_ancillary_bits) (twolame_options * glopts, int num);
++static int (*dl_twolame_set_error_protection) (twolame_options * glopts, int err_protection);
++static int (*dl_twolame_set_mode) (twolame_options * glopts, TWOLAME_MPEG_mode mode);
++static int (*dl_twolame_set_in_samplerate) (twolame_options * glopts, int samplerate);
++static int (*dl_twolame_set_out_samplerate) (twolame_options * glopts, int samplerate);
++static int (*dl_twolame_set_version) (twolame_options * glopts, TWOLAME_MPEG_version version);
++static int (*dl_twolame_set_psymodel) (twolame_options * glopts, int psymodel);
++static int (*dl_twolame_get_psymodel) (twolame_options * glopts);
++static int (*dl_twolame_set_num_channels) (twolame_options * glopts, int num_channels);
++static int (*dl_twolame_set_bitrate) (twolame_options * glopts, int bitrate);
++static int (*dl_twolame_set_VBR) (twolame_options * glopts, int vbr);
++static int (*dl_twolame_set_VBR_q) (twolame_options * glopts, float level);
++static int (*dl_twolame_set_VBR_max_bitrate_kbps) (twolame_options * glopts, int bitrate);
++static int (*dl_twolame_get_VBR_max_bitrate_kbps) (twolame_options * glopts);
++static int (*dl_twolame_set_padding) (twolame_options * glopts, TWOLAME_Padding padding);
++static int (*dl_twolame_set_verbosity) (twolame_options * glopts, int verbosity);
++static int (*dl_twolame_set_version) (twolame_options * glopts, TWOLAME_MPEG_version version);
++
++#define	twolame_encode_buffer_float32_interleaved	dl_twolame_encode_buffer_float32_interleaved
++#define	twolame_init					dl_twolame_init
++#define	twolame_init_params				dl_twolame_init_params
++#define	twolame_encode_buffer_interleaved		dl_twolame_encode_buffer_interleaved
++#define	twolame_set_num_ancillary_bits			dl_twolame_set_num_ancillary_bits
++#define	twolame_set_error_protection			dl_twolame_set_error_protection
++#define	twolame_set_mode				dl_twolame_set_mode
++#define	twolame_set_in_samplerate			dl_twolame_set_in_samplerate
++#define	twolame_set_out_samplerate			dl_twolame_set_out_samplerate
++#define	twolame_set_version				dl_twolame_set_version
++#define	twolame_set_psymodel				dl_twolame_set_psymodel
++#define	twolame_get_psymodel				dl_twolame_get_psymodel
++#define	twolame_set_num_channels			dl_twolame_set_num_channels
++#define	twolame_set_bitrate				dl_twolame_set_bitrate
++#define	twolame_set_VBR					dl_twolame_set_VBR
++#define	twolame_set_VBR_q				dl_twolame_set_VBR_q
++#define	twolame_set_VBR_max_bitrate_kbps		dl_twolame_set_VBR_max_bitrate_kbps
++#define	twolame_get_VBR_max_bitrate_kbps		dl_twolame_get_VBR_max_bitrate_kbps
++#define	twolame_set_padding				dl_twolame_set_padding
++#define	twolame_set_verbosity				dl_twolame_set_verbosity
++#define	twolame_set_version				dl_twolame_set_version
++#define	TWOLAME_LIB					"libtwolame.so.0"
++
++static int loadLibTwoLame() {
++	void *libtwolame = NULL;
++	const char *err = NULL;
++
++	libtwolame = dlopen(TWOLAME_LIB, RTLD_LAZY);
++	if ((err = dlerror())) {
++		mp_msg(MSGT_OSDEP, MSGL_FATAL, "%s\n%s is missing, twolame support disabled\n", err, TWOLAME_LIB);
++		if (libtwolame)
++			dlclose(libtwolame);
++		return 1;
++	}
++
++
++	dl_sym(twolame_encode_buffer_float32_interleaved,(int (*) (twolame_options * glopts,
++				const float pcm[],
++				int num_samples,
++				unsigned char *mp2buffer, int mp2buffer_size)),
++			libtwolame);
++
++	dl_sym(twolame_init, (twolame_options* (*) (void)), libtwolame);
++
++	dl_sym(twolame_init_params, (int (*)(twolame_options * glopts)), libtwolame);
++
++	dl_sym(twolame_encode_buffer_interleaved, (int (*) (twolame_options * glopts,
++				const short int pcm[],
++				int num_samples,
++				unsigned char *mp2buffer, int mp2buffer_size)),
++			libtwolame);
++
++	dl_sym(twolame_set_num_ancillary_bits, (int (*) (twolame_options * glopts, int num)), libtwolame);
++
++	dl_sym(twolame_set_error_protection, (int (*) (twolame_options * glopts, int err_protection)), libtwolame);
++
++	dl_sym(twolame_set_mode, (int (*) (twolame_options * glopts, TWOLAME_MPEG_mode mode)), libtwolame);
++
++	dl_sym(twolame_set_in_samplerate, (int (*) (twolame_options * glopts, int samplerate)), libtwolame);
++
++	dl_sym(twolame_set_out_samplerate, (int (*) (twolame_options * glopts, int samplerate)), libtwolame)
++
++	dl_sym(twolame_set_version, (int (*) (twolame_options * glopts, TWOLAME_MPEG_version version)), libtwolame);
++
++	dl_sym(twolame_set_psymodel, (int (*) (twolame_options * glopts, int psymodel)), libtwolame);
++
++	dl_sym(twolame_get_psymodel, (int (*) (twolame_options * glopts)), libtwolame);
++
++	dl_sym(twolame_set_num_channels, (int (*) (twolame_options * glopts, int num_channels)), libtwolame);
++
++	dl_sym(twolame_set_bitrate, (int (*) (twolame_options * glopts, int bitrate)), libtwolame);
++
++	dl_sym(twolame_set_VBR, (int (*) (twolame_options * glopts, int vbr)), libtwolame);
++
++	dl_sym(twolame_set_VBR_q, (int (*) (twolame_options * glopts, float level)), libtwolame);
++
++	dl_sym(twolame_set_VBR_max_bitrate_kbps, (int (*) (twolame_options * glopts, int bitrate)), libtwolame);
++
++	dl_sym(twolame_get_VBR_max_bitrate_kbps, (int (*) (twolame_options * glopts)), libtwolame);
++
++	dl_sym(twolame_set_padding, (int (*) (twolame_options * glopts, TWOLAME_Padding padding)), libtwolame);
++
++	dl_sym(twolame_set_verbosity, (int (*) (twolame_options * glopts, int verbosity)), libtwolame);
++
++	dl_sym(twolame_set_version, (int (*) (twolame_options * glopts, TWOLAME_MPEG_version version)), libtwolame);
++
++	return 0;
++error:
++
++	mp_msg(MSGT_OSDEP, MSGL_FATAL, "libtwolame: Missing symbols in %s: %s\n"
++			"twolame support disabled\n", TWOLAME_LIB, err);
++	dlclose(libtwolame);
++
++	return 1;
++}
++#endif
++
+ 
+ typedef struct {
+ 	twolame_options *twolame_ctx;
+@@ -143,6 +273,10 @@ int mpae_init_twolame(audio_encoder_t *e
+ 	int mode;
+ 	mpae_twolame_ctx *ctx = NULL;
+ 
++#ifdef TWOLAME_DLOPEN
++	if (loadLibTwoLame())
++		return 0;
++#endif
+ 	if(encoder->params.channels == 1)
+ 	{
+ 		mp_msg(MSGT_MENCODER, MSGL_INFO, "ae_twolame, 1 audio channel, forcing mono mode\n");
+--- mplayer/libmpcodecs/ve_x264.c.dlopen~	2011-04-28 15:45:16.000000000 +0200
++++ mplayer/libmpcodecs/ve_x264.c	2012-01-13 16:20:32.416718017 +0100
+@@ -48,7 +48,97 @@
+ #include "ve.h"
+ #include "ve_x264.h"
+ 
++#ifndef CONFIG_X264_DLOPEN
+ #include <x264.h>
++#else
++#include "localinc/x264.h"
++#include "localinc/dlopen.h"
++
++static void (*dl_x264_picture_init) (x264_picture_t *);
++static int  (*dl_x264_encoder_encode) (x264_t *, x264_nal_t **, int *, x264_picture_t *, x264_picture_t *);
++static int  (*dl_x264_encoder_delayed_frames) (x264_t *);
++static x264_t* (*dl_x264_encoder_open) ( x264_param_t * );
++static int  (*dl_x264_encoder_reconfig) ( x264_t *, x264_param_t * );
++static void (*dl_x264_encoder_close) (x264_t *);
++static void (*dl_x264_param_default) (x264_param_t *);
++static int  (*dl_x264_param_parse) (x264_param_t *, const char *name, const char *value );
++static int  (*dl_x264_param_default_preset) (x264_param_t *, const char *preset, const char *tune);
++static int  (*dl_x264_param_apply_profile) (x264_param_t *, const char *profile);
++static void (*dl_x264_param_apply_fastfirstpass) (x264_param_t *);
++static int  (*dl_x264_encoder_headers) (x264_t *, x264_nal_t **, int *);
++
++#define x264_picture_init		dl_x264_picture_init
++#define x264_encoder_encode		dl_x264_encoder_encode
++#define	x264_encoder_delayed_frames	dl_x264_encoder_delayed_frames
++#undef x264_encoder_open
++#define x264_encoder_open		dl_x264_encoder_open
++#define x264_encoder_reconfig		dl_x264_encoder_reconfig
++#define x264_encoder_close		dl_x264_encoder_close
++#define	x264_param_default		dl_x264_param_default
++#define x264_param_apply_profile	dl_x264_param_apply_profile
++#define x264_param_apply_fastfirstpass	dl_x264_param_apply_fastfirstpass
++#define	x264_param_parse		dl_x264_param_parse
++#define x264_param_default_preset	dl_x264_param_default_preset
++#define x264_encoder_headers		dl_x264_encoder_headers
++
++#define	X264_BUILD_str num2str(X264_BUILD)
++#define	X264_LIB "libx264.so." X264_BUILD_str
++#define	x264_encoder_open_str "x264_encoder_open_" X264_BUILD_str
++
++static int loadLibX264() {
++
++    void *libx264 = NULL;
++    const char *err = NULL;
++
++    libx264 = dlopen(X264_LIB, RTLD_LAZY);
++    if ((err = dlerror())) {
++	mp_msg(MSGT_OSDEP, MSGL_FATAL, "%s\n%s is missing, x264 support will be disabled\n", err, X264_LIB);
++
++	if (libx264)
++	    dlclose(libx264);
++	return 1;
++    }
++
++
++    dl_sym(x264_picture_init, (void (*) (x264_picture_t *)), libx264);
++
++    dl_sym(x264_encoder_encode, (int (*) (x264_t *, x264_nal_t **, int *, x264_picture_t *, x264_picture_t *)), libx264);
++
++    dl_sym(x264_encoder_delayed_frames, (int (*) (x264_t *)), libx264);
++
++    dl_x264_encoder_open =(x264_t* (*) (x264_param_t *)) dlsym(libx264, x264_encoder_open_str);
++		if ((err = dlerror()))
++			goto error;
++
++    dl_sym(x264_encoder_reconfig, (int (*) (x264_t *, x264_param_t * )), libx264);
++
++    dl_sym(x264_encoder_close, (void (*) (x264_t *)), libx264);
++
++    dl_sym(x264_param_default, (void (*) (x264_param_t *)), libx264);
++
++    dl_sym(x264_param_apply_fastfirstpass, (void (*) (x264_param_t *)), libx264);
++
++    dl_sym(x264_param_parse, (int (*) (x264_param_t *, const char *name, const char *value )), libx264);
++
++    dl_sym(x264_param_default_preset, (int (*) (x264_param_t *, const char *preset, const char *tune)), libx264)
++
++    dl_sym(x264_param_apply_profile, (int (*) (x264_param_t *, const char *profile)), libx264);
++
++    dl_sym(x264_param_apply_fastfirstpass, (void (*) (x264_param_t *)), libx264);
++
++    dl_sym(x264_encoder_headers, (int (*) (x264_t *, x264_nal_t **, int *)),libx264);
++
++    return 0;
++
++error:
++    mp_msg(MSGT_OSDEP, MSGL_FATAL, "libx264: Missing symbols in %s: %s\n "
++	    "x264 support disabled\n", X264_LIB, err);
++    dlclose(libx264);
++
++    return 1;
++}
++
++#endif
+ 
+ typedef struct h264_module_t {
+     muxer_stream_t *mux;
+@@ -70,6 +160,9 @@ void x264enc_set_param(const m_option_t*
+     char *p, *copy, *name;
+ 
+     if (!initialized) {
++#ifdef	CONFIG_X264_DLOPEN
++        loadLibX264();
++#endif
+         x264_param_default(&param);
+         initialized = 1;
+     }
+--- mplayer/localinc/dca.h.dlopen~	2012-01-13 16:20:17.180740893 +0100
++++ mplayer/localinc/dca.h	2012-01-13 16:20:17.180740893 +0100
+@@ -0,0 +1,86 @@
++/*
++ * dca.h
++ * Copyright (C) 2004 Gildas Bazin <gbazin@videolan.org>
++ *
++ * This file is part of libdca, a free DTS Coherent Acoustics stream decoder.
++ * See http://www.videolan.org/developers/libdca.html for updates.
++ *
++ * libdca is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * libdca is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the
++ * Free Software Foundation, Inc.,
++ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++
++#ifndef LIBDCA_DCA_H
++#define LIBDCA_DCA_H
++
++/* x86 accelerations */
++#define MM_ACCEL_X86_MMX	0x80000000
++#define MM_ACCEL_X86_3DNOW	0x40000000
++#define MM_ACCEL_X86_MMXEXT	0x20000000
++
++uint32_t mm_accel (void);
++
++#if defined(LIBDCA_FIXED)
++typedef int32_t sample_t;
++typedef int32_t level_t;
++#elif defined(LIBDCA_DOUBLE)
++typedef double sample_t;
++typedef double level_t;
++#else
++typedef float sample_t;
++typedef float level_t;
++#endif
++
++typedef struct dca_state_s dca_state_t;
++
++#define DCA_MONO 0
++#define DCA_CHANNEL 1
++#define DCA_STEREO 2
++#define DCA_STEREO_SUMDIFF 3
++#define DCA_STEREO_TOTAL 4
++#define DCA_3F 5
++#define DCA_2F1R 6
++#define DCA_3F1R 7
++#define DCA_2F2R 8
++#define DCA_3F2R 9
++#define DCA_4F2R 10
++
++#define DCA_DOLBY 101 /* FIXME */
++
++#define DCA_CHANNEL_MAX  DCA_3F2R /* We don't handle anything above that */
++#define DCA_CHANNEL_BITS 6
++#define DCA_CHANNEL_MASK 0x3F
++
++#define DCA_LFE 0x80
++#define DCA_ADJUST_LEVEL 0x100
++
++dca_state_t * dca_init (uint32_t mm_accel);
++
++int dca_syncinfo (dca_state_t *state, uint8_t * buf, int * flags,
++                  int * sample_rate, int * bit_rate, int *frame_length);
++
++int dca_frame (dca_state_t * state, uint8_t * buf, int * flags,
++               level_t * level, sample_t bias);
++
++void dca_dynrng (dca_state_t * state,
++                 level_t (* call) (level_t, void *), void * data);
++
++int dca_blocks_num (dca_state_t * state);
++int dca_block (dca_state_t * state);
++
++sample_t * dca_samples (dca_state_t * state);
++
++void dca_free (dca_state_t * state);
++
++#endif /* LIBDCA_DCA_H */
+--- mplayer/localinc/dec_if.h.dlopen~	2012-01-13 16:20:17.180740893 +0100
++++ mplayer/localinc/dec_if.h	2012-01-13 16:20:17.180740893 +0100
+@@ -0,0 +1,36 @@
++/* ------------------------------------------------------------------
++ * Copyright (C) 2009 Martin Storsjo
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied.
++ * See the License for the specific language governing permissions
++ * and limitations under the License.
++ * -------------------------------------------------------------------
++ */
++
++#ifndef OPENCORE_AMRWB_DEC_IF_H
++#define OPENCORE_AMRWB_DEC_IF_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#define _good_frame 0
++
++void* D_IF_init(void);
++void D_IF_decode(void* state, const unsigned char* bits, short* synth, int bfi);
++void D_IF_exit(void* state);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+--- mplayer/localinc/dlopen.h.dlopen~	2012-01-13 16:20:17.180740893 +0100
++++ mplayer/localinc/dlopen.h	2012-01-13 16:20:17.180740893 +0100
+@@ -0,0 +1,12 @@
++#ifndef LOCALINC_DLOPEN_H
++#define LOCALINC_DLOPEN_H
++#include <dlfcn.h>
++#define num2str(x) str(x)
++#define str(x) #x
++
++#define dl_sym(func, args, lib) \
++	dl_##func = args dlsym(lib, #func); \
++	if ((err = dlerror())) \
++		goto error;
++
++#endif
+--- mplayer/localinc/dts.h.dlopen~	2012-01-13 16:20:17.180740893 +0100
++++ mplayer/localinc/dts.h	2012-01-13 16:20:17.181740892 +0100
+@@ -0,0 +1,55 @@
++/*
++ * dts.h
++ * Copyright (C) 2004 Gildas Bazin <gbazin@videolan.org>
++ *
++ * This file is part of libdca, a free DTS Coherent Acoustics stream decoder.
++ * See http://www.videolan.org/developers/libdca.html for updates.
++ *
++ * libdca is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * libdca is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the
++ * Free Software Foundation, Inc.,
++ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++
++#ifndef LIBDCA_COMPAT_H
++# define LIBDCA_COMPAT_H 1
++# include "dca.h"
++
++typedef struct dca_state_s dts_state_t;
++# define DTS_MONO DCA_MONO
++# define DTS_CHANNEL DCA_CHANNEL
++# define DTS_STEREO DCA_STEREO
++# define DTS_STEREO_SUMDIFF DCA_STEREO_SUMDIFF
++# define DTS_STEREO_TOTAL DCA_STEREO_TOTAL
++# define DTS_3F DCA_3F
++# define DTS_2F1R DCA_2F1R
++# define DTS_3F1R DCA_3F1R
++# define DTS_2F2R DCA_2F2R
++# define DTS_3F2R DCA_3F2R
++# define DTS_4F2R DCA_4F2R
++# define DTS_DOLBY DCA_DOLBY
++# define DTS_CHANNEL_MAX DCA_CHANNEL_MAX
++# define DTS_CHANNEL_BITS DCA_CHANNEL_BITS
++# define DTS_CHANNEL_MASK DCA_CHANNEL_MASK
++# define DTS_LFE DCA_LFE
++# define DTS_ADJUST_LEVEL DCA_ADJUST_LEVEL
++
++# define dts_init dca_init
++# define dts_syncinfo dca_syncinfo
++# define dts_frame dca_frame
++# define dts_dynrng dca_dynrng
++# define dts_blocks_num dca_blocks_num
++# define dts_block dca_block
++# define dts_samples dca_samples
++# define dts_free dca_free
++#endif
+--- mplayer/localinc/faaccfg.h.dlopen~	2012-01-13 16:20:17.181740892 +0100
++++ mplayer/localinc/faaccfg.h	2012-01-13 16:20:17.181740892 +0100
+@@ -0,0 +1,122 @@
++/*
++ * FAAC - Freeware Advanced Audio Coder
++ * Copyright (C) 2001 Menno Bakker
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ * $Id: faaccfg.h,v 1.3 2004/07/04 12:12:05 corrados Exp $
++ */
++
++#ifndef _FAACCFG_H_
++#define _FAACCFG_H_
++
++#define FAAC_CFG_VERSION 104
++
++/* MPEG ID's */
++#define MPEG2 1
++#define MPEG4 0
++
++/* AAC object types */
++#define MAIN 1
++#define LOW  2
++#define SSR  3
++#define LTP  4
++
++/* Input Formats */
++#define FAAC_INPUT_NULL    0
++#define FAAC_INPUT_16BIT   1
++#define FAAC_INPUT_24BIT   2
++#define FAAC_INPUT_32BIT   3
++#define FAAC_INPUT_FLOAT   4
++
++#define SHORTCTL_NORMAL    0
++#define SHORTCTL_NOSHORT   1
++#define SHORTCTL_NOLONG    2
++
++#pragma pack(push, 1)
++typedef struct faacEncConfiguration
++{
++    /* config version */
++    int version;
++
++    /* library version */
++    char *name;
++
++    /* copyright string */
++    char *copyright;
++
++    /* MPEG version, 2 or 4 */
++    unsigned int mpegVersion;
++
++    /* AAC object type */
++    unsigned int aacObjectType;
++
++    /* Allow mid/side coding */
++    unsigned int allowMidside;
++
++    /* Use one of the channels as LFE channel */
++    unsigned int useLfe;
++
++    /* Use Temporal Noise Shaping */
++    unsigned int useTns;
++
++    /* bitrate / channel of AAC file */
++    unsigned long bitRate;
++
++    /* AAC file frequency bandwidth */
++    unsigned int bandWidth;
++
++    /* Quantizer quality */
++    unsigned long quantqual;
++
++    /* Bitstream output format (0 = Raw; 1 = ADTS) */
++    unsigned int outputFormat;
++
++    /* psychoacoustic model list */
++    psymodellist_t *psymodellist;
++
++    /* selected index in psymodellist */
++    unsigned int psymodelidx;
++
++    /*
++		PCM Sample Input Format
++		0	FAAC_INPUT_NULL			invalid, signifies a misconfigured config
++		1	FAAC_INPUT_16BIT		native endian 16bit
++		2	FAAC_INPUT_24BIT		native endian 24bit in 24 bits		(not implemented)
++		3	FAAC_INPUT_32BIT		native endian 24bit in 32 bits		(DEFAULT)
++		4	FAAC_INPUT_FLOAT		32bit floating point
++    */
++    unsigned int inputFormat;
++
++    /* block type enforcing (SHORTCTL_NORMAL/SHORTCTL_NOSHORT/SHORTCTL_NOLONG) */
++    int shortctl;
++	
++	/*
++		Channel Remapping
++
++		Default			0, 1, 2, 3 ... 63  (64 is MAX_CHANNELS in coder.h)
++
++		WAVE 4.0		2, 0, 1, 3
++		WAVE 5.0		2, 0, 1, 3, 4
++		WAVE 5.1		2, 0, 1, 4, 5, 3
++		AIFF 5.1		2, 0, 3, 1, 4, 5 
++	*/
++	int channel_map[64];	
++
++} faacEncConfiguration, *faacEncConfigurationPtr;
++
++#pragma pack(pop)
++
++#endif /* _FAACCFG_H_ */
+--- mplayer/localinc/faac.h.dlopen~	2012-01-13 16:20:17.181740892 +0100
++++ mplayer/localinc/faac.h	2012-01-13 16:20:17.181740892 +0100
+@@ -0,0 +1,99 @@
++/*
++ * FAAC - Freeware Advanced Audio Coder
++ * Copyright (C) 2001 Menno Bakker
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ * $Id: faac.h,v 1.36 2009/01/25 18:50:32 menno Exp $
++ */
++
++#ifndef _FAAC_H_
++#define _FAAC_H_
++
++#ifdef __cplusplus
++extern "C" {
++#endif /* __cplusplus */
++
++#if defined(_WIN32) && !defined(__MINGW32__)
++# ifndef FAACAPI
++#  define FAACAPI __stdcall
++# endif
++#else
++# ifndef FAACAPI
++#  define FAACAPI
++# endif
++#endif
++
++#pragma pack(push, 1)
++
++typedef struct {
++  void *ptr;
++  char *name;
++}
++psymodellist_t;
++
++#include "faaccfg.h"
++
++
++typedef void *faacEncHandle;
++
++#ifndef HAVE_INT32_T
++typedef signed int int32_t;
++#endif
++
++/*
++	Allows an application to get FAAC version info. This is intended
++	purely for informative purposes.
++
++	Returns FAAC_CFG_VERSION.
++*/
++int FAACAPI faacEncGetVersion(char **faac_id_string,
++			      char **faac_copyright_string);
++
++
++faacEncConfigurationPtr FAACAPI
++  faacEncGetCurrentConfiguration(faacEncHandle hEncoder);
++
++
++int FAACAPI faacEncSetConfiguration(faacEncHandle hEncoder,
++				    faacEncConfigurationPtr config);
++
++
++faacEncHandle FAACAPI faacEncOpen(unsigned long sampleRate,
++				  unsigned int numChannels,
++				  unsigned long *inputSamples,
++				  unsigned long *maxOutputBytes);
++
++
++int FAACAPI faacEncGetDecoderSpecificInfo(faacEncHandle hEncoder, unsigned char **ppBuffer,
++					  unsigned long *pSizeOfDecoderSpecificInfo);
++
++
++int FAACAPI faacEncEncode(faacEncHandle hEncoder, int32_t * inputBuffer, unsigned int samplesInput,
++			 unsigned char *outputBuffer,
++			 unsigned int bufferSize);
++
++
++int FAACAPI faacEncClose(faacEncHandle hEncoder);
++
++
++
++#pragma pack(pop)
++
++#ifdef __cplusplus
++}
++#endif /* __cplusplus */
++
++#endif /* _FAAC_H_ */
+--- mplayer/localinc/if_rom.h.dlopen~	2012-01-13 16:20:17.181740892 +0100
++++ mplayer/localinc/if_rom.h	2012-01-13 16:20:17.181740892 +0100
+@@ -0,0 +1,33 @@
++/* ------------------------------------------------------------------
++ * Copyright (C) 2009 Martin Storsjo
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied.
++ * See the License for the specific language governing permissions
++ * and limitations under the License.
++ * -------------------------------------------------------------------
++ */
++
++#ifndef OPENCORE_AMRWB_IF_ROM_H
++#define OPENCORE_AMRWB_IF_ROM_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#include <stdint.h>
++typedef int16_t Word16;
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+--- mplayer/localinc/interf_dec.h.dlopen~	2012-01-13 16:20:17.181740892 +0100
++++ mplayer/localinc/interf_dec.h	2012-01-13 16:20:17.181740892 +0100
+@@ -0,0 +1,34 @@
++/* ------------------------------------------------------------------
++ * Copyright (C) 2009 Martin Storsjo
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied.
++ * See the License for the specific language governing permissions
++ * and limitations under the License.
++ * -------------------------------------------------------------------
++ */
++
++#ifndef OPENCORE_AMRNB_INTERF_DEC_H
++#define OPENCORE_AMRNB_INTERF_DEC_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++void* Decoder_Interface_init(void);
++void Decoder_Interface_exit(void* state);
++void Decoder_Interface_Decode(void* state, const unsigned char* in, short* out, int bfi);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+--- mplayer/localinc/interf_enc.h.dlopen~	2012-01-13 16:20:17.181740892 +0100
++++ mplayer/localinc/interf_enc.h	2012-01-13 16:20:17.181740892 +0100
+@@ -0,0 +1,50 @@
++/* ------------------------------------------------------------------
++ * Copyright (C) 2009 Martin Storsjo
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied.
++ * See the License for the specific language governing permissions
++ * and limitations under the License.
++ * -------------------------------------------------------------------
++ */
++
++#ifndef OPENCORE_AMRNB_INTERF_ENC_H
++#define OPENCORE_AMRNB_INTERF_ENC_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#ifndef AMRNB_WRAPPER_INTERNAL
++/* Copied from enc/src/gsmamr_enc.h */
++enum Mode {
++	MR475 = 0,/* 4.75 kbps */
++	MR515,    /* 5.15 kbps */
++	MR59,     /* 5.90 kbps */
++	MR67,     /* 6.70 kbps */
++	MR74,     /* 7.40 kbps */
++	MR795,    /* 7.95 kbps */
++	MR102,    /* 10.2 kbps */
++	MR122,    /* 12.2 kbps */
++	MRDTX,    /* DTX       */
++	N_MODES   /* Not Used  */
++};
++#endif
++
++void* Encoder_Interface_init(int dtx);
++void Encoder_Interface_exit(void* state);
++int Encoder_Interface_Encode(void* state, enum Mode mode, const short* speech, unsigned char* out, int forceSpeech);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+--- mplayer/localinc/neaacdec.h.dlopen~	2012-01-13 16:20:17.182740891 +0100
++++ mplayer/localinc/neaacdec.h	2012-01-13 16:20:17.182740891 +0100
+@@ -0,0 +1,258 @@
++/*
++** FAAD2 - Freeware Advanced Audio (AAC) Decoder including SBR decoding
++** Copyright (C) 2003-2005 M. Bakker, Nero AG, http://www.nero.com
++**  
++** This program is free software; you can redistribute it and/or modify
++** it under the terms of the GNU General Public License as published by
++** the Free Software Foundation; either version 2 of the License, or
++** (at your option) any later version.
++** 
++** This program is distributed in the hope that it will be useful,
++** but WITHOUT ANY WARRANTY; without even the implied warranty of
++** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++** GNU General Public License for more details.
++** 
++** You should have received a copy of the GNU General Public License
++** along with this program; if not, write to the Free Software 
++** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++**
++** Any non-GPL usage of this software or parts of this software is strictly
++** forbidden.
++**
++** The "appropriate copyright message" mentioned in section 2c of the GPLv2
++** must read: "Code from FAAD2 is copyright (c) Nero AG, www.nero.com"
++**
++** Commercial non-GPL licensing of this software is possible.
++** For more info contact Nero AG through Mpeg4AAClicense@nero.com.
++**
++** $Id: neaacdec.h,v 1.13 2009/01/26 23:51:15 menno Exp $
++**/
++
++#ifndef __NEAACDEC_H__
++#define __NEAACDEC_H__
++
++#ifdef __cplusplus
++extern "C" {
++#endif /* __cplusplus */
++
++
++#if 1
++/* MACROS FOR BACKWARDS COMPATIBILITY */
++/* structs */
++#define faacDecHandle                  NeAACDecHandle
++#define faacDecConfiguration           NeAACDecConfiguration
++#define faacDecConfigurationPtr        NeAACDecConfigurationPtr
++#define faacDecFrameInfo               NeAACDecFrameInfo
++/* functions */
++#define faacDecGetErrorMessage         NeAACDecGetErrorMessage
++#define faacDecSetConfiguration        NeAACDecSetConfiguration
++#define faacDecGetCurrentConfiguration NeAACDecGetCurrentConfiguration
++#define faacDecInit                    NeAACDecInit
++#define faacDecInit2                   NeAACDecInit2
++#define faacDecInitDRM                 NeAACDecInitDRM
++#define faacDecPostSeekReset           NeAACDecPostSeekReset
++#define faacDecOpen                    NeAACDecOpen
++#define faacDecClose                   NeAACDecClose
++#define faacDecDecode                  NeAACDecDecode
++#define AudioSpecificConfig            NeAACDecAudioSpecificConfig
++#endif
++
++
++#ifdef _WIN32
++  #pragma pack(push, 8)
++  #ifndef NEAACDECAPI
++    #define NEAACDECAPI __cdecl
++  #endif
++#else
++  #ifndef NEAACDECAPI
++    #define NEAACDECAPI
++  #endif
++#endif
++
++#define FAAD2_VERSION "2.7"
++
++/* object types for AAC */
++#define MAIN       1
++#define LC         2
++#define SSR        3
++#define LTP        4
++#define HE_AAC     5
++#define ER_LC     17
++#define ER_LTP    19
++#define LD        23
++#define DRM_ER_LC 27 /* special object type for DRM */
++
++/* header types */
++#define RAW        0
++#define ADIF       1
++#define ADTS       2
++#define LATM       3
++
++/* SBR signalling */
++#define NO_SBR           0
++#define SBR_UPSAMPLED    1
++#define SBR_DOWNSAMPLED  2
++#define NO_SBR_UPSAMPLED 3
++
++/* library output formats */
++#define FAAD_FMT_16BIT  1
++#define FAAD_FMT_24BIT  2
++#define FAAD_FMT_32BIT  3
++#define FAAD_FMT_FLOAT  4
++#define FAAD_FMT_FIXED  FAAD_FMT_FLOAT
++#define FAAD_FMT_DOUBLE 5
++
++/* Capabilities */
++#define LC_DEC_CAP           (1<<0) /* Can decode LC */
++#define MAIN_DEC_CAP         (1<<1) /* Can decode MAIN */
++#define LTP_DEC_CAP          (1<<2) /* Can decode LTP */
++#define LD_DEC_CAP           (1<<3) /* Can decode LD */
++#define ERROR_RESILIENCE_CAP (1<<4) /* Can decode ER */
++#define FIXED_POINT_CAP      (1<<5) /* Fixed point */
++
++/* Channel definitions */
++#define FRONT_CHANNEL_CENTER (1)
++#define FRONT_CHANNEL_LEFT   (2)
++#define FRONT_CHANNEL_RIGHT  (3)
++#define SIDE_CHANNEL_LEFT    (4)
++#define SIDE_CHANNEL_RIGHT   (5)
++#define BACK_CHANNEL_LEFT    (6)
++#define BACK_CHANNEL_RIGHT   (7)
++#define BACK_CHANNEL_CENTER  (8)
++#define LFE_CHANNEL          (9)
++#define UNKNOWN_CHANNEL      (0)
++
++/* DRM channel definitions */
++#define DRMCH_MONO          1
++#define DRMCH_STEREO        2
++#define DRMCH_SBR_MONO      3
++#define DRMCH_SBR_STEREO    4
++#define DRMCH_SBR_PS_STEREO 5
++
++
++/* A decode call can eat up to FAAD_MIN_STREAMSIZE bytes per decoded channel,
++   so at least so much bytes per channel should be available in this stream */
++#define FAAD_MIN_STREAMSIZE 768 /* 6144 bits/channel */
++
++
++typedef void *NeAACDecHandle;
++
++typedef struct mp4AudioSpecificConfig
++{
++    /* Audio Specific Info */
++    unsigned char objectTypeIndex;
++    unsigned char samplingFrequencyIndex;
++    unsigned long samplingFrequency;
++    unsigned char channelsConfiguration;
++
++    /* GA Specific Info */
++    unsigned char frameLengthFlag;
++    unsigned char dependsOnCoreCoder;
++    unsigned short coreCoderDelay;
++    unsigned char extensionFlag;
++    unsigned char aacSectionDataResilienceFlag;
++    unsigned char aacScalefactorDataResilienceFlag;
++    unsigned char aacSpectralDataResilienceFlag;
++    unsigned char epConfig;
++
++    char sbr_present_flag;
++    char forceUpSampling;
++    char downSampledSBR;
++} mp4AudioSpecificConfig;
++
++typedef struct NeAACDecConfiguration
++{
++    unsigned char defObjectType;
++    unsigned long defSampleRate;
++    unsigned char outputFormat;
++    unsigned char downMatrix;
++    unsigned char useOldADTSFormat;
++    unsigned char dontUpSampleImplicitSBR;
++} NeAACDecConfiguration, *NeAACDecConfigurationPtr;
++
++typedef struct NeAACDecFrameInfo
++{
++    unsigned long bytesconsumed;
++    unsigned long samples;
++    unsigned char channels;
++    unsigned char error;
++    unsigned long samplerate;
++
++    /* SBR: 0: off, 1: on; upsample, 2: on; downsampled, 3: off; upsampled */
++    unsigned char sbr;
++
++    /* MPEG-4 ObjectType */
++    unsigned char object_type;
++
++    /* AAC header type; MP4 will be signalled as RAW also */
++    unsigned char header_type;
++
++    /* multichannel configuration */
++    unsigned char num_front_channels;
++    unsigned char num_side_channels;
++    unsigned char num_back_channels;
++    unsigned char num_lfe_channels;
++    unsigned char channel_position[64];
++
++    /* PS: 0: off, 1: on */
++    unsigned char ps;
++} NeAACDecFrameInfo;
++
++char* NEAACDECAPI NeAACDecGetErrorMessage(unsigned char errcode);
++
++unsigned long NEAACDECAPI NeAACDecGetCapabilities(void);
++
++NeAACDecHandle NEAACDECAPI NeAACDecOpen(void);
++
++NeAACDecConfigurationPtr NEAACDECAPI NeAACDecGetCurrentConfiguration(NeAACDecHandle hDecoder);
++
++unsigned char NEAACDECAPI NeAACDecSetConfiguration(NeAACDecHandle hDecoder,
++                                                   NeAACDecConfigurationPtr config);
++
++/* Init the library based on info from the AAC file (ADTS/ADIF) */
++long NEAACDECAPI NeAACDecInit(NeAACDecHandle hDecoder,
++                              unsigned char *buffer,
++                              unsigned long buffer_size,
++                              unsigned long *samplerate,
++                              unsigned char *channels);
++
++/* Init the library using a DecoderSpecificInfo */
++char NEAACDECAPI NeAACDecInit2(NeAACDecHandle hDecoder,
++                               unsigned char *pBuffer,
++                               unsigned long SizeOfDecoderSpecificInfo,
++                               unsigned long *samplerate,
++                               unsigned char *channels);
++
++/* Init the library for DRM */
++char NEAACDECAPI NeAACDecInitDRM(NeAACDecHandle *hDecoder, unsigned long samplerate,
++                                 unsigned char channels);
++
++void NEAACDECAPI NeAACDecPostSeekReset(NeAACDecHandle hDecoder, long frame);
++
++void NEAACDECAPI NeAACDecClose(NeAACDecHandle hDecoder);
++
++void* NEAACDECAPI NeAACDecDecode(NeAACDecHandle hDecoder,
++                                 NeAACDecFrameInfo *hInfo,
++                                 unsigned char *buffer,
++                                 unsigned long buffer_size);
++
++void* NEAACDECAPI NeAACDecDecode2(NeAACDecHandle hDecoder,
++                                  NeAACDecFrameInfo *hInfo,
++                                  unsigned char *buffer,
++                                  unsigned long buffer_size,
++                                  void **sample_buffer,
++                                  unsigned long sample_buffer_size);
++
++char NEAACDECAPI NeAACDecAudioSpecificConfig(unsigned char *pBuffer,
++                                             unsigned long buffer_size,
++                                             mp4AudioSpecificConfig *mp4ASC);
++
++#ifdef _WIN32
++  #pragma pack(pop)
++#endif
++
++#ifdef __cplusplus
++}
++#endif /* __cplusplus */
++
++#endif
+--- mplayer/localinc/twolame.h.dlopen~	2012-01-13 16:20:17.182740891 +0100
++++ mplayer/localinc/twolame.h	2012-01-13 16:20:17.182740891 +0100
+@@ -0,0 +1,923 @@
++/*
++ *	TwoLAME: an optimized MPEG Audio Layer Two encoder
++ *
++ *	Copyright (C) 2001-2004 Michael Cheng
++ *	Copyright (C) 2004-2006 The TwoLAME Project
++ *
++ *	This library is free software; you can redistribute it and/or
++ *	modify it under the terms of the GNU Lesser General Public
++ *	License as published by the Free Software Foundation; either
++ *	version 2.1 of the License, or (at your option) any later version.
++ *
++ *	This library is distributed in the hope that it will be useful,
++ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *	Lesser General Public License for more details.
++ *
++ *	You should have received a copy of the GNU Lesser General Public
++ *	License along with this library; if not, write to the Free Software
++ *	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ *  $Id$
++ *
++ */
++
++#ifndef __TWOLAME_H__
++#define __TWOLAME_H__
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/** \file twolame.h */
++
++/*
++ * ATTENTION WIN32 USERS!
++ * 
++ * By default, when you use this header file, it is configured to use
++ * symbols from the "twolame.dll" file. If you use the static version of
++ * the library, define LIBTWOLAME_STATIC prior to including this header.
++ */
++
++#ifdef _WIN32
++#ifdef LIBTWOLAME_STATIC
++#define DLL_EXPORT
++#else
++#ifdef LIBTWOLAME_DLL_EXPORTS
++#define DLL_EXPORT __declspec(dllexport)
++#else
++#define DLL_EXPORT __declspec(dllimport)
++#endif
++#endif
++#else
++#define DLL_EXPORT
++#endif
++
++
++#ifndef TRUE
++#define TRUE	(1)
++#endif
++
++#ifndef FALSE
++#define FALSE	(0)
++#endif
++
++
++/** MPEG modes */
++    typedef enum {
++        TWOLAME_AUTO_MODE = -1,
++                            /**< Choose Mode Automatically */
++        TWOLAME_STEREO = 0, /**< Stereo */
++        TWOLAME_JOINT_STEREO,
++                            /**< Joint Stereo */
++        TWOLAME_DUAL_CHANNEL,
++                            /**< Dual Channel */
++        TWOLAME_MONO,       /**< Mono */
++        TWOLAME_NOT_SET
++    } TWOLAME_MPEG_mode;
++
++
++/** MPEG Version.
++ *
++ *	MPEG2 is for Lower Sampling Frequencies - LSF < 32000.
++ */
++    typedef enum {
++        TWOLAME_MPEG2 = 0,
++                        /**< MPEG-2	 - for sample rates less than 32k */
++        TWOLAME_MPEG1   /**< MPEG-1 */
++    } TWOLAME_MPEG_version;
++
++
++/** Padding types. */
++    typedef enum {
++        TWOLAME_PAD_NO = 0, /**< No Padding */
++        TWOLAME_PAD_ALL     /**< Pad all frames */
++//  TWOLAME_PAD_ADJUST      // unsupported by twolame
++    } TWOLAME_Padding;
++
++/** Emphasis types. */
++    typedef enum {
++        TWOLAME_EMPHASIS_N = 0,
++                            /**< No Emphasis */
++        TWOLAME_EMPHASIS_5 = 1,
++                            /**< 50/15 ms */
++        // reserved
++        TWOLAME_EMPHASIS_C = 3
++                            /**< CCIT J.17 */
++    } TWOLAME_Emphasis;
++
++
++/** Number of samples per frame of Layer 2 MPEG Audio */
++#define TWOLAME_SAMPLES_PER_FRAME		(1152)
++
++
++/** Opaque structure for the twolame encoder options. */
++    struct twolame_options_struct;
++
++/** Opaque data type for the twolame encoder options. */
++    typedef struct twolame_options_struct twolame_options;
++
++
++
++
++
++/** Get the version number of the TwoLAME library. 
++ *	eg "0.3.1".
++ *
++ *	\return The version number as a C string
++ */
++    DLL_EXPORT const char *get_twolame_version(void);
++
++
++/** Get the URL of the TwoLAME homepage. 
++ *	eg "http://www.twolame.org/".
++ *
++ *	\return The url as a C string
++ */
++    DLL_EXPORT const char *get_twolame_url(void);
++
++
++/** Print the library version and 
++ *	encoder parameter settings to STDERR.
++ *
++ *	Will display differnent ammounts of information
++ *	depending on the verbosity setting.
++ *	If verbosity is set to 0 then no message will be displayed.
++ *
++ *	\param glopts		Options pointer created by twolame_init()
++ *
++ */
++    DLL_EXPORT void twolame_print_config(twolame_options * glopts);
++
++
++/** Initialise the twolame encoder.
++ *
++ *	Sets defaults for all parameters.
++ *	Will return NULL if malloc() failed, otherwise 
++ *	returns a pointer which you then need to pass to 
++ *	all future API calls.
++ *	
++ *	\return a pointer to your new options data structure
++ */
++    DLL_EXPORT twolame_options *twolame_init(void);
++
++
++/** Prepare to start encoding.
++ *
++ *	You must call twolame_init_params() before you start encoding.
++ *	It will check call your parameters to make sure they are valid,
++ *	as well as allocating buffers and initising internally used
++ *	variables.
++ *	
++ *	\param glopts		Options pointer created by twolame_init()
++ *	\return				0 if all patameters are valid, 
++ *						non-zero if something is invalid
++ */
++    DLL_EXPORT int twolame_init_params(twolame_options * glopts);
++
++
++/** Encode some 16-bit PCM audio to MP2.
++ *
++ *	Takes 16-bit PCM audio samples from seperate left and right
++ *	buffers and places encoded audio into mp2buffer.
++ *	
++ *	\param glopts			twolame options pointer
++ *	\param leftpcm			Left channel audio samples
++ *	\param rightpcm			Right channel audio samples
++ *	\param num_samples		Number of samples per channel
++ *	\param mp2buffer		Buffer to place encoded audio into
++ *	\param mp2buffer_size	Size of the output buffer
++ *	\return					The number of bytes put in output buffer
++ *							or a negative value on error
++ */
++    DLL_EXPORT int twolame_encode_buffer(twolame_options * glopts,
++                                         const short int leftpcm[],
++                                         const short int rightpcm[],
++                                         int num_samples,
++                                         unsigned char *mp2buffer, int mp2buffer_size);
++
++
++/** Encode some 16-bit PCM audio to MP2.
++ *
++ *	Takes interleaved 16-bit PCM audio samples from a single 
++ *	buffer and places encoded audio into mp2buffer.
++ *	
++ *	\param glopts			twolame options pointer
++ *	\param pcm				Audio samples for left AND right channels
++ *	\param num_samples		Number of samples per channel
++ *	\param mp2buffer		Buffer to place encoded audio into
++ *	\param mp2buffer_size	Size of the output buffer
++ *	\return					The number of bytes put in output buffer
++ *							or a negative value on error
++ */
++    DLL_EXPORT int twolame_encode_buffer_interleaved(twolame_options * glopts,
++                                                     const short int pcm[],
++                                                     int num_samples,
++                                                     unsigned char *mp2buffer, int mp2buffer_size);
++
++
++/** Encode some 32-bit PCM audio to MP2.
++ *
++ *	Takes 32-bit floating point PCM audio samples from seperate 
++ *	left and right buffers and places encoded audio into mp2buffer.
++ *
++ *	Note: the 32-bit samples are currently scaled down to 
++ *	16-bit samples internally.
++ *	
++ *	\param glopts			twolame options pointer
++ *	\param leftpcm			Left channel audio samples
++ *	\param rightpcm			Right channel audio samples
++ *	\param num_samples		Number of samples per channel
++ *	\param mp2buffer		Buffer to place encoded audio into
++ *	\param mp2buffer_size	Size of the output buffer
++ *	\return					The number of bytes put in output buffer
++ *							or a negative value on error
++ */
++    DLL_EXPORT int twolame_encode_buffer_float32(twolame_options * glopts,
++                                                 const float leftpcm[],
++                                                 const float rightpcm[],
++                                                 int num_samples,
++                                                 unsigned char *mp2buffer, int mp2buffer_size);
++
++
++/** Encode some 32-bit PCM audio to MP2.
++ *
++ *	Takes 32-bit floating point PCM audio samples from a single 
++ *	buffer and places encoded audio into mp2buffer.
++ *	
++ *	\param glopts			twolame options pointer
++ *	\param pcm				Audio samples for left AND right channels
++ *	\param num_samples		Number of samples per channel
++ *	\param mp2buffer		Buffer to place encoded audio into
++ *	\param mp2buffer_size	Size of the output buffer
++ *	\return					The number of bytes put in output buffer
++ *							or a negative value on error
++ */
++    int twolame_encode_buffer_float32_interleaved(twolame_options * glopts,
++                                                  const float pcm[],
++                                                  int num_samples,
++                                                  unsigned char *mp2buffer, int mp2buffer_size);
++
++
++/** Encode any remains buffered PCM audio to MP2.
++ *
++ *	Encodes any remaining audio samples in the libtwolame
++ *	internal sample buffer. This function will return at
++ *	most a single frame of MPEG Audio, and at least 0 frames.
++ *	
++ *	\param glopts			twolame options pointer
++ *	\param mp2buffer		Buffer to place encoded audio into
++ *	\param mp2buffer_size	Size of the output buffer
++ *	\return					The number of bytes put in output buffer
++ *							or a negative value on error
++ */
++    DLL_EXPORT int twolame_encode_flush(twolame_options * glopts,
++                                        unsigned char *mp2buffer, int mp2buffer_size);
++
++
++/** Shut down the twolame encoder.
++ *
++ *	Shuts down the twolame encoder and frees all memory
++ *	that it previously allocated. You should call this
++ *	once you have finished all your encoding. This function
++ *	will set your glopts pointer to NULL for you.
++ *
++ *	\param glopts			pointer to twolame options pointer
++ */
++    DLL_EXPORT void twolame_close(twolame_options ** glopts);
++
++
++
++/** Set the verbosity of the encoder.
++ *
++ *	Sets how verbose the encoder is with the debug and
++ *	informational messages it displays. The higher the
++ *	number, the more messages it will display.
++ *	Set to 0 for no status messages to STDERR 
++ *	( error messages will still be displayed ).
++ *
++ *	Default: 1
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param verbosity		integer between 0 and 10
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_verbosity(twolame_options * glopts, int verbosity);
++
++
++/** Get the verbosity of the encoder.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			integer indicating the verbosity of the encoder (0-10)
++ */
++    DLL_EXPORT int twolame_get_verbosity(twolame_options * glopts);
++
++
++/** Set the MPEG Audio Mode (Mono, Stereo, etc) for 
++ *	the output stream.
++ *
++ *	Default: TWOLAME_AUTO_MODE
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param mode				the mode to set to
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_mode(twolame_options * glopts, TWOLAME_MPEG_mode mode);
++
++
++/** Get the MPEG Audio mode of the output stream.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the MPEG audio mode
++ */
++    DLL_EXPORT TWOLAME_MPEG_mode twolame_get_mode(twolame_options * glopts);
++
++
++/** Get a string name for the current MPEG Audio mode.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the name of the MPEG audio mode as a string
++ */
++    DLL_EXPORT const char *twolame_get_mode_name(twolame_options * glopts);
++
++
++/** Set the MPEG version of the MPEG audio stream. 
++ *
++ *	Default: TWOLAME_MPEG1
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param version			the version to set to
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_version(twolame_options * glopts, TWOLAME_MPEG_version version);
++
++
++/** Get the MPEG version of the output stream.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the MPEG version
++ */
++    DLL_EXPORT TWOLAME_MPEG_version twolame_get_version(twolame_options * glopts);
++
++
++/** Get a string name for the current MPEG version.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the name of the MPEG version as a string
++ */
++    DLL_EXPORT const char *twolame_get_version_name(twolame_options * glopts);
++
++
++/** Get the number of bytes per MPEG audio frame, for current settings.
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\return					the number of bytes per frame
++ *
++ */
++    DLL_EXPORT int twolame_get_framelength(twolame_options * glopts);
++
++
++/** Set the Psychoacoustic Model used to encode the audio.
++ *
++ *	Default: 3
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param psymodel			the psychoacoustic model number
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_psymodel(twolame_options * glopts, int psymodel);
++
++
++/** Get the Psychoacoustic Model used to encode the audio.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the psychoacoustic model number
++ */
++    DLL_EXPORT int twolame_get_psymodel(twolame_options * glopts);
++
++
++/** Set the number of channels in the input stream.
++ *
++ *	If this is different the number of channels in
++ *	the output stream (set by mode) then the encoder
++ *	will automatically downmix/upmix the audio.
++ *
++ *	Default: 2
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param num_channels		the number of input channels
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_num_channels(twolame_options * glopts, int num_channels);
++
++
++/** Get the number of channels in the input stream.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the number of channels
++ */
++    DLL_EXPORT int twolame_get_num_channels(twolame_options * glopts);
++
++
++/** Set the scaling level for audio before encoding.
++ *
++ *	Set to 0 to disable.
++ *
++ *	Default: 0
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param scale			the amount to scale by
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_scale(twolame_options * glopts, float scale);
++
++
++/** Get the scaling level for audio before encoding.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the amount to scale audio sample by
++ */
++    DLL_EXPORT float twolame_get_scale(twolame_options * glopts);
++
++/** Set the scaling level for left channel audio before encoding.
++ *
++ *	Set to 0 to disable.
++ *
++ *	Default: 0
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param scale			the amount to scale by
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_scale_left(twolame_options * glopts, float scale);
++
++
++/** Get the scaling level for audio left channel before encoding.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the amount to scale left channel audio samples by
++ */
++    DLL_EXPORT float twolame_get_scale_left(twolame_options * glopts);
++
++
++/** Set the scaling level for right channel audio before encoding.
++ *
++ *	Set to 0 to disable.
++ *
++ *	Default: 0
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param scale			the amount to scale by
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_scale_right(twolame_options * glopts, float scale);
++
++
++/** Get the scaling level for audio right channel before encoding.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the amount to scale right channel audio samples by
++ */
++    DLL_EXPORT float twolame_get_scale_right(twolame_options * glopts);
++
++
++/** Set the samplerate of the PCM audio input.
++ *
++ *	Default: 44100
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param samplerate		the samplerate in Hz
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_in_samplerate(twolame_options * glopts, int samplerate);
++
++
++/** Get the samplerate of the PCM audio input.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the input samplerate
++ */
++    DLL_EXPORT int twolame_get_in_samplerate(twolame_options * glopts);
++
++
++/** Set the samplerate of the MPEG audio output.
++ *
++ *	Default: 44100
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param samplerate		the samplerate in Hz
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_out_samplerate(twolame_options * glopts, int samplerate);
++
++
++/** Get the samplerate of the MPEG audio output.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the output samplerate
++ */
++    DLL_EXPORT int twolame_get_out_samplerate(twolame_options * glopts);
++
++
++/** Set the bitrate of the MPEG audio output stream.
++ *
++ *	Default: 192
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param bitrate			the bitrate in kbps
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_bitrate(twolame_options * glopts, int bitrate);
++
++
++/** Get the bitrate of the MPEG audio output.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the output bitrate in kbps
++ */
++    DLL_EXPORT int twolame_get_bitrate(twolame_options * glopts);
++
++
++/** Set the bitrate of the MPEG audio output stream (LAME style).
++ *
++ *	same as twolame_set_bitrate()
++ */
++    DLL_EXPORT int twolame_set_brate(twolame_options * glopts, int bitrate);
++
++
++/** Get the bitrate of the MPEG audio output stream (LAME style).
++ *
++ *	same as twolame_get_bitrate()
++ */
++    DLL_EXPORT int twolame_get_brate(twolame_options * glopts);
++
++
++/** Set frame padding for the MPEG audio output stream.
++ *
++ *	i.e. adjust frame sizes to achieve overall target bitrate
++ *
++ *	Default: TWOLAME_PAD_NO
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param padding			the padding type
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_padding(twolame_options * glopts, TWOLAME_Padding padding);
++
++/** Get the padding type of the MPEG audio output.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the output bitrate in kbps
++ */
++    DLL_EXPORT TWOLAME_Padding twolame_get_padding(twolame_options * glopts);
++
++
++/** Enable/Disable Energy Level Extension.
++ *
++ *	Enable writing the peak PCM level (energy level) at the end of each
++ *	MPEG audio frame (in the ancillary bits). This function will
++ *	automatically call twolame_set_num_ancillary_bits() to set the required
++ *	number of ancillary bits for this feature.
++ *
++ *	The energy level extension is commonly used in the broadcast industry 
++ *	for visualising the audio in editing applications without decoding.
++ *
++ *	Default: FALSE
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param energylevels		energy level extension state (TRUE/FALSE)
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_energy_levels(twolame_options * glopts, int energylevels);
++
++
++/** Get the Energy Level Extension state.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			state of the Energy Level Extension (TRUE/FALSE)
++ */
++    DLL_EXPORT int twolame_get_energy_levels(twolame_options * glopts);
++
++
++/** Set number of Ancillary Bits at end of frame.
++ *
++ *	Default: 0
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param num				number of bits to reserve
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_num_ancillary_bits(twolame_options * glopts, int num);
++
++
++/** Get the number of Ancillary Bits at end of frame.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			number of Ancillary Bits at end of frame
++ */
++    DLL_EXPORT int twolame_get_num_ancillary_bits(twolame_options * glopts);
++
++
++
++/** Set the type of pre-emphasis to be applied to the decoded audio.
++ *
++ *	Default: TWOLAME_EMPHASIS_N
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param emphasis			the type of pre-emphasis
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_emphasis(twolame_options * glopts, TWOLAME_Emphasis emphasis);
++
++
++/** Get the type of pre-emphasis to be applied to the decoded audio.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the type of pre-emphasis
++ */
++    DLL_EXPORT TWOLAME_Emphasis twolame_get_emphasis(twolame_options * glopts);
++
++
++/** Enable/Disable CRC Error Protection.
++ *
++ *	Default: FALSE
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param err_protection	error protection state (TRUE/FALSE)
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_error_protection(twolame_options * glopts, int err_protection);
++
++
++/** Get the CRC Error Protection state.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			state of Error Protection (TRUE/FALSE)
++ */
++    DLL_EXPORT int twolame_get_error_protection(twolame_options * glopts);
++
++
++/** Set the MPEG Audio Copyright flag.
++ *
++ *	Indicates that MPEG stream is copyrighted.
++ *
++ *	Default: FALSE
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param copyright		copyright flag state (TRUE/FALSE)
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_copyright(twolame_options * glopts, int copyright);
++
++
++/** Get the copright flag state
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			state of the copyright flag (TRUE/FALSE)
++ */
++    DLL_EXPORT int twolame_get_copyright(twolame_options * glopts);
++
++
++/** Set the MPEG Audio Original flag.
++ *
++ *	Default: FALSE
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param original			original flag state (TRUE/FALSE)
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_original(twolame_options * glopts, int original);
++
++
++/** Get the origianl flag state.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			state of the original flag (TRUE/FALSE)
++ */
++    DLL_EXPORT int twolame_get_original(twolame_options * glopts);
++
++
++/** Enable/Disable VBR (Variable Bit Rate) mode.
++ *
++ *	Default: FALSE
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param vbr				VBR state (TRUE/FALSE)
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_VBR(twolame_options * glopts, int vbr);
++
++
++/** Get the VBR state.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			state of VBR (TRUE/FALSE)
++ */
++    DLL_EXPORT int twolame_get_VBR(twolame_options * glopts);
++
++
++/** Set the level/quality of the VBR audio.
++ *
++ *	The level value can is a measurement of quality - the higher 
++ *	the level the higher the average bitrate of the resultant file.
++ *
++ *	Default: 5.0
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param level			quality level (-10 to 10)
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_VBR_level(twolame_options * glopts, float level);
++
++
++/** Get the level/quality of the VBR audio.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			quality value for VBR 
++ */
++    DLL_EXPORT float twolame_get_VBR_level(twolame_options * glopts);
++
++
++
++/* 
++   Using the twolame_set_VBR_q()/twolame_get_VBR_q functions 
++   are deprecated, please use twolame_set_VBR_level() instead.
++*/
++    DLL_EXPORT int twolame_set_VBR_q(twolame_options * glopts, float level);
++    DLL_EXPORT float twolame_get_VBR_q(twolame_options * glopts);
++
++
++
++/** Set the adjustment (in dB) applied to the ATH for Psycho models 3 and 4.
++ *
++ *	Default: 0.0
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param level			adjustment level in db
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_ATH_level(twolame_options * glopts, float level);
++
++
++/** Get the adjustment (in dB) applied to the ATH for Psycho models 3 and 4.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			adjustment level in db
++ */
++    DLL_EXPORT float twolame_get_ATH_level(twolame_options * glopts);
++
++
++/** Set the upper bitrate for VBR
++ *
++ *	Default: 0 (off)
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param bitrate			upper bitrate for VBR
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_VBR_max_bitrate_kbps(twolame_options * glopts, int bitrate);
++
++/** Get the upper bitrate for VBR.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the upper bitrate for VBR
++ */
++    DLL_EXPORT int twolame_get_VBR_max_bitrate_kbps(twolame_options * glopts);
++
++
++/** Enable/Disable the quick mode for psycho model calculation.
++ *
++ *	Default: FALSE
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param quickmode		the state of quick mode (TRUE/FALSE)
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_quick_mode(twolame_options * glopts, int quickmode);
++
++/** Get the state of quick mode.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the state of quick mode (TRUE/FALSE)
++ */
++    DLL_EXPORT int twolame_get_quick_mode(twolame_options * glopts);
++
++
++/** Set how often the psy model is calculated.
++ *
++ *	Default: 10
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param quickcount		number of frames between calculations
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_quick_count(twolame_options * glopts, int quickcount);
++
++/** Get the how often the psy model is calculated.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			number of frames between calculations
++ */
++    DLL_EXPORT int twolame_get_quick_count(twolame_options * glopts);
++
++
++
++
++
++
++
++/* WARNING: DAB support is currently broken */
++
++
++
++
++
++/** Enable/Disable the Eureka 147 DAB extensions for MP2.
++ *
++ *	Default: FALSE
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param dab				state of DAB extensions (TRUE/FALSE)
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_DAB(twolame_options * glopts, int dab);
++
++/** Get the state of the DAB extensions
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			the state of DAB (TRUE/FALSE)
++ */
++    DLL_EXPORT int twolame_get_DAB(twolame_options * glopts);
++
++
++/** Set the number of bytes to reserve for DAB XPAD data.
++ *
++ *	Default: 0
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param length			number of bytes to reserve
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_DAB_xpad_length(twolame_options * glopts, int length);
++
++
++/** Get the number of bytes reserved for DAB XPAD data.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			number of XPAD bytes
++ */
++    DLL_EXPORT int twolame_get_DAB_xpad_length(twolame_options * glopts);
++
++
++/** Set the CRC error protection length for DAB.
++ *
++ *	Default: 2
++ *
++ *	\param glopts			pointer to twolame options pointer
++ *	\param length			length of DAB CRC
++ *	\return					0 if successful, 
++ *							non-zero on failure
++ */
++    DLL_EXPORT int twolame_set_DAB_crc_length(twolame_options * glopts, int length);
++
++
++/** Get the CRC error protection length for DAB.
++ *
++ *	\param glopts	pointer to twolame options pointer
++ *	\return			length of DAB CRC
++ */
++    DLL_EXPORT int twolame_get_DAB_crc_length(twolame_options * glopts);
++
++
++
++#ifdef __cplusplus
++}
++#endif
++#endif                          /* _TWOLAME_H_ */
++// vim:ts=4:sw=4:nowrap:
+--- mplayer/localinc/x264_config.h.dlopen~	2012-01-13 16:20:17.183740890 +0100
++++ mplayer/localinc/x264_config.h	2012-01-13 16:20:17.183740890 +0100
+@@ -0,0 +1,6 @@
++#define X264_BIT_DEPTH     8
++#define X264_GPL           1
++#define X264_INTERLACED    1
++#define X264_CHROMA_FORMAT 0
++#define X264_VERSION ""
++#define X264_POINTVER "0.120.x"
+--- mplayer/localinc/x264.h.dlopen~	2012-01-13 16:20:17.183740890 +0100
++++ mplayer/localinc/x264.h	2012-01-13 16:20:17.183740890 +0100
+@@ -0,0 +1,838 @@
++/*****************************************************************************
++ * x264.h: x264 public header
++ *****************************************************************************
++ * Copyright (C) 2003-2011 x264 project
++ *
++ * Authors: Laurent Aimar <fenrir@via.ecp.fr>
++ *          Loren Merritt <lorenm@u.washington.edu>
++ *          Jason Garrett-Glaser <darkshikari@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02111, USA.
++ *
++ * This program is also available under a commercial proprietary license.
++ * For more information, contact us at licensing@x264.com.
++ *****************************************************************************/
++
++#ifndef X264_X264_H
++#define X264_X264_H
++
++#if !defined(_STDINT_H) && !defined(_STDINT_H_) && \
++    !defined(_INTTYPES_H) && !defined(_INTTYPES_H_)
++# ifdef _MSC_VER
++#  pragma message("You must include stdint.h or inttypes.h before x264.h")
++# else
++#  warning You must include stdint.h or inttypes.h before x264.h
++# endif
++#endif
++
++#include <stdarg.h>
++
++#include "x264_config.h"
++
++#define X264_BUILD 120
++
++/* x264_t:
++ *      opaque handler for encoder */
++typedef struct x264_t x264_t;
++
++/****************************************************************************
++ * NAL structure and functions
++ ****************************************************************************/
++
++enum nal_unit_type_e
++{
++    NAL_UNKNOWN     = 0,
++    NAL_SLICE       = 1,
++    NAL_SLICE_DPA   = 2,
++    NAL_SLICE_DPB   = 3,
++    NAL_SLICE_DPC   = 4,
++    NAL_SLICE_IDR   = 5,    /* ref_idc != 0 */
++    NAL_SEI         = 6,    /* ref_idc == 0 */
++    NAL_SPS         = 7,
++    NAL_PPS         = 8,
++    NAL_AUD         = 9,
++    NAL_FILLER      = 12,
++    /* ref_idc == 0 for 6,9,10,11,12 */
++};
++enum nal_priority_e
++{
++    NAL_PRIORITY_DISPOSABLE = 0,
++    NAL_PRIORITY_LOW        = 1,
++    NAL_PRIORITY_HIGH       = 2,
++    NAL_PRIORITY_HIGHEST    = 3,
++};
++
++/* The data within the payload is already NAL-encapsulated; the ref_idc and type
++ * are merely in the struct for easy access by the calling application.
++ * All data returned in an x264_nal_t, including the data in p_payload, is no longer
++ * valid after the next call to x264_encoder_encode.  Thus it must be used or copied
++ * before calling x264_encoder_encode or x264_encoder_headers again. */
++typedef struct
++{
++    int i_ref_idc;  /* nal_priority_e */
++    int i_type;     /* nal_unit_type_e */
++    int b_long_startcode;
++    int i_first_mb; /* If this NAL is a slice, the index of the first MB in the slice. */
++    int i_last_mb;  /* If this NAL is a slice, the index of the last MB in the slice. */
++
++    /* Size of payload in bytes. */
++    int     i_payload;
++    /* If param->b_annexb is set, Annex-B bytestream with startcode.
++     * Otherwise, startcode is replaced with a 4-byte size.
++     * This size is the size used in mp4/similar muxing; it is equal to i_payload-4 */
++    uint8_t *p_payload;
++} x264_nal_t;
++
++/****************************************************************************
++ * Encoder parameters
++ ****************************************************************************/
++/* CPU flags
++ */
++#define X264_CPU_CACHELINE_32    0x0000001  /* avoid memory loads that span the border between two cachelines */
++#define X264_CPU_CACHELINE_64    0x0000002  /* 32/64 is the size of a cacheline in bytes */
++#define X264_CPU_ALTIVEC         0x0000004
++#define X264_CPU_MMX             0x0000008
++#define X264_CPU_MMX2            0x0000010  /* MMX2 aka MMXEXT aka ISSE */
++#define X264_CPU_MMXEXT          X264_CPU_MMX2
++#define X264_CPU_SSE             0x0000020
++#define X264_CPU_SSE2            0x0000040
++#define X264_CPU_SSE2_IS_SLOW    0x0000080  /* avoid most SSE2 functions on Athlon64 */
++#define X264_CPU_SSE2_IS_FAST    0x0000100  /* a few functions are only faster on Core2 and Phenom */
++#define X264_CPU_SSE3            0x0000200
++#define X264_CPU_SSSE3           0x0000400
++#define X264_CPU_SHUFFLE_IS_FAST 0x0000800  /* Penryn, Nehalem, and Phenom have fast shuffle units */
++#define X264_CPU_STACK_MOD4      0x0001000  /* if stack is only mod4 and not mod16 */
++#define X264_CPU_SSE4            0x0002000  /* SSE4.1 */
++#define X264_CPU_SSE42           0x0004000  /* SSE4.2 */
++#define X264_CPU_SSE_MISALIGN    0x0008000  /* Phenom support for misaligned SSE instruction arguments */
++#define X264_CPU_LZCNT           0x0010000  /* Phenom support for "leading zero count" instruction. */
++#define X264_CPU_ARMV6           0x0020000
++#define X264_CPU_NEON            0x0040000  /* ARM NEON */
++#define X264_CPU_FAST_NEON_MRC   0x0080000  /* Transfer from NEON to ARM register is fast (Cortex-A9) */
++#define X264_CPU_SLOW_CTZ        0x0100000  /* BSR/BSF x86 instructions are really slow on some CPUs */
++#define X264_CPU_SLOW_ATOM       0x0200000  /* The Atom just sucks */
++#define X264_CPU_AVX             0x0400000  /* AVX support: requires OS support even if YMM registers
++                                             * aren't used. */
++#define X264_CPU_XOP             0x0800000  /* AMD XOP */
++#define X264_CPU_FMA4            0x1000000  /* AMD FMA4 */
++
++/* Analyse flags
++ */
++#define X264_ANALYSE_I4x4       0x0001  /* Analyse i4x4 */
++#define X264_ANALYSE_I8x8       0x0002  /* Analyse i8x8 (requires 8x8 transform) */
++#define X264_ANALYSE_PSUB16x16  0x0010  /* Analyse p16x8, p8x16 and p8x8 */
++#define X264_ANALYSE_PSUB8x8    0x0020  /* Analyse p8x4, p4x8, p4x4 */
++#define X264_ANALYSE_BSUB16x16  0x0100  /* Analyse b16x8, b8x16 and b8x8 */
++#define X264_DIRECT_PRED_NONE        0
++#define X264_DIRECT_PRED_SPATIAL     1
++#define X264_DIRECT_PRED_TEMPORAL    2
++#define X264_DIRECT_PRED_AUTO        3
++#define X264_ME_DIA                  0
++#define X264_ME_HEX                  1
++#define X264_ME_UMH                  2
++#define X264_ME_ESA                  3
++#define X264_ME_TESA                 4
++#define X264_CQM_FLAT                0
++#define X264_CQM_JVT                 1
++#define X264_CQM_CUSTOM              2
++#define X264_RC_CQP                  0
++#define X264_RC_CRF                  1
++#define X264_RC_ABR                  2
++#define X264_QP_AUTO                 0
++#define X264_AQ_NONE                 0
++#define X264_AQ_VARIANCE             1
++#define X264_AQ_AUTOVARIANCE         2
++#define X264_B_ADAPT_NONE            0
++#define X264_B_ADAPT_FAST            1
++#define X264_B_ADAPT_TRELLIS         2
++#define X264_WEIGHTP_NONE            0
++#define X264_WEIGHTP_SIMPLE          1
++#define X264_WEIGHTP_SMART           2
++#define X264_B_PYRAMID_NONE          0
++#define X264_B_PYRAMID_STRICT        1
++#define X264_B_PYRAMID_NORMAL        2
++#define X264_KEYINT_MIN_AUTO         0
++#define X264_KEYINT_MAX_INFINITE     (1<<30)
++
++static const char * const x264_direct_pred_names[] = { "none", "spatial", "temporal", "auto", 0 };
++static const char * const x264_motion_est_names[] = { "dia", "hex", "umh", "esa", "tesa", 0 };
++static const char * const x264_b_pyramid_names[] = { "none", "strict", "normal", 0 };
++static const char * const x264_overscan_names[] = { "undef", "show", "crop", 0 };
++static const char * const x264_vidformat_names[] = { "component", "pal", "ntsc", "secam", "mac", "undef", 0 };
++static const char * const x264_fullrange_names[] = { "off", "on", 0 };
++static const char * const x264_colorprim_names[] = { "", "bt709", "undef", "", "bt470m", "bt470bg", "smpte170m", "smpte240m", "film", 0 };
++static const char * const x264_transfer_names[] = { "", "bt709", "undef", "", "bt470m", "bt470bg", "smpte170m", "smpte240m", "linear", "log100", "log316", 0 };
++static const char * const x264_colmatrix_names[] = { "GBR", "bt709", "undef", "", "fcc", "bt470bg", "smpte170m", "smpte240m", "YCgCo", 0 };
++static const char * const x264_nal_hrd_names[] = { "none", "vbr", "cbr", 0 };
++
++/* Colorspace type */
++#define X264_CSP_MASK           0x00ff  /* */
++#define X264_CSP_NONE           0x0000  /* Invalid mode     */
++#define X264_CSP_I420           0x0001  /* yuv 4:2:0 planar */
++#define X264_CSP_YV12           0x0002  /* yvu 4:2:0 planar */
++#define X264_CSP_NV12           0x0003  /* yuv 4:2:0, with one y plane and one packed u+v */
++#define X264_CSP_I422           0x0004  /* yuv 4:2:2 planar */
++#define X264_CSP_YV16           0x0005  /* yvu 4:2:2 planar */
++#define X264_CSP_NV16           0x0006  /* yuv 4:2:2, with one y plane and one packed u+v */
++#define X264_CSP_I444           0x0007  /* yuv 4:4:4 planar */
++#define X264_CSP_YV24           0x0008  /* yvu 4:4:4 planar */
++#define X264_CSP_BGR            0x0009  /* packed bgr 24bits   */
++#define X264_CSP_BGRA           0x000a  /* packed bgr 32bits   */
++#define X264_CSP_RGB            0x000b  /* packed rgb 24bits   */
++#define X264_CSP_MAX            0x000c  /* end of list */
++#define X264_CSP_VFLIP          0x1000  /* the csp is vertically flipped */
++#define X264_CSP_HIGH_DEPTH     0x2000  /* the csp has a depth of 16 bits per pixel component */
++
++/* Slice type */
++#define X264_TYPE_AUTO          0x0000  /* Let x264 choose the right type */
++#define X264_TYPE_IDR           0x0001
++#define X264_TYPE_I             0x0002
++#define X264_TYPE_P             0x0003
++#define X264_TYPE_BREF          0x0004  /* Non-disposable B-frame */
++#define X264_TYPE_B             0x0005
++#define X264_TYPE_KEYFRAME      0x0006  /* IDR or I depending on b_open_gop option */
++#define IS_X264_TYPE_I(x) ((x)==X264_TYPE_I || (x)==X264_TYPE_IDR)
++#define IS_X264_TYPE_B(x) ((x)==X264_TYPE_B || (x)==X264_TYPE_BREF)
++
++/* Log level */
++#define X264_LOG_NONE          (-1)
++#define X264_LOG_ERROR          0
++#define X264_LOG_WARNING        1
++#define X264_LOG_INFO           2
++#define X264_LOG_DEBUG          3
++
++/* Threading */
++#define X264_THREADS_AUTO 0 /* Automatically select optimal number of threads */
++#define X264_SYNC_LOOKAHEAD_AUTO (-1) /* Automatically select optimal lookahead thread buffer size */
++
++/* HRD */
++#define X264_NAL_HRD_NONE            0
++#define X264_NAL_HRD_VBR             1
++#define X264_NAL_HRD_CBR             2
++
++/* Zones: override ratecontrol or other options for specific sections of the video.
++ * See x264_encoder_reconfig() for which options can be changed.
++ * If zones overlap, whichever comes later in the list takes precedence. */
++typedef struct
++{
++    int i_start, i_end; /* range of frame numbers */
++    int b_force_qp; /* whether to use qp vs bitrate factor */
++    int i_qp;
++    float f_bitrate_factor;
++    struct x264_param_t *param;
++} x264_zone_t;
++
++typedef struct x264_param_t
++{
++    /* CPU flags */
++    unsigned int cpu;
++    int         i_threads;       /* encode multiple frames in parallel */
++    int         b_sliced_threads;  /* Whether to use slice-based threading. */
++    int         b_deterministic; /* whether to allow non-deterministic optimizations when threaded */
++    int         b_cpu_independent; /* force canonical behavior rather than cpu-dependent optimal algorithms */
++    int         i_sync_lookahead; /* threaded lookahead buffer */
++
++    /* Video Properties */
++    int         i_width;
++    int         i_height;
++    int         i_csp;         /* CSP of encoded bitstream */
++    int         i_level_idc;
++    int         i_frame_total; /* number of frames to encode if known, else 0 */
++
++    /* NAL HRD
++     * Uses Buffering and Picture Timing SEIs to signal HRD
++     * The HRD in H.264 was not designed with VFR in mind.
++     * It is therefore not recommendeded to use NAL HRD with VFR.
++     * Furthermore, reconfiguring the VBV (via x264_encoder_reconfig)
++     * will currently generate invalid HRD. */
++    int         i_nal_hrd;
++
++    struct
++    {
++        /* they will be reduced to be 0 < x <= 65535 and prime */
++        int         i_sar_height;
++        int         i_sar_width;
++
++        int         i_overscan;    /* 0=undef, 1=no overscan, 2=overscan */
++
++        /* see h264 annex E for the values of the following */
++        int         i_vidformat;
++        int         b_fullrange;
++        int         i_colorprim;
++        int         i_transfer;
++        int         i_colmatrix;
++        int         i_chroma_loc;    /* both top & bottom */
++    } vui;
++
++    /* Bitstream parameters */
++    int         i_frame_reference;  /* Maximum number of reference frames */
++    int         i_dpb_size;         /* Force a DPB size larger than that implied by B-frames and reference frames.
++                                     * Useful in combination with interactive error resilience. */
++    int         i_keyint_max;       /* Force an IDR keyframe at this interval */
++    int         i_keyint_min;       /* Scenecuts closer together than this are coded as I, not IDR. */
++    int         i_scenecut_threshold; /* how aggressively to insert extra I frames */
++    int         b_intra_refresh;    /* Whether or not to use periodic intra refresh instead of IDR frames. */
++
++    int         i_bframe;   /* how many b-frame between 2 references pictures */
++    int         i_bframe_adaptive;
++    int         i_bframe_bias;
++    int         i_bframe_pyramid;   /* Keep some B-frames as references: 0=off, 1=strict hierarchical, 2=normal */
++    int         b_open_gop;
++    int         b_bluray_compat;
++
++    int         b_deblocking_filter;
++    int         i_deblocking_filter_alphac0;    /* [-6, 6] -6 light filter, 6 strong */
++    int         i_deblocking_filter_beta;       /* [-6, 6]  idem */
++
++    int         b_cabac;
++    int         i_cabac_init_idc;
++
++    int         b_interlaced;
++    int         b_constrained_intra;
++
++    int         i_cqm_preset;
++    char        *psz_cqm_file;      /* JM format */
++    uint8_t     cqm_4iy[16];        /* used only if i_cqm_preset == X264_CQM_CUSTOM */
++    uint8_t     cqm_4py[16];
++    uint8_t     cqm_4ic[16];
++    uint8_t     cqm_4pc[16];
++    uint8_t     cqm_8iy[64];
++    uint8_t     cqm_8py[64];
++    uint8_t     cqm_8ic[64];
++    uint8_t     cqm_8pc[64];
++
++    /* Log */
++    void        (*pf_log)( void *, int i_level, const char *psz, va_list );
++    void        *p_log_private;
++    int         i_log_level;
++    int         b_visualize;
++    char        *psz_dump_yuv;  /* filename for reconstructed frames */
++
++    /* Encoder analyser parameters */
++    struct
++    {
++        unsigned int intra;     /* intra partitions */
++        unsigned int inter;     /* inter partitions */
++
++        int          b_transform_8x8;
++        int          i_weighted_pred; /* weighting for P-frames */
++        int          b_weighted_bipred; /* implicit weighting for B-frames */
++        int          i_direct_mv_pred; /* spatial vs temporal mv prediction */
++        int          i_chroma_qp_offset;
++
++        int          i_me_method; /* motion estimation algorithm to use (X264_ME_*) */
++        int          i_me_range; /* integer pixel motion estimation search range (from predicted mv) */
++        int          i_mv_range; /* maximum length of a mv (in pixels). -1 = auto, based on level */
++        int          i_mv_range_thread; /* minimum space between threads. -1 = auto, based on number of threads. */
++        int          i_subpel_refine; /* subpixel motion estimation quality */
++        int          b_chroma_me; /* chroma ME for subpel and mode decision in P-frames */
++        int          b_mixed_references; /* allow each mb partition to have its own reference number */
++        int          i_trellis;  /* trellis RD quantization */
++        int          b_fast_pskip; /* early SKIP detection on P-frames */
++        int          b_dct_decimate; /* transform coefficient thresholding on P-frames */
++        int          i_noise_reduction; /* adaptive pseudo-deadzone */
++        float        f_psy_rd; /* Psy RD strength */
++        float        f_psy_trellis; /* Psy trellis strength */
++        int          b_psy; /* Toggle all psy optimizations */
++
++        /* the deadzone size that will be used in luma quantization */
++        int          i_luma_deadzone[2]; /* {inter, intra} */
++
++        int          b_psnr;    /* compute and print PSNR stats */
++        int          b_ssim;    /* compute and print SSIM stats */
++    } analyse;
++
++    /* Rate control parameters */
++    struct
++    {
++        int         i_rc_method;    /* X264_RC_* */
++
++        int         i_qp_constant;  /* 0 to (51 + 6*(x264_bit_depth-8)). 0=lossless */
++        int         i_qp_min;       /* min allowed QP value */
++        int         i_qp_max;       /* max allowed QP value */
++        int         i_qp_step;      /* max QP step between frames */
++
++        int         i_bitrate;
++        float       f_rf_constant;  /* 1pass VBR, nominal QP */
++        float       f_rf_constant_max;  /* In CRF mode, maximum CRF as caused by VBV */
++        float       f_rate_tolerance;
++        int         i_vbv_max_bitrate;
++        int         i_vbv_buffer_size;
++        float       f_vbv_buffer_init; /* <=1: fraction of buffer_size. >1: kbit */
++        float       f_ip_factor;
++        float       f_pb_factor;
++
++        int         i_aq_mode;      /* psy adaptive QP. (X264_AQ_*) */
++        float       f_aq_strength;
++        int         b_mb_tree;      /* Macroblock-tree ratecontrol. */
++        int         i_lookahead;
++
++        /* 2pass */
++        int         b_stat_write;   /* Enable stat writing in psz_stat_out */
++        char        *psz_stat_out;
++        int         b_stat_read;    /* Read stat from psz_stat_in and use it */
++        char        *psz_stat_in;
++
++        /* 2pass params (same as ffmpeg ones) */
++        float       f_qcompress;    /* 0.0 => cbr, 1.0 => constant qp */
++        float       f_qblur;        /* temporally blur quants */
++        float       f_complexity_blur; /* temporally blur complexity */
++        x264_zone_t *zones;         /* ratecontrol overrides */
++        int         i_zones;        /* number of zone_t's */
++        char        *psz_zones;     /* alternate method of specifying zones */
++    } rc;
++
++    /* Cropping Rectangle parameters: added to those implicitly defined by
++       non-mod16 video resolutions. */
++    struct
++    {
++        unsigned int i_left;
++        unsigned int i_top;
++        unsigned int i_right;
++        unsigned int i_bottom;
++    } crop_rect;
++
++    /* frame packing arrangement flag */
++    int i_frame_packing;
++
++    /* Muxing parameters */
++    int b_aud;                  /* generate access unit delimiters */
++    int b_repeat_headers;       /* put SPS/PPS before each keyframe */
++    int b_annexb;               /* if set, place start codes (4 bytes) before NAL units,
++                                 * otherwise place size (4 bytes) before NAL units. */
++    int i_sps_id;               /* SPS and PPS id number */
++    int b_vfr_input;            /* VFR input.  If 1, use timebase and timestamps for ratecontrol purposes.
++                                 * If 0, use fps only. */
++    int b_pulldown;             /* use explicity set timebase for CFR */
++    uint32_t i_fps_num;
++    uint32_t i_fps_den;
++    uint32_t i_timebase_num;    /* Timebase numerator */
++    uint32_t i_timebase_den;    /* Timebase denominator */
++
++    int b_tff;
++
++    /* Pulldown:
++     * The correct pic_struct must be passed with each input frame.
++     * The input timebase should be the timebase corresponding to the output framerate. This should be constant.
++     * e.g. for 3:2 pulldown timebase should be 1001/30000
++     * The PTS passed with each frame must be the PTS of the frame after pulldown is applied.
++     * Frame doubling and tripling require b_vfr_input set to zero (see H.264 Table D-1)
++     *
++     * Pulldown changes are not clearly defined in H.264. Therefore, it is the calling app's responsibility to manage this.
++     */
++
++    int b_pic_struct;
++
++    /* Fake Interlaced.
++     *
++     * Used only when b_interlaced=0. Setting this flag makes it possible to flag the stream as PAFF interlaced yet
++     * encode all frames progessively. It is useful for encoding 25p and 30p Blu-Ray streams.
++     */
++
++    int b_fake_interlaced;
++
++    /* Slicing parameters */
++    int i_slice_max_size;    /* Max size per slice in bytes; includes estimated NAL overhead. */
++    int i_slice_max_mbs;     /* Max number of MBs per slice; overrides i_slice_count. */
++    int i_slice_count;       /* Number of slices per frame: forces rectangular slices. */
++
++    /* Optional callback for freeing this x264_param_t when it is done being used.
++     * Only used when the x264_param_t sits in memory for an indefinite period of time,
++     * i.e. when an x264_param_t is passed to x264_t in an x264_picture_t or in zones.
++     * Not used when x264_encoder_reconfig is called directly. */
++    void (*param_free)( void* );
++
++    /* Optional low-level callback for low-latency encoding.  Called for each output NAL unit
++     * immediately after the NAL unit is finished encoding.  This allows the calling application
++     * to begin processing video data (e.g. by sending packets over a network) before the frame
++     * is done encoding.
++     *
++     * This callback MUST do the following in order to work correctly:
++     * 1) Have available an output buffer of at least size nal->i_payload*3/2 + 5 + 16.
++     * 2) Call x264_nal_encode( h, dst, nal ), where dst is the output buffer.
++     * After these steps, the content of nal is valid and can be used in the same way as if
++     * the NAL unit were output by x264_encoder_encode.
++     *
++     * This does not need to be synchronous with the encoding process: the data pointed to
++     * by nal (both before and after x264_nal_encode) will remain valid until the next
++     * x264_encoder_encode call.  The callback must be re-entrant.
++     *
++     * This callback does not work with frame-based threads; threads must be disabled
++     * or sliced-threads enabled.  This callback also does not work as one would expect
++     * with HRD -- since the buffering period SEI cannot be calculated until the frame
++     * is finished encoding, it will not be sent via this callback.
++     *
++     * Note also that the NALs are not necessarily returned in order when sliced threads is
++     * enabled.  Accordingly, the variable i_first_mb and i_last_mb are available in
++     * x264_nal_t to help the calling application reorder the slices if necessary.
++     *
++     * When this callback is enabled, x264_encoder_encode does not return valid NALs;
++     * the calling application is expected to acquire all output NALs through the callback.
++     *
++     * It is generally sensible to combine this callback with a use of slice-max-mbs or
++     * slice-max-size. */
++    void (*nalu_process) ( x264_t *h, x264_nal_t *nal );
++} x264_param_t;
++
++void x264_nal_encode( x264_t *h, uint8_t *dst, x264_nal_t *nal );
++
++/****************************************************************************
++ * H.264 level restriction information
++ ****************************************************************************/
++
++typedef struct
++{
++    int level_idc;
++    int mbps;        /* max macroblock processing rate (macroblocks/sec) */
++    int frame_size;  /* max frame size (macroblocks) */
++    int dpb;         /* max decoded picture buffer (bytes) */
++    int bitrate;     /* max bitrate (kbit/sec) */
++    int cpb;         /* max vbv buffer (kbit) */
++    int mv_range;    /* max vertical mv component range (pixels) */
++    int mvs_per_2mb; /* max mvs per 2 consecutive mbs. */
++    int slice_rate;  /* ?? */
++    int mincr;       /* min compression ratio */
++    int bipred8x8;   /* limit bipred to >=8x8 */
++    int direct8x8;   /* limit b_direct to >=8x8 */
++    int frame_only;  /* forbid interlacing */
++} x264_level_t;
++
++/* all of the levels defined in the standard, terminated by .level_idc=0 */
++extern const x264_level_t x264_levels[];
++
++/****************************************************************************
++ * Basic parameter handling functions
++ ****************************************************************************/
++
++/* x264_param_default:
++ *      fill x264_param_t with default values and do CPU detection */
++void    x264_param_default( x264_param_t * );
++
++/* x264_param_parse:
++ *  set one parameter by name.
++ *  returns 0 on success, or returns one of the following errors.
++ *  note: BAD_VALUE occurs only if it can't even parse the value,
++ *  numerical range is not checked until x264_encoder_open() or
++ *  x264_encoder_reconfig().
++ *  value=NULL means "true" for boolean options, but is a BAD_VALUE for non-booleans. */
++#define X264_PARAM_BAD_NAME  (-1)
++#define X264_PARAM_BAD_VALUE (-2)
++int x264_param_parse( x264_param_t *, const char *name, const char *value );
++
++/****************************************************************************
++ * Advanced parameter handling functions
++ ****************************************************************************/
++
++/* These functions expose the full power of x264's preset-tune-profile system for
++ * easy adjustment of large numbers of internal parameters.
++ *
++ * In order to replicate x264CLI's option handling, these functions MUST be called
++ * in the following order:
++ * 1) x264_param_default_preset
++ * 2) Custom user options (via param_parse or directly assigned variables)
++ * 3) x264_param_apply_fastfirstpass
++ * 4) x264_param_apply_profile
++ *
++ * Additionally, x264CLI does not apply step 3 if the preset chosen is "placebo"
++ * or --slow-firstpass is set. */
++
++/* x264_param_default_preset:
++ *      The same as x264_param_default, but also use the passed preset and tune
++ *      to modify the default settings.
++ *      (either can be NULL, which implies no preset or no tune, respectively)
++ *
++ *      Currently available presets are, ordered from fastest to slowest: */
++static const char * const x264_preset_names[] = { "ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow", "placebo", 0 };
++
++/*      The presets can also be indexed numerically, as in:
++ *      x264_param_default_preset( &param, "3", ... )
++ *      with ultrafast mapping to "0" and placebo mapping to "9".  This mapping may
++ *      of course change if new presets are added in between, but will always be
++ *      ordered from fastest to slowest.
++ *
++ *      Warning: the speed of these presets scales dramatically.  Ultrafast is a full
++ *      100 times faster than placebo!
++ *
++ *      Currently available tunings are: */
++static const char * const x264_tune_names[] = { "film", "animation", "grain", "stillimage", "psnr", "ssim", "fastdecode", "zerolatency", 0 };
++
++/*      Multiple tunings can be used if separated by a delimiter in ",./-+",
++ *      however multiple psy tunings cannot be used.
++ *      film, animation, grain, stillimage, psnr, and ssim are psy tunings.
++ *
++ *      returns 0 on success, negative on failure (e.g. invalid preset/tune name). */
++int     x264_param_default_preset( x264_param_t *, const char *preset, const char *tune );
++
++/* x264_param_apply_fastfirstpass:
++ *      If first-pass mode is set (rc.b_stat_read == 0, rc.b_stat_write == 1),
++ *      modify the encoder settings to disable options generally not useful on
++ *      the first pass. */
++void    x264_param_apply_fastfirstpass( x264_param_t * );
++
++/* x264_param_apply_profile:
++ *      Applies the restrictions of the given profile.
++ *      Currently available profiles are, from most to least restrictive: */
++static const char * const x264_profile_names[] = { "baseline", "main", "high", "high10", "high422", "high444", 0 };
++
++/*      (can be NULL, in which case the function will do nothing)
++ *
++ *      Does NOT guarantee that the given profile will be used: if the restrictions
++ *      of "High" are applied to settings that are already Baseline-compatible, the
++ *      stream will remain baseline.  In short, it does not increase settings, only
++ *      decrease them.
++ *
++ *      returns 0 on success, negative on failure (e.g. invalid profile name). */
++int     x264_param_apply_profile( x264_param_t *, const char *profile );
++
++/****************************************************************************
++ * Picture structures and functions
++ ****************************************************************************/
++
++/* x264_bit_depth:
++ *      Specifies the number of bits per pixel that x264 uses. This is also the
++ *      bit depth that x264 encodes in. If this value is > 8, x264 will read
++ *      two bytes of input data for each pixel sample, and expect the upper
++ *      (16-x264_bit_depth) bits to be zero.
++ *      Note: The flag X264_CSP_HIGH_DEPTH must be used to specify the
++ *      colorspace depth as well. */
++extern const int x264_bit_depth;
++
++/* x264_chroma_format:
++ *      Specifies the chroma formats that x264 supports encoding. When this
++ *      value is non-zero, then it represents a X264_CSP_* that is the only
++ *      chroma format that x264 supports encoding. If the value is 0 then
++ *      there are no restrictions. */
++extern const int x264_chroma_format;
++
++enum pic_struct_e
++{
++    PIC_STRUCT_AUTO              = 0, // automatically decide (default)
++    PIC_STRUCT_PROGRESSIVE       = 1, // progressive frame
++    // "TOP" and "BOTTOM" are not supported in x264 (PAFF only)
++    PIC_STRUCT_TOP_BOTTOM        = 4, // top field followed by bottom
++    PIC_STRUCT_BOTTOM_TOP        = 5, // bottom field followed by top
++    PIC_STRUCT_TOP_BOTTOM_TOP    = 6, // top field, bottom field, top field repeated
++    PIC_STRUCT_BOTTOM_TOP_BOTTOM = 7, // bottom field, top field, bottom field repeated
++    PIC_STRUCT_DOUBLE            = 8, // double frame
++    PIC_STRUCT_TRIPLE            = 9, // triple frame
++};
++
++typedef struct
++{
++    double cpb_initial_arrival_time;
++    double cpb_final_arrival_time;
++    double cpb_removal_time;
++
++    double dpb_output_time;
++} x264_hrd_t;
++
++/* Arbitrary user SEI:
++ * Payload size is in bytes and the payload pointer must be valid.
++ * Payload types and syntax can be found in Annex D of the H.264 Specification.
++ * SEI payload alignment bits as described in Annex D must be included at the
++ * end of the payload if needed.
++ * The payload should not be NAL-encapsulated.
++ * Payloads are written first in order of input, apart from in the case when HRD
++ * is enabled where payloads are written after the Buffering Period SEI. */
++
++typedef struct
++{
++    int payload_size;
++    int payload_type;
++    uint8_t *payload;
++} x264_sei_payload_t;
++
++typedef struct
++{
++    int num_payloads;
++    x264_sei_payload_t *payloads;
++    /* In: optional callback to free each payload AND x264_sei_payload_t when used. */
++    void (*sei_free)( void* );
++} x264_sei_t;
++
++typedef struct
++{
++    int     i_csp;       /* Colorspace */
++    int     i_plane;     /* Number of image planes */
++    int     i_stride[4]; /* Strides for each plane */
++    uint8_t *plane[4];   /* Pointers to each plane */
++} x264_image_t;
++
++typedef struct
++{
++    /* In: an array of quantizer offsets to be applied to this image during encoding.
++     *     These are added on top of the decisions made by x264.
++     *     Offsets can be fractional; they are added before QPs are rounded to integer.
++     *     Adaptive quantization must be enabled to use this feature.  Behavior if quant
++     *     offsets differ between encoding passes is undefined.
++     *
++     *     Array contains one offset per macroblock, in raster scan order.  In interlaced
++     *     mode, top-field MBs and bottom-field MBs are interleaved at the row level. */
++    float *quant_offsets;
++    /* In: optional callback to free quant_offsets when used.
++     *     Useful if one wants to use a different quant_offset array for each frame. */
++    void (*quant_offsets_free)( void* );
++} x264_image_properties_t;
++
++typedef struct
++{
++    /* In: force picture type (if not auto)
++     *     If x264 encoding parameters are violated in the forcing of picture types,
++     *     x264 will correct the input picture type and log a warning.
++     *     The quality of frametype decisions may suffer if a great deal of fine-grained
++     *     mixing of auto and forced frametypes is done.
++     * Out: type of the picture encoded */
++    int     i_type;
++    /* In: force quantizer for != X264_QP_AUTO */
++    int     i_qpplus1;
++    /* In: pic_struct, for pulldown/doubling/etc...used only if b_pic_struct=1.
++     *     use pic_struct_e for pic_struct inputs
++     * Out: pic_struct element associated with frame */
++    int     i_pic_struct;
++    /* Out: whether this frame is a keyframe.  Important when using modes that result in
++     * SEI recovery points being used instead of IDR frames. */
++    int     b_keyframe;
++    /* In: user pts, Out: pts of encoded picture (user)*/
++    int64_t i_pts;
++    /* Out: frame dts. When the pts of the first frame is close to zero,
++     *      initial frames may have a negative dts which must be dealt with by any muxer */
++    int64_t i_dts;
++    /* In: custom encoding parameters to be set from this frame forwards
++           (in coded order, not display order). If NULL, continue using
++           parameters from the previous frame.  Some parameters, such as
++           aspect ratio, can only be changed per-GOP due to the limitations
++           of H.264 itself; in this case, the caller must force an IDR frame
++           if it needs the changed parameter to apply immediately. */
++    x264_param_t *param;
++    /* In: raw data */
++    x264_image_t img;
++    /* In: optional information to modify encoder decisions for this frame */
++    x264_image_properties_t prop;
++    /* Out: HRD timing information. Output only when i_nal_hrd is set. */
++    x264_hrd_t hrd_timing;
++    /* In: arbitrary user SEI (e.g subtitles, AFDs) */
++    x264_sei_t extra_sei;
++    /* private user data. copied from input to output frames. */
++    void *opaque;
++} x264_picture_t;
++
++/* x264_picture_init:
++ *  initialize an x264_picture_t.  Needs to be done if the calling application
++ *  allocates its own x264_picture_t as opposed to using x264_picture_alloc. */
++void x264_picture_init( x264_picture_t *pic );
++
++/* x264_picture_alloc:
++ *  alloc data for a picture. You must call x264_picture_clean on it.
++ *  returns 0 on success, or -1 on malloc failure or invalid colorspace. */
++int x264_picture_alloc( x264_picture_t *pic, int i_csp, int i_width, int i_height );
++
++/* x264_picture_clean:
++ *  free associated resource for a x264_picture_t allocated with
++ *  x264_picture_alloc ONLY */
++void x264_picture_clean( x264_picture_t *pic );
++
++/****************************************************************************
++ * Encoder functions
++ ****************************************************************************/
++
++/* Force a link error in the case of linking against an incompatible API version.
++ * Glue #defines exist to force correct macro expansion; the final output of the macro
++ * is x264_encoder_open_##X264_BUILD (for purposes of dlopen). */
++#define x264_encoder_glue1(x,y) x##y
++#define x264_encoder_glue2(x,y) x264_encoder_glue1(x,y)
++#define x264_encoder_open x264_encoder_glue2(x264_encoder_open_,X264_BUILD)
++
++/* x264_encoder_open:
++ *      create a new encoder handler, all parameters from x264_param_t are copied */
++x264_t *x264_encoder_open( x264_param_t * );
++
++/* x264_encoder_reconfig:
++ *      various parameters from x264_param_t are copied.
++ *      this takes effect immediately, on whichever frame is encoded next;
++ *      due to delay, this may not be the next frame passed to encoder_encode.
++ *      if the change should apply to some particular frame, use x264_picture_t->param instead.
++ *      returns 0 on success, negative on parameter validation error.
++ *      not all parameters can be changed; see the actual function for a detailed breakdown. */
++int     x264_encoder_reconfig( x264_t *, x264_param_t * );
++/* x264_encoder_parameters:
++ *      copies the current internal set of parameters to the pointer provided
++ *      by the caller.  useful when the calling application needs to know
++ *      how x264_encoder_open has changed the parameters, or the current state
++ *      of the encoder after multiple x264_encoder_reconfig calls.
++ *      note that the data accessible through pointers in the returned param struct
++ *      (e.g. filenames) should not be modified by the calling application. */
++void    x264_encoder_parameters( x264_t *, x264_param_t * );
++/* x264_encoder_headers:
++ *      return the SPS and PPS that will be used for the whole stream.
++ *      *pi_nal is the number of NAL units outputted in pp_nal.
++ *      returns negative on error.
++ *      the payloads of all output NALs are guaranteed to be sequential in memory. */
++int     x264_encoder_headers( x264_t *, x264_nal_t **pp_nal, int *pi_nal );
++/* x264_encoder_encode:
++ *      encode one picture.
++ *      *pi_nal is the number of NAL units outputted in pp_nal.
++ *      returns negative on error, zero if no NAL units returned.
++ *      the payloads of all output NALs are guaranteed to be sequential in memory. */
++int     x264_encoder_encode( x264_t *, x264_nal_t **pp_nal, int *pi_nal, x264_picture_t *pic_in, x264_picture_t *pic_out );
++/* x264_encoder_close:
++ *      close an encoder handler */
++void    x264_encoder_close  ( x264_t * );
++/* x264_encoder_delayed_frames:
++ *      return the number of currently delayed (buffered) frames
++ *      this should be used at the end of the stream, to know when you have all the encoded frames. */
++int     x264_encoder_delayed_frames( x264_t * );
++/* x264_encoder_maximum_delayed_frames( x264_t *h ):
++ *      return the maximum number of delayed (buffered) frames that can occur with the current
++ *      parameters. */
++int     x264_encoder_maximum_delayed_frames( x264_t *h );
++/* x264_encoder_intra_refresh:
++ *      If an intra refresh is not in progress, begin one with the next P-frame.
++ *      If an intra refresh is in progress, begin one as soon as the current one finishes.
++ *      Requires that b_intra_refresh be set.
++ *
++ *      Useful for interactive streaming where the client can tell the server that packet loss has
++ *      occurred.  In this case, keyint can be set to an extremely high value so that intra refreshes
++ *      only occur when calling x264_encoder_intra_refresh.
++ *
++ *      In multi-pass encoding, if x264_encoder_intra_refresh is called differently in each pass,
++ *      behavior is undefined.
++ *
++ *      Should not be called during an x264_encoder_encode. */
++void    x264_encoder_intra_refresh( x264_t * );
++/* x264_encoder_invalidate_reference:
++ *      An interactive error resilience tool, designed for use in a low-latency one-encoder-few-clients
++ *      system.  When the client has packet loss or otherwise incorrectly decodes a frame, the encoder
++ *      can be told with this command to "forget" the frame and all frames that depend on it, referencing
++ *      only frames that occurred before the loss.  This will force a keyframe if no frames are left to
++ *      reference after the aforementioned "forgetting".
++ *
++ *      It is strongly recommended to use a large i_dpb_size in this case, which allows the encoder to
++ *      keep around extra, older frames to fall back on in case more recent frames are all invalidated.
++ *      Unlike increasing i_frame_reference, this does not increase the number of frames used for motion
++ *      estimation and thus has no speed impact.  It is also recommended to set a very large keyframe
++ *      interval, so that keyframes are not used except as necessary for error recovery.
++ *
++ *      x264_encoder_invalidate_reference is not currently compatible with the use of B-frames or intra
++ *      refresh.
++ *
++ *      In multi-pass encoding, if x264_encoder_invalidate_reference is called differently in each pass,
++ *      behavior is undefined.
++ *
++ *      Should not be called during an x264_encoder_encode, but multiple calls can be made simultaneously.
++ *
++ *      Returns 0 on success, negative on failure. */
++int x264_encoder_invalidate_reference( x264_t *, int64_t pts );
++
++#endif

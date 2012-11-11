@@ -1,0 +1,102 @@
+From b22ef2883be3e48e55e6b511ae74472e6ecffae5 Mon Sep 17 00:00:00 2001
+From: Anssi Hannula <anssi.hannula@iki.fi>
+Date: Fri, 27 Jan 2012 14:32:15 +0200
+Subject: [PATCH 1/2] lavcac3enc: make the filter usable with shared FFmpeg
+
+Add some local definitions and a bit rate array to make FFmpeg private
+headers and symbols unneeded, allowing lavcac3enc to be built with
+shared FFmpeg.
+
+This also fixes the issue that the filter code expects the FFmpeg
+private definition AC3_MAX_CHANNELS to be the maximum number of
+"logical" channels to be encoded into AC-3, while it actually specifies
+the maximum channel count in the bitstream, which may include a coupling
+channel which is not an actual full audio channel. The issue is fixed by
+making the local AC3_MAX_CHANNELS to have the value of 6, which the
+FFmpeg private header also had before the addition of coupling support
+in 2011.
+---
+ Makefile              |    4 ++--
+ libaf/af.c            |    4 +---
+ libaf/af_lavcac3enc.c |   17 +++++++++++++----
+ 3 files changed, 16 insertions(+), 9 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 8e80b9e..b5fedcb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -70,6 +70,7 @@ SRCS_COMMON-$(FAAD)                  += libmpcodecs/ad_faad.c
+ SRCS_COMMON-$(FASTMEMCPY)            += libvo/aclib.c
+ SRCS_COMMON-$(FFMPEG)                += av_helpers.c                \
+                                         av_opts.c                   \
++                                        libaf/af_lavcac3enc.c       \
+                                         libaf/af_lavcresample.c     \
+                                         libmpcodecs/ad_ffmpeg.c     \
+                                         libmpcodecs/ad_spdif.c      \
+@@ -86,8 +87,7 @@ SRCS_COMMON-$(FFMPEG)                += av_helpers.c                \
+ SRCS_COMMON-$(CONFIG_VF_LAVFI)      +=  libmpcodecs/vf_lavfi.c
+ 
+ # These filters use private headers and do not work with shared FFmpeg.
+-SRCS_COMMON-$(FFMPEG_A)              += libaf/af_lavcac3enc.c    \
+-                                        libmpcodecs/vf_fspp.c    \
++SRCS_COMMON-$(FFMPEG_A)              += libmpcodecs/vf_fspp.c    \
+                                         libmpcodecs/vf_mcdeint.c \
+                                         libmpcodecs/vf_qp.c      \
+                                         libmpcodecs/vf_spp.c     \
+diff --git a/libaf/af.c b/libaf/af.c
+index 7cc62ee..8a4dd55 100644
+--- a/libaf/af.c
++++ b/libaf/af.c
+@@ -72,10 +72,8 @@ static const af_info_t * const filter_list[] = {
+ #endif
+    &af_info_volnorm,
+    &af_info_extrastereo,
+-#ifdef CONFIG_FFMPEG_A
+-   &af_info_lavcac3enc,
+-#endif
+ #ifdef CONFIG_FFMPEG
++   &af_info_lavcac3enc,
+    &af_info_lavcresample,
+ #endif
+    &af_info_sweep,
+diff --git a/libaf/af_lavcac3enc.c b/libaf/af_lavcac3enc.c
+index f66d2cb..060b3f3 100644
+--- a/libaf/af_lavcac3enc.c
++++ b/libaf/af_lavcac3enc.c
+@@ -33,9 +33,18 @@
+ #include "av_helpers.h"
+ 
+ #include "libavcodec/avcodec.h"
+-#include "libavcodec/ac3.h"
+ #include "libavutil/intreadwrite.h"
+ 
++#define AC3_MAX_CHANNELS        6
++#define AC3_FRAME_SIZE          1536
++#define AC3_MAX_CODED_FRAME_SIZE 3840
++#define AC3_BIT_RATES_COUNT     19
++
++static const int ac3_bit_rates[AC3_BIT_RATES_COUNT] = {
++    32000, 40000, 48000, 56000, 64000, 80000, 96000, 112000, 128000, 160000,
++    192000, 224000, 256000, 320000, 384000, 448000, 512000, 576000, 640000
++};
++
+ // Data for specific instances of this filter
+ typedef struct af_ac3enc_s {
+     struct AVCodec        *lavc_acodec;
+@@ -117,10 +126,10 @@ static int control(struct af_instance_s *af, int cmd, void *arg)
+         if (s->bit_rate < 1000)
+             s->bit_rate *= 1000;
+         if (s->bit_rate) {
+-            for (i = 0; i < 19; ++i)
+-                if (ff_ac3_bitrate_tab[i] * 1000 == s->bit_rate)
++            for (i = 0; i < AC3_BIT_RATES_COUNT; ++i)
++                if (ac3_bit_rates[i] == s->bit_rate)
+                     break;
+-            if (i >= 19) {
++            if (i >= AC3_BIT_RATES_COUNT) {
+                 mp_msg(MSGT_AFILTER, MSGL_WARN, "af_lavcac3enc unable set unsupported "
+                        "bitrate %d, use default bitrate (check manpage to see "
+                        "supported bitrates).\n", s->bit_rate);
+-- 
+1.7.7.2
+
