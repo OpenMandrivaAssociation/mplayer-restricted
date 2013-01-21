@@ -237,7 +237,7 @@ Patch44:        mplayer-mp_taglists-declaration.patch
 URL:		http://www.mplayerhq.hu
 License:	GPLv2
 Group:		Video
-BuildRequires:	pkgconfig(ncurses)
+BuildRequires:	pkgconfig(ncursesw)
 %if %{build_aa}
 BuildRequires:	aalib-devel
 %endif
@@ -285,7 +285,6 @@ BuildRequires:	pkgconfig(libpng15)
 %if %{build_sdl}
 BuildRequires:	pkgconfig(sdl) >= 1.1.8
 %endif
-BuildRequires:	termcap-devel
 %if %{build_xmms}
 BuildRequires:	xmms-devel
 %endif
