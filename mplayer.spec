@@ -28,7 +28,7 @@
 %if "%{svn}" != ""
 %define rel 0.%{svn}.1
 %else
-%define rel 5
+%define rel 6
 %endif
 %endif
 
