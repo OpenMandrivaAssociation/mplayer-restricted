@@ -11,7 +11,7 @@
 %define Name		MPlayer
 %define Summary		Movie player for linux
 %define prerel		%nil
-%define version 1.1
+%define version 1.1.1
 %define svn %nil
 %if "%svn" != ""
 %define fversion %{svn}
@@ -22,13 +22,13 @@
 %if "%{svn}" != ""
 %define rel		1.%{prerel}.0.%{svn}.1
 %else 
-%define rel 1.%{prerel}.6
+%define rel 0.%{prerel}.1
 %endif
 %else
 %if "%{svn}" != ""
 %define rel 0.%{svn}.1
 %else
-%define rel 6
+%define rel 1
 %endif
 %endif
 
@@ -487,7 +487,7 @@ rm -f Blue/README
 %patch0 -p1 -b .mdv~
 %patch28 -p1 -b .rtsp-extra-fixes
 %patch31 -p1 -b .format~
-%patch33 -p0
+%patch33 -p1 -b .dlfcn~
 %patch35 -p0
 %if ! %{build_plf}
 %patch39 -p1 -b .dlopen~
@@ -497,6 +497,10 @@ rm -rf ffmpeg
 %patch42 -p1 -b .internal_filters~
 %patch43 -p1 -b .ffm_stable~
 %patch44 -p0 -b .mp_taglists~
+
+# Sometimes (1.1.1) mplayer guys forget to update the VERSION file...
+# Let's fix it here, but let's not abuse this ;)
+echo %version >VERSION
 
 perl -pi -e 's^r\$svn_revision^%{release}^' version.sh
 

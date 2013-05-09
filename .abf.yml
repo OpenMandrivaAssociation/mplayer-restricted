@@ -1,3 +1,5 @@
+removed_sources:
+  MPlayer-1.1.tar.xz: 913a4bbeab7cbb515c2f43ad39bc83071b2efd75
 sources:
-  "Blue-1.8.tar.bz2": 0250d0b468b36ee13f160a814297afcb77f97e1d
-  "MPlayer-1.1.tar.xz": 913a4bbeab7cbb515c2f43ad39bc83071b2efd75
+  Blue-1.8.tar.bz2: 0250d0b468b36ee13f160a814297afcb77f97e1d
+  MPlayer-1.1.1.tar.xz: ba2f3bd1442d04b17b0143680850273d928689c1

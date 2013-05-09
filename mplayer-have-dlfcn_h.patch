@@ -1,8 +1,6 @@
-Index: libdvdread4/dvd_input.c
-===================================================================
---- libdvdread4/dvd_input.c	(Revision 1166)
-+++ libdvdread4/dvd_input.c	(Arbeitskopie)
-@@ -50,12 +50,7 @@
+--- MPlayer-1.1.1/libdvdread4/dvd_input.c.orig	2013-05-09 10:06:43.871182500 +0200
++++ MPlayer-1.1.1/libdvdread4/dvd_input.c	2013-05-09 10:07:17.439762835 +0200
+@@ -48,12 +48,7 @@ char *      (*dvdinput_error) (dvd_input
  #else
  
  /* dlopening libdvdcss */
@@ -13,5 +11,5 @@ Index: libdvdread4/dvd_input.c
 -#include "../../msvc/contrib/dlfcn.c"
 -#endif
  
- typedef struct dvdcss_s *dvdcss_handle;
- static dvdcss_handle (*DVDcss_open)  (const char *);
+ typedef struct dvdcss_s *dvdcss_t;
+ static dvdcss_t (*DVDcss_open)  (const char *);
