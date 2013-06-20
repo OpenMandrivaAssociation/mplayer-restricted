@@ -1,0 +1,2 @@
+error: Failed build dependencies:
+	pkgconfig(libpng15) is needed by mplayer-1.1.1-1.src
