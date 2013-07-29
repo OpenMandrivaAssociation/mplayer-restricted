@@ -1,18 +1,6 @@
-%define build_3264bit     0
-%{?_with_3264bit: %{expand: %%global build_3264bit 1}}
-%{?_without_3264bit: %{expand: %%global build_3264bit 0}}
-%if %{build_3264bit}
-%define	pkgext	32
-%else
-%define pkgext	%{nil}
-%endif
-
-%define name		mplayer%{pkgext}
-%define Name		MPlayer
-%define Summary		Movie player for linux
-%define prerel		%nil
-%define version 1.1.1
-%define svn %nil
+%define oname	MPlayer
+%define prerel	%{nil}
+%define svn	%{nil}
 %if "%svn" != ""
 %define fversion %{svn}
 %else
@@ -20,7 +8,7 @@
 %endif
 %if "%{prerel}" != ""
 %if "%{svn}" != ""
-%define rel		1.%{prerel}.0.%{svn}.1
+%define rel	1.%{prerel}.0.%{svn}.1
 %else 
 %define rel 0.%{prerel}.1
 %endif
@@ -28,12 +16,11 @@
 %if "%{svn}" != ""
 %define rel 0.%{svn}.1
 %else
-%define rel 1
+%define rel 2
 %endif
 %endif
 
 %define build_plf	0
-%define build_optimization	0
 %define build_debug	0
 %define build_mencoder	1
 %define build_gui	1
@@ -92,7 +79,7 @@
 %define build_vesa	0
 %endif
 
-%{?_with_plf: %{expand: %%global build_plf 1}}
+%{?_with_plf:	%{expand:	%%global build_plf 1}}
 
 #####################
 # Hardcode PLF build
@@ -131,7 +118,6 @@
 %{?_without_yasm: %{expand: %%global build_yasm 0}}
 %{?_with_vesa: %{expand: %%global build_vesa 1}}
 %{?_without_vesa: %{expand: %%global build_vesa 0}}
-%{?_with_optimization: %{expand: %%global build_optimization 1}}
 %{?_with_debug: %{expand: %%global build_debug 1}}
 %{?_without_debug: %{expand: %%global build_debug 0}}
 %{?_with_mencoder: %{expand: %%global build_mencoder 1}}
@@ -207,37 +193,62 @@
 %{?_with_vpx: %{expand: %%global build_vpx 1}}
 %{?_without_vpx: %{expand: %%global build_vpx 0}}
 
-
-Name:		%{name}
-Version:	%{version}
+Summary:	Movie player for linux
+Name:		mplayer
+Version:	1.1.1
 Release:	%{rel}%{?extrarelsuffix}
-Summary:	%{Summary}
+License:	GPLv2
+Group:		Video
+Url:		http://www.mplayerhq.hu
 %if "%svn" != ""
 #gw generated using svn export
 Source0:	%{name}-%{svn}.tar.xz
 %else
-Source0:	ftp://ftp1.mplayerhq.hu/MPlayer/releases/%{Name}-%{fversion}.tar.xz
+Source0:	ftp://ftp1.mplayerhq.hu/MPlayer/releases/%{oname}-%{fversion}.tar.xz
 %endif
 #gw default skin
 Source4:	Blue-1.8.tar.bz2
 Source5:	kernel-version.sh
-Patch0:		mplayer-mdvconfig.patch
+Patch0:	mplayer-mdvconfig.patch
 # fixes for crashes found while fixing CVE-2008-1558
 Patch28:	mplayer-rtsp-extra-fixes.patch
-Patch31:       mplayer-format-string-literal.patch
+Patch31:	mplayer-format-string-literal.patch
 #gw HAVE_DLFCN_H isn't defined
-Patch33:       mplayer-have-dlfcn_h.patch
-#gw fix crash: https://qa.mandriva.com/show_bug.cgi?id=55443
+Patch33:	mplayer-have-dlfcn_h.patch
+#gw fix crash:	https://qa.mandriva.com/show_bug.cgi?id=55443
 Patch35:	mplayer-fix-dvd-crash.patch
 Patch39:	mplayer-dlopen-libfaac-libfaad-and-libx264.patch
 Patch40:	mplayer-r34578-local-copy-of-internal-ffmpeg-type-definition.patch
 Patch42:	mplayer-filters-hack-with-shared.patch
 Patch43:	mplayer-r34911-dont-use-ffmpeg-functionality-outside-stable-release.patch
-Patch44:        mplayer-mp_taglists-declaration.patch
-URL:		http://www.mplayerhq.hu
-License:	GPLv2
-Group:		Video
+Patch44:	mplayer-mp_taglists-declaration.patch
+
+BuildRequires:	docbook-style-xsl
+BuildRequires:	docbook-dtd412-xml
+BuildRequires:	xsltproc
+BuildRequires:	bzip2-devel
+BuildRequires:	giflib-devel
+BuildRequires:	gsm-devel
+BuildRequires:	jpeg-devel
+BuildRequires:	ladspa-devel
+BuildRequires:	libdxr3-devel
+BuildRequires:	libmpcdec-devel
+BuildRequires:	mng-devel
+BuildRequires:	nas-devel
+BuildRequires:	pkgconfig(caca)
+BuildRequires:	pkgconfig(dvdread)
+BuildRequires:	pkgconfig(dvdnavmini)
+BuildRequires:	pkgconfig(gl)
+BuildRequires:	pkgconfig(libbs2b)
+BuildRequires:	pkgconfig(libmpg123)
+BuildRequires:	pkgconfig(libopenjpeg1)
+BuildRequires:	pkgconfig(libpng)
+BuildRequires:	pkgconfig(mad)
 BuildRequires:	pkgconfig(ncursesw)
+BuildRequires:	pkgconfig(speex)
+BuildRequires:	pkgconfig(xxf86vm)
+BuildRequires:	pkgconfig(xxf86dga)
+BuildRequires:	pkgconfig(xscrnsaver)
 %if %{build_aa}
 BuildRequires:	aalib-devel
 %endif
@@ -270,18 +281,12 @@ BuildRequires:	pkgconfig(schroedinger-1.0)
 %if %{build_dv}
 BuildRequires:	pkgconfig(libdv)
 %endif
-BuildRequires:	libdxr3-devel
-BuildRequires:	jpeg-devel
-BuildRequires:	openjpeg-devel
 %if %{build_lirc}
 BuildRequires:	pkgconfig(liblircclient0)
 %endif
 %if %{build_lzo}
 BuildRequires:	liblzo-devel
 %endif
-BuildRequires:  pkgconfig(mad)
-BuildRequires:  nas-devel
-BuildRequires:	pkgconfig(libpng)
 %if %{build_sdl}
 BuildRequires:	pkgconfig(sdl) >= 1.1.8
 %endif
@@ -292,8 +297,7 @@ BuildRequires:	xmms-devel
 BuildRequires:	libggiwmh-devel
 %endif
 %if %{build_smb}
-# require samba < 3.2.0 to avoid shipping GPLv2 vs GPLv3
-BuildRequires:	libsmbclient-devel < 3.2.0
+BuildRequires:	pkgconfig(smbclient)
 %endif
 %if %{build_twolame}
 BuildRequires:	pkgconfig(twolame)
@@ -344,37 +348,18 @@ BuildRequires:	pkgconfig(vdpau)
 %if %{build_libass}
 BuildRequires:	pkgconfig(libass)
 %endif
-BuildRequires:	gsm-devel
-BuildRequires:	pkgconfig(libmpg123)
 %if %{build_vpx}
 BuildRequires:	pkgconfig(vpx)
 %endif
 %if %{build_rtmp}
 BuildRequires:	pkgconfig(librtmp)
 %endif
-BuildRequires:	bzip2-devel
-BuildRequires:	mng-devel
-BuildRequires:	pkgconfig(gl)
-BuildRequires:	pkgconfig(xxf86vm)
-BuildRequires:	pkgconfig(xxf86dga)
-BuildRequires:	pkgconfig(xscrnsaver)
-BuildRequires:	pkgconfig(speex)
-BuildRequires:	libmpcdec-devel
-BuildRequires:	ladspa-devel
-BuildRequires:	xsltproc
-BuildRequires:	docbook-style-xsl
-BuildRequires:	docbook-dtd412-xml
-BuildRequires:	pkgconfig(caca)
-BuildRequires:	giflib-devel
 %if %{build_yasm}
 BuildRequires:	yasm
 %endif
-BuildRequires:	pkgconfig(libbs2b)
 %if %{build_system_ffmpeg}
 BuildRequires:	ffmpeg-devel
 %endif
-BuildRequires:	pkgconfig(dvdread)
-BuildRequires:	pkgconfig(dvdnavmini)
 
 %if "%{_lib}" == "lib64"
 %global	_ext	()(64bit)
@@ -393,8 +378,6 @@ Suggests:	libtwolame.so.0%{_ext}
 Suggests:	libdca.so.0%{_ext}
 Suggests:	libdvdcss.so.2%{_ext}
 %endif
-
-%rename		mplayer%{pkgext}1.0
 
 %description
 MPlayer is a movie player for LINUX (runs on many other Unices, and
@@ -427,12 +410,12 @@ win32-codecs, real-codecs and xanim-codecs.
 %endif
 
 %package doc
-Summary:	%{Name} documentation
+Summary:	%{oname} documentation
 Group:		Books/Computer books
 BuildArch:	noarch
 
 %description doc
-This package contains documentation for %{Name}.
+This package contains documentation for %{oname}.
 
 %if %{build_gui}
 %package gui
@@ -442,24 +425,21 @@ Requires:	%{name} = %{version}
 BuildRequires:	pkgconfig(gtk+-2.0)
 BuildRequires:	imagemagick
 Requires:	soundwrapper
-%rename		mplayer%{pkgext}1.0-gui
-Conflicts:	mplayer-skins < 1.3
 
 %description gui
 This package contains a GUI for %{name}.
 %endif
 
 %if %{build_mencoder}
-%package -n mencoder%{pkgext}
+%package -n mencoder
 Summary:	MPlayer's movie encoder
 Group:		Video
 Requires:	%{name}
-%rename		mencoder%{pkgext}1.0
 
-%description -n mencoder%{pkgext}
+%description -n mencoder
 MEncoder a movie encoder and is a part of the MPlayer package.
 %if ! %{build_plf}
-Note: this version doesn't have support for encoding mp3 audio streams in the
+Note: this version does not have support for encoding mp3 audio streams in the
 video files.
 %else
 This restricted build has additional support for AAC decoding with libfaad
@@ -468,9 +448,6 @@ also includes support for reading DVDs encrypted with CSS which might
 be illegal in some countries.
 %endif
 %endif
-
-
-#' close.. vim syntax highlight workaround.. ;p
 
 %prep
 %if "%{svn}" != ""
@@ -500,16 +477,14 @@ rm -rf ffmpeg
 
 # Sometimes (1.1.1) mplayer guys forget to update the VERSION file...
 # Let's fix it here, but let's not abuse this ;)
-echo %version >VERSION
+echo %{version} >VERSION
 
 perl -pi -e 's^r\$svn_revision^%{release}^' version.sh
 
 mv DOCS/README README.DOCS
 
 %build
-%if !%{build_optimization}
 export CFLAGS="$CFLAGS %{optflags}"
-%endif
 %if %{build_debug}
 export CFLAGS="$CFLAGS -g"
 %endif
@@ -519,16 +494,12 @@ export CFLAGS="$CFLAGS -mcpu=7450 -maltivec"
 %if %{build_directfb}
 export CPPFLAGS="-I%{_includedir}/directfb"
 %endif
-%if %{build_3264bit}
-export EXESUF=32
-%endif
 export LDFLAGS="%{?ldflags}"
 ./configure \
 	--prefix=%{_prefix} \
 	--datadir=%{_datadir}/%{name} \
 	--confdir=%{_sysconfdir}/%{name} \
 	--libdir=%{_libdir} \
-%if ! %{build_optimization}
 	--enable-runtime-cpudetection \
 %if ! %{build_dts}
 	--disable-libdca \
@@ -540,7 +511,6 @@ export LDFLAGS="%{?ldflags}"
 	--enable-sse \
 	--enable-sse2 \
 	--enable-fastmemcpy \
-%endif
 %endif
 	--enable-freetype \
 	--enable-nas \
@@ -684,34 +654,34 @@ export LDFLAGS="%{?ldflags}"
 
 
 # Keep this line before empty end %%configure (ppc conditionnal pb)
-make EXESUF=%{pkgext}
+make
 #gw make sure we have our version string included:
 fgrep %{version} version.h
 
 %install
 install -d -m 755 %{buildroot}%{_datadir}/%{name}
 install -d -m 755 %{buildroot}%{_sysconfdir}/%{name}
-install -m755 mplayer%{pkgext} -D %{buildroot}%{_bindir}/mplayer%{pkgext}
+install -m755 mplayer -D %{buildroot}%{_bindir}/mplayer
 for lang in de fr hu pl es it zh_CN en; do
-    install -m644 DOCS/man/$lang/mplayer.1 -D %{buildroot}%{_mandir}/$([ "$lang" != "en" ] && echo $lang)/man1/mplayer%{pkgext}.1
+    install -m644 DOCS/man/$lang/mplayer.1 -D %{buildroot}%{_mandir}/$([ "$lang" != "en" ] && echo $lang)/man1/mplayer.1
 done
 
-%find_lang mplayer%{pkgext} --with-man
+%find_lang mplayer --with-man
 
 ######################### Mencoder #########################
 %if %{build_mencoder}
-install -m755 mencoder%{pkgext} -D %{buildroot}%{_bindir}/mencoder%{pkgext}
+install -m755 mencoder -D %{buildroot}%{_bindir}/mencoder
 
 for lang in de fr hu pl es it zh_CN en; do
-    ln -s mplayer%{pkgext}.1 %{buildroot}%{_mandir}/$([ "$lang" != "en" ] && echo $lang)/man1/mencoder%{pkgext}.1
+    ln -s mplayer.1 %{buildroot}%{_mandir}/$([ "$lang" != "en" ] && echo $lang)/man1/mencoder.1
 done
 
-%find_lang mencoder%{pkgext} --with-man
+%find_lang mencoder --with-man
 
-install -m 755 TOOLS/mencvcd.sh %{buildroot}%{_bindir}/mencvcd%{pkgext}
-install -m 755 TOOLS/divx2svcd.sh %{buildroot}%{_bindir}/divx2svcd%{pkgext}
-install -m 755 TOOLS/wma2ogg.pl %{buildroot}%{_bindir}/wma2ogg%{pkgext}.pl
-install -m 755 TOOLS/midentify.sh %{buildroot}%{_bindir}/midentify%{pkgext}
+install -m 755 TOOLS/mencvcd.sh %{buildroot}%{_bindir}/mencvcd
+install -m 755 TOOLS/divx2svcd.sh %{buildroot}%{_bindir}/divx2svcd
+install -m 755 TOOLS/wma2ogg.pl %{buildroot}%{_bindir}/wma2ogg.pl
+install -m 755 TOOLS/midentify.sh %{buildroot}%{_bindir}/midentify
 %endif
 ######################### /Mencoder #########################
 
@@ -724,29 +694,14 @@ install -d -m 755 %{buildroot}%{_datadir}/%{name}/skins/
 cp -r Blue %{buildroot}%{_datadir}/%{name}/skins/
 ln -s Blue %{buildroot}%{_datadir}/%{name}/skins/default
 # gmplayer equals mplayer -gui
-ln -s mplayer%{pkgext} %{buildroot}%{_bindir}/gmplayer%{pkgext}
+ln -s mplayer %{buildroot}%{_bindir}/gmplayer
 # icons
 mkdir -p %{buildroot}{%{_liconsdir},%{_iconsdir},%{_miconsdir}}
-convert -transparent white Blue/icons/icon48x48.png %{buildroot}%{_liconsdir}/mplayer%{pkgext}.png 
-convert -transparent white Blue/icons/icon32x32.png %{buildroot}%{_iconsdir}/mplayer%{pkgext}.png 
-convert -transparent white -scale 16x16 Blue/icons/icon48x48.png %{buildroot}%{_miconsdir}/mplayer%{pkgext}.png
-install -D -m 644 etc/mplayer.desktop %{buildroot}%{_datadir}/applications/mplayer%{pkgext}.desktop
-perl -pi -e 's@mplayer$@mplayer%{pkgext}@g' %{buildroot}%{_datadir}/applications/mplayer%{pkgext}.desktop
-%endif
-
-%if %{build_3264bit}
-if [ -e %{buildroot}%{_liconsdir}/mplayer%{pkgext}.png ]; then
-	convert %{buildroot}%{_liconsdir}/mplayer%{pkgext}.png -channel green -negate \
-		%{buildroot}%{_liconsdir}/mplayer%{pkgext}.png
-fi
-if [ -e %{buildroot}%{_iconsdir}/mplayer%{pkgext}.png ]; then
-	convert %{buildroot}%{_iconsdir}/mplayer%{pkgext}.png -channel green -negate \
-		%{buildroot}%{_iconsdir}/mplayer%{pkgext}.png
-fi
-if [ -e %{buildroot}%{_miconsdir}/mplayer%{pkgext}.png ]; then
-	convert %{buildroot}%{_miconsdir}/mplayer%{pkgext}.png -channel green -negate \
-		%{buildroot}%{_miconsdir}/mplayer%{pkgext}.png
-fi
+convert -transparent white Blue/icons/icon48x48.png %{buildroot}%{_liconsdir}/mplayer.png 
+convert -transparent white Blue/icons/icon32x32.png %{buildroot}%{_iconsdir}/mplayer.png 
+convert -transparent white -scale 16x16 Blue/icons/icon48x48.png %{buildroot}%{_miconsdir}/mplayer.png
+install -D -m 644 etc/mplayer.desktop %{buildroot}%{_datadir}/applications/mplayer.desktop
+perl -pi -e 's@mplayer$@mplayer@g' %{buildroot}%{_datadir}/applications/mplayer.desktop
 %endif
 
 %if %{build_debug}
@@ -760,36 +715,36 @@ if [ -d %{_datadir}/%{name}/skins/default ]
 fi
 %endif
 
-%files -f mplayer%{pkgext}.lang
+%files -f mplayer.lang
 %doc AUTHORS Changelog README Copyright
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/mplayer.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/menu.conf
-%{_bindir}/midentify%{pkgext}
-%{_bindir}/mplayer%{pkgext}
-%{_mandir}/man1/mplayer%{pkgext}.1*
+%{_bindir}/midentify
+%{_bindir}/mplayer
+%{_mandir}/man1/mplayer.1*
 %dir %{_datadir}/%{name}
 
 %files doc
-%defattr(-,root,root,755)
 %doc README.DOCS
 %doc DOCS/default.css DOCS/xml DOCS/tech/
 
 %if %{build_mencoder}
-%files -n mencoder%{pkgext} -f mencoder%{pkgext}.lang
-%{_bindir}/mencoder%{pkgext}
-%{_bindir}/divx2svcd%{pkgext}
-%{_bindir}/mencvcd%{pkgext}
-%{_bindir}/wma2ogg%{pkgext}.pl
-%{_mandir}/man1/mencoder%{pkgext}.1*
+%files -n mencoder -f mencoder.lang
+%{_bindir}/mencoder
+%{_bindir}/divx2svcd
+%{_bindir}/mencvcd
+%{_bindir}/wma2ogg.pl
+%{_mandir}/man1/mencoder.1*
 %endif
 
 %if %{build_gui}
 %files gui
-%{_bindir}/gmplayer%{pkgext}
-%{_datadir}/applications/mplayer%{pkgext}.desktop
+%{_bindir}/gmplayer
+%{_datadir}/applications/mplayer.desktop
 %{_datadir}/%{name}/skins
-%{_iconsdir}/mplayer%{pkgext}.png
-%{_miconsdir}/mplayer%{pkgext}.png
-%{_liconsdir}/mplayer%{pkgext}.png
+%{_iconsdir}/mplayer.png
+%{_miconsdir}/mplayer.png
+%{_liconsdir}/mplayer.png
 %endif
+
