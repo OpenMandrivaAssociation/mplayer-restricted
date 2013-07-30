@@ -192,6 +192,9 @@
 %{?_without_vdpau: %{expand: %%global build_vdpau 0}}
 %{?_with_vpx: %{expand: %%global build_vpx 1}}
 %{?_without_vpx: %{expand: %%global build_vpx 0}}
+%ifnarch %arm %mips aarch64
+%bcond_without	cpudetection
+%endif
 
 Summary:	Movie player for linux
 Name:		mplayer
@@ -500,7 +503,9 @@ export LDFLAGS="%{?ldflags}"
 	--datadir=%{_datadir}/%{name} \
 	--confdir=%{_sysconfdir}/%{name} \
 	--libdir=%{_libdir} \
+%if %{with cpudetection}
 	--enable-runtime-cpudetection \
+%endif
 %if ! %{build_dts}
 	--disable-libdca \
 	--enable-libdca-dlopen \
