@@ -1,294 +1,3 @@
---- mplayer/configure.dlopen~	2012-01-05 16:41:59.000000000 +0100
-+++ mplayer/configure	2012-01-13 16:20:17.177740899 +0100
-@@ -729,6 +729,7 @@ _mp3lame=auto
- _mp3lame_lavc=auto
- _toolame=auto
- _twolame=auto
-+_twolame_dlopen=no
- _tremor=auto
- _tremor_internal=yes
- _tremor_low=no
-@@ -740,10 +741,13 @@ _mpg123=auto
- _mp3lib=auto
- _liba52=auto
- _libdca=auto
-+_libdca_dlopen=no
- _libmpeg2=auto
- _libmpeg2_internal=auto
- _faad=auto
-+_faad_dlopen=no
- _faac=auto
-+_faac_dlopen=no
- _faac_lavc=auto
- _ladspa=auto
- _libbs2b=auto
-@@ -802,6 +806,7 @@ crystalhd=auto
- _xvid=auto
- _xvid_lavc=auto
- _x264=auto
-+_x264_dlopen=no
- _x264_lavc=auto
- _libdirac_lavc=auto
- _libschroedinger_lavc=auto
-@@ -1114,6 +1119,8 @@ for ac_option do
-   --disable-toolame)    _toolame=no     ;;
-   --enable-twolame)     _twolame=yes    ;;
-   --disable-twolame)    _twolame=no     ;;
-+  --enable-twolame-dlopen)         _twolame_dlopen=yes        ;;
-+  --disable-twolame-dlopen)        _twolame_dlopen=no         ;;
-   --enable-libcdio)     _libcdio=yes    ;;
-   --disable-libcdio)    _libcdio=no     ;;
-   --enable-liblzo)      _liblzo=yes     ;;
-@@ -1140,6 +1147,8 @@ for ac_option do
-   --disable-liba52)     _liba52=no      ;;
-   --enable-libdca)      _libdca=yes     ;;
-   --disable-libdca)     _libdca=no      ;;
-+  --enable-libdca-dlopen)         _libdca_dlopen=yes        ;;
-+  --disable-libdca-dlopen)        _libdca_dlopen=no         ;;
-   --enable-libmpeg2)    _libmpeg2=yes   ;;
-   --disable-libmpeg2)   _libmpeg2=no    ;;
-   --enable-libmpeg2-internal)    _libmpeg2_internal=yes   ;;
-@@ -1148,8 +1157,12 @@ for ac_option do
-   --disable-musepack)   _musepack=no    ;;
-   --enable-faad)        _faad=yes       ;;
-   --disable-faad)       _faad=no        ;;
-+  --enable-faad-dlopen)         _faad_dlopen=yes        ;;
-+  --disable-faad-dlopen)        _faad_dlopen=no         ;;
-   --enable-faac)        _faac=yes       ;;
-   --disable-faac)       _faac=no        ;;
-+  --enable-faac-dlopen)          _faac_dlopen=yes       ;;
-+  --disable-faac-dlopen)         _faac_dlopen=no         ;;
-   --enable-faac-lavc)   _faac_lavc=yes  ;;
-   --disable-faac-lavc)  _faac_lavc=no   ;;
-   --enable-ladspa)      _ladspa=yes     ;;
-@@ -1250,6 +1263,8 @@ for ac_option do
-   --disable-xvid-lavc)  _xvid_lavc=no   ;;
-   --enable-x264)        _x264=yes       ;;
-   --disable-x264)       _x264=no        ;;
-+  --enable-x264-dlopen)         _x264_dlopen=yes        ;;
-+  --disable-x264-dlopen)        _x264_dlopen=no         ;;
-   --enable-x264-lavc)   _x264_lavc=yes  ;;
-   --disable-x264-lavc)  _x264_lavc=no   ;;
-   --enable-libdirac-lavc)   _libdirac_lavc=yes  ;;
-@@ -1262,8 +1277,12 @@ for ac_option do
-   --disable-libnut)     _libnut=no      ;;
-   --enable-libopencore_amrnb)   _libopencore_amrnb=yes  ;;
-   --disable-libopencore_amrnb)  _libopencore_amrnb=no   ;;
-+  --enable-libopencore_amrnb-dlopen)   _libopencore_amrnb_dlopen=yes  ;;
-+  --disable-libopencore_amrnb-dlopen)  _libopencore_amrnb_dlopen=no   ;;
-   --enable-libopencore_amrwb)   _libopencore_amrwb=yes  ;;
-   --disable-libopencore_amrwb)  _libopencore_amrwb=no   ;;
-+  --enable-libopencore_amrwb-dlopen)   _libopencore_amrwb_dlopen=yes  ;;
-+  --disable-libopencore_amrwb-dlopen)  _libopencore_amrwb_dlopen=no   ;;
-   --enable-decoder=*)  libavdecoders="$libavdecoders $(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')" ;;
-   --disable-decoder=*) libavdecoders=$(echo $libavdecoders | sed "s/$(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')//g") ;;
-   --enable-encoder=*)  libavencoders="$libavencoders $(echo $ac_option | cut -d '=' -f 2 | tr '[a-z]' '[A-Z]')" ;;
-@@ -6118,12 +6137,20 @@ if test "$_twolame" = auto ; then
-   _twolame=no
-   statement_check twolame.h 'twolame_init()' -ltwolame && _twolame=yes
- fi
--if test "$_twolame" = yes ; then
-+if test "$_twolame_dlopen" = yes ; then
-+  def_twolame="#define CONFIG_TWOLAME 1"
-+  def_twolame_dlopen="#define CONFIG_TWOLAME_DLOPEN 1"
-+  _twolame=yes
-+  _twolame_dlopen=yes
-+  codecmodules="twolame $codecmodules"
-+elif test "$_twolame" = yes ; then
-   def_twolame='#define CONFIG_TWOLAME 1'
-+  def_twolame_dlopen='#undef CONFIG_TWOLAME_DLOPEN'
-   libs_mencoder="$libs_mencoder -ltwolame"
-   codecmodules="twolame $codecmodules"
- else
-   def_twolame='#undef CONFIG_TWOLAME'
-+  def_twolame_dlopen='#undef CONFIG_TWOLAME_DLOPEN'
-   nocodecmodules="twolame $nocodecmodules"
- fi
- echores "$_twolame"
-@@ -6348,7 +6375,13 @@ if test "$_libdca" = auto ; then
-       extra_ldflags="$extra_ldflags $ld_dca" && _libdca=yes && break
-   done
- fi
--if test "$_libdca" = yes ; then
-+if test "$_libdca_dlopen" = yes ; then
-+  def_libdca="#define CONFIG_LIBDCA 1"
-+  def_libdca_dlopen="#define CONFIG_LIBDCA_DLOPEN 1"
-+  _libdca=yes
-+  _libdca_dlopen=yes
-+  codecmodules="libdca $codecmodules"
-+elif test "$_libdca" = yes ; then
-   def_libdca='#define CONFIG_LIBDCA 1'
-   codecmodules="libdca $codecmodules"
- else
-@@ -6392,9 +6425,17 @@ if test "$_faac" = auto && test "$_menco
- int main(void) { unsigned long x, y; faacEncOpen(48000, 2, &x, &y); return 0; }
- EOF
-   _faac=no
-+if test "$_faac_dlopen" = yes ; then
-+  def_faac="#define CONFIG_FAAC 1"
-+  def_faac_dlopen="#define CONFIG_FAAC_DLOPEN 1"
-+  _faac=yes
-+  _faac_dlopen=yes
-+else
-+  def_faac_dlopen="#undef CONFIG_FAAC_DLOPEN"
-   for ld_faac in "-lfaac" "-lfaac -lmp4v2 -lstdc++" ; do
-     cc_check $ld_faac && libs_mencoder="$libs_mencoder $ld_faac" && _faac=yes && break
-   done
-+  fi
- fi
- if test "$_faac" = yes ; then
-   def_faac="#define CONFIG_FAAC 1"
-@@ -6430,7 +6471,17 @@ EOF
- fi
- 
- def_faad='#undef CONFIG_FAAD'
--if test "$_faad" = yes ; then
-+def_faad_dlopen='#undef CONFIG_FAAD_DLOPEN'
-+if test "$_faad_dlopen" = yes ; then
-+  def_faad="#define CONFIG_FAAD 1"
-+  def_faad_dlopen="#define CONFIG_FAAD_DLOPEN 1"
-+  _faad=yes
-+  _faad_dlopen=yes
-+else
-+  def_faad_dlopen="#undef CONFIG_FAAD_DLOPEN"
-+fi
-+
-+if test "$_faad" = yes && test "$_faad_dlopen" == no; then
-   def_faad='#define CONFIG_FAAD 1'
-   extra_ldflags="$extra_ldflags -lfaad"
-   codecmodules="faad2 $codecmodules"
-@@ -6736,7 +6787,14 @@ if test "$_libopencore_amrnb" = auto ; t
-     res_comment="ffmpeg (static) is required by libopencore_amrnb, sorry"
-   fi
- fi
--if test "$_libopencore_amrnb" = yes ; then
-+if test "$_libopencore_amrnb_dlopen" = yes ; then
-+  _libopencore_amr=yes
-+  def_libopencore_amrnb='#define CONFIG_LIBOPENCORE_AMRNB 1'
-+  def_libopencore_amrnb_dlopen='#define CONFIG_LIBOPENCORE_AMRNB_DLOPEN 1'
-+  libavdecoders="$libavdecoders LIBOPENCORE_AMRNB_DECODER"
-+  libavencoders="$libavencoders LIBOPENCORE_AMRNB_ENCODER"
-+  codecmodules="libopencore_amrnb $codecmodules"
-+elif test "$_libopencore_amrnb" = yes ; then
-   _libopencore_amr=yes
-   extra_ldflags="$extra_ldflags -lopencore-amrnb"
-   def_libopencore_amrnb='#define CONFIG_LIBOPENCORE_AMRNB 1'
-@@ -6759,7 +6817,13 @@ if test "$_libopencore_amrwb" = auto ; t
-     res_comment="ffmpeg (static) is required by libopencore_amrwb, sorry"
-   fi
- fi
--if test "$_libopencore_amrwb" = yes ; then
-+if test "$_libopencore_amrwb_dlopen" = yes ; then
-+  _libopencore_amr=yes
-+  def_libopencore_amrwb='#define CONFIG_LIBOPENCORE_AMRWB 1'
-+  def_libopencore_amrwb_dlopen='#define CONFIG_LIBOPENCORE_AMRWB_DLOPEN 1'
-+  libavdecoders="$libavdecoders LIBOPENCORE_AMRWB_DECODER"
-+  codecmodules="libopencore_amrwb $codecmodules"
-+elif test "$_libopencore_amrwb" = yes ; then
-   _libopencore_amr=yes
-   extra_ldflags="$extra_ldflags -lopencore-amrwb"
-   def_libopencore_amrwb='#define CONFIG_LIBOPENCORE_AMRWB 1'
-@@ -6846,11 +6910,23 @@ if test "$_x264" = auto && test "$_menco
- #endif
- int main(void) { x264_encoder_open((void*)0); return 0; }
- EOF
-+
-+if test "$_x264_dlopen" = yes ; then
-+  def_x264='#define CONFIG_X264 1'
-+  def_x264_dlopen='#define CONFIG_X264_DLOPEN 1'
-+  codecmodules="x264 $codecmodules"
-+  _x264=yes
-+  _x264_dlopen=yes
-+else
-+  _x264_dlopen=no
-+  def_x264='#undef CONFIG_X264_DLOPEN'
-+  nocodecmodules="x264 $nocodecmodules"
-   _x264=no
-   for ld_x264 in "-lx264 $ld_pthread" "-lx264 $ld_pthread" ; do
-     cc_check $ld_x264 && libs_mencoder="$libs_mencoder $ld_x264" && _x264=yes && break
-   done
- fi
-+fi
- 
- if test "$_x264" = yes ; then
-   def_x264='#define CONFIG_X264 1'
-@@ -6870,7 +6946,6 @@ fi
- res_comment="in FFmpeg: $_x264_lavc"
- echores "$_x264"
- 
--
- echocheck "libdirac"
- if test "$_libdirac_lavc" = auto; then
-   _libdirac_lavc=no
-@@ -7996,7 +8071,9 @@ DXR2 = $_dxr2
- DXR3 = $_dxr3
- ESD = $_esd
- FAAC=$_faac
-+FAAC_DLOPEN=$_faac_dlopen
- FAAD = $_faad
-+FAAD_DLOPEN=$_faad_dlopen
- FASTMEMCPY = $_fastmemcpy
- FBDEV = $_fbdev
- FREETYPE = $_freetype
-@@ -8027,6 +8104,7 @@ LIBASS_INTERNAL = $ass_internal
- LIBBLURAY = $_bluray
- LIBBS2B = $_libbs2b
- LIBDCA = $_libdca
-+LIBDCA_DLOPEN = $_libdca_dlopen
- LIBDV = $_libdv
- LIBDVDCSS_INTERNAL = $_libdvdcss_internal
- LIBLZO = $_liblzo
-@@ -8086,6 +8164,7 @@ TV_V4L  = $_tv_v4l
- TV_V4L1 = $_tv_v4l1
- TV_V4L2 = $_tv_v4l2
- TWOLAME=$_twolame
-+TWOLAME_DLOPEN=$_twolame_dlopen
- UNRAR_EXEC = $_unrar_exec
- V4L2 = $_v4l2
- VCD = $_vcd
-@@ -8116,6 +8195,7 @@ WIN32_EMULATION = $_win32_emulation
- WINVIDIX = $winvidix
- X11 = $_x11
- X264 = $_x264
-+X264_DLOPEN = $_x264_dlopen
- XANIM_CODECS = $_xanim
- XMGA = $_xmga
- XMMS_PLUGINS = $_xmms
-@@ -8401,10 +8481,12 @@ $def_vcd
- 
- /* codec libraries */
- $def_faac
-+$def_faac_dlopen
- $def_faad
-+$def_faad_dlopen
- $def_liba52
- $def_libdca
--$def_libdv
-+$def_libdca_dlopen
- $def_liblzo
- $def_libmpeg2
- $def_libmpeg2_internal
-@@ -8420,8 +8502,10 @@ $def_theora
- $def_toolame
- $def_tremor
- $def_twolame
-+$def_twolame_dlopen
- $def_vorbis
- $def_x264
-+$def_x264_dlopen
- $def_xvid
- $def_zlib
- 
-@@ -8719,7 +8803,9 @@ $def_faac_lavc
- $def_libdirac_lavc
- $def_libgsm
- $def_libopencore_amrnb
-+$def_libopencore_amrnb_dlopen
- $def_libopencore_amrwb
-+$def_libopencore_amrwb_dlopen
- $def_libopenjpeg
- $def_librtmp
- $def_libschroedinger_lavc
 --- mplayer/libmpcodecs/ad_faad.c.dlopen~	2011-10-26 17:12:35.000000000 +0200
 +++ mplayer/libmpcodecs/ad_faad.c	2012-01-13 16:20:17.179740895 +0100
 @@ -23,10 +23,101 @@
@@ -408,97 +117,6 @@
    faac_hdec = faacDecOpen();
  
    // If we don't get the ES descriptor, try manual config
---- mplayer/libmpcodecs/ad_libdca.c.dlopen~	2010-09-08 19:38:52.000000000 +0200
-+++ mplayer/libmpcodecs/ad_libdca.c	2012-01-13 16:20:17.179740895 +0100
-@@ -31,7 +31,76 @@
- #include "ad_internal.h"
- #include "dec_audio.h"
- 
-+#define CONFIG_LIBDCA_DLOPEN 1
-+#ifndef CONFIG_LIBDCA_DLOPEN
- #include <dts.h>
-+#else
-+#include "localinc/dts.h"
-+#include <dlfcn.h>
-+
-+static dca_state_t * (*dl_dca_init) (uint32_t mm_accel);
-+static int (*dl_dca_syncinfo) (dca_state_t *state, uint8_t * buf, int * flags,
-+                  int * sample_rate, int * bit_rate, int *frame_length);
-+static int (*dl_dca_frame) (dca_state_t * state, uint8_t * buf, int * flags,
-+               level_t * level, sample_t bias);
-+static int (*dl_dca_blocks_num) (dca_state_t * state);
-+static int (*dl_dca_block) (dca_state_t * state);
-+static sample_t * (*dl_dca_samples) (dca_state_t * state);
-+static void (*dl_dca_free) (dca_state_t * state);
-+
-+#define	dca_init	dl_dca_init
-+#define dca_syncinfo	dl_dca_syncinfo
-+#define	dca_frame	dl_dca_frame
-+#define	dca_blocks_num	dl_dca_blocks_num
-+#define	dca_block	dl_dca_block
-+#define	dca_samples	dl_dca_samples
-+#define	dca_free	dl_dca_free
-+
-+#define	DCA_LIB		"libdca.so.0"
-+
-+#define dl_sym(func, args, lib) \
-+	dl_##func = args dlsym(lib, #func); \
-+	if ((err = dlerror())) \
-+		goto error;
-+
-+static int loadLibDCA() {
-+    void *libdca = NULL;
-+    const char *err = NULL;
-+
-+    libdca = dlopen(DCA_LIB, RTLD_LAZY);
-+    if ((err = dlerror())) {
-+        mp_msg(MSGT_OSDEP, MSGL_FATAL, "%s\n%s is missing, dca support will be disabled\n", err, DCA_LIB);
-+	if (libdca)
-+	    dlclose(libdca);
-+	return 1;
-+    }
-+
-+    dl_sym(dca_init, (dca_state_t * (*) (uint32_t mm_accel)), libdca);
-+
-+    dl_sym(dca_syncinfo, (int (*) (dca_state_t *state, uint8_t * buf, int * flags,
-+                  int * sample_rate, int * bit_rate, int *frame_length)), libdca);
-+
-+    dl_sym(dca_frame, (int (*) (dca_state_t * state, uint8_t * buf, int * flags,
-+               level_t * level, sample_t bias)), libdca);
-+
-+    dl_sym(dca_blocks_num, (int (*) (dca_state_t * state)), libdca);
-+
-+    dl_sym(dca_block, (int (*) (dca_state_t * state)), libdca);
-+
-+    dl_sym(dca_samples, (sample_t* (*) (dca_state_t * state)), libdca);
-+
-+    dl_sym(dca_free, (void (*) (dca_state_t * state)), libdca);
-+
-+    return 0;
-+
-+error:
-+    mp_msg(MSGT_OSDEP, MSGL_FATAL, "libdca: Missing symbols in %s: %s\n "
-+	  "dca support disabled\n", DCA_LIB, err);
-+    dlclose(libdca);
-+    return 1;
-+
-+}
-+#endif
- 
- static const ad_info_t info =
- {
-@@ -295,6 +364,11 @@ static int init(sh_audio_t *sh)
-     int flags;
-     int decoded_bytes;
- 
-+#ifdef CONFIG_LIBDCA_DLOPEN
-+    if(loadLibDCA())
-+	return 0;
-+#endif
-+
-     s = dts_init(0);
-     if(s == NULL) {
-         mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dts_init() failed\n");
 --- mplayer/libmpcodecs/ae_faac.c.dlopen~	2011-07-27 17:33:03.000000000 +0200
 +++ mplayer/libmpcodecs/ae_faac.c	2012-01-13 16:20:17.179740895 +0100
 @@ -30,10 +30,77 @@
@@ -591,165 +209,6 @@
  	if(encoder->params.channels < 1 || encoder->params.channels > 6 || (param_mpeg != 2 && param_mpeg != 4))
  	{
  		mp_msg(MSGT_MENCODER, MSGL_FATAL, "AE_FAAC, unsupported number of channels: %d, or mpeg version: %d, exit\n", encoder->params.channels, param_mpeg);
---- mplayer/libmpcodecs/ae_twolame.c.dlopen~	2010-09-12 17:55:47.000000000 +0200
-+++ mplayer/libmpcodecs/ae_twolame.c	2012-01-13 16:20:17.179740895 +0100
-@@ -22,7 +22,6 @@
- #include <unistd.h>
- #include <string.h>
- #include <sys/types.h>
--#include <twolame.h>
- 
- #include "m_option.h"
- #include "mp_msg.h"
-@@ -34,6 +33,137 @@
- #include "ae_twolame.h"
- #include "libmpdemux/mp3_hdr.h"
- 
-+#ifndef CONFIG_TWOLAME_DLOPEN
-+#include <twolame.h>
-+#else
-+#include "localinc/twolame.h"
-+#include "localinc/dlopen.h"
-+
-+static int (*dl_twolame_encode_buffer_float32_interleaved) (twolame_options * glopts,
-+                                                  const float pcm[],
-+                                                  int num_samples,
-+						  unsigned char *mp2buffer, int mp2buffer_size);
-+static twolame_options* (*dl_twolame_init) (void);
-+static int (*dl_twolame_init_params) (twolame_options * glopts);
-+static int (*dl_twolame_encode_buffer_interleaved) (twolame_options * glopts,
-+                                                     const short int pcm[],
-+                                                     int num_samples,
-+                                                     unsigned char *mp2buffer, int mp2buffer_size);
-+static int (*dl_twolame_set_num_ancillary_bits) (twolame_options * glopts, int num);
-+static int (*dl_twolame_set_error_protection) (twolame_options * glopts, int err_protection);
-+static int (*dl_twolame_set_mode) (twolame_options * glopts, TWOLAME_MPEG_mode mode);
-+static int (*dl_twolame_set_in_samplerate) (twolame_options * glopts, int samplerate);
-+static int (*dl_twolame_set_out_samplerate) (twolame_options * glopts, int samplerate);
-+static int (*dl_twolame_set_version) (twolame_options * glopts, TWOLAME_MPEG_version version);
-+static int (*dl_twolame_set_psymodel) (twolame_options * glopts, int psymodel);
-+static int (*dl_twolame_get_psymodel) (twolame_options * glopts);
-+static int (*dl_twolame_set_num_channels) (twolame_options * glopts, int num_channels);
-+static int (*dl_twolame_set_bitrate) (twolame_options * glopts, int bitrate);
-+static int (*dl_twolame_set_VBR) (twolame_options * glopts, int vbr);
-+static int (*dl_twolame_set_VBR_q) (twolame_options * glopts, float level);
-+static int (*dl_twolame_set_VBR_max_bitrate_kbps) (twolame_options * glopts, int bitrate);
-+static int (*dl_twolame_get_VBR_max_bitrate_kbps) (twolame_options * glopts);
-+static int (*dl_twolame_set_padding) (twolame_options * glopts, TWOLAME_Padding padding);
-+static int (*dl_twolame_set_verbosity) (twolame_options * glopts, int verbosity);
-+static int (*dl_twolame_set_version) (twolame_options * glopts, TWOLAME_MPEG_version version);
-+
-+#define	twolame_encode_buffer_float32_interleaved	dl_twolame_encode_buffer_float32_interleaved
-+#define	twolame_init					dl_twolame_init
-+#define	twolame_init_params				dl_twolame_init_params
-+#define	twolame_encode_buffer_interleaved		dl_twolame_encode_buffer_interleaved
-+#define	twolame_set_num_ancillary_bits			dl_twolame_set_num_ancillary_bits
-+#define	twolame_set_error_protection			dl_twolame_set_error_protection
-+#define	twolame_set_mode				dl_twolame_set_mode
-+#define	twolame_set_in_samplerate			dl_twolame_set_in_samplerate
-+#define	twolame_set_out_samplerate			dl_twolame_set_out_samplerate
-+#define	twolame_set_version				dl_twolame_set_version
-+#define	twolame_set_psymodel				dl_twolame_set_psymodel
-+#define	twolame_get_psymodel				dl_twolame_get_psymodel
-+#define	twolame_set_num_channels			dl_twolame_set_num_channels
-+#define	twolame_set_bitrate				dl_twolame_set_bitrate
-+#define	twolame_set_VBR					dl_twolame_set_VBR
-+#define	twolame_set_VBR_q				dl_twolame_set_VBR_q
-+#define	twolame_set_VBR_max_bitrate_kbps		dl_twolame_set_VBR_max_bitrate_kbps
-+#define	twolame_get_VBR_max_bitrate_kbps		dl_twolame_get_VBR_max_bitrate_kbps
-+#define	twolame_set_padding				dl_twolame_set_padding
-+#define	twolame_set_verbosity				dl_twolame_set_verbosity
-+#define	twolame_set_version				dl_twolame_set_version
-+#define	TWOLAME_LIB					"libtwolame.so.0"
-+
-+static int loadLibTwoLame() {
-+	void *libtwolame = NULL;
-+	const char *err = NULL;
-+
-+	libtwolame = dlopen(TWOLAME_LIB, RTLD_LAZY);
-+	if ((err = dlerror())) {
-+		mp_msg(MSGT_OSDEP, MSGL_FATAL, "%s\n%s is missing, twolame support disabled\n", err, TWOLAME_LIB);
-+		if (libtwolame)
-+			dlclose(libtwolame);
-+		return 1;
-+	}
-+
-+
-+	dl_sym(twolame_encode_buffer_float32_interleaved,(int (*) (twolame_options * glopts,
-+				const float pcm[],
-+				int num_samples,
-+				unsigned char *mp2buffer, int mp2buffer_size)),
-+			libtwolame);
-+
-+	dl_sym(twolame_init, (twolame_options* (*) (void)), libtwolame);
-+
-+	dl_sym(twolame_init_params, (int (*)(twolame_options * glopts)), libtwolame);
-+
-+	dl_sym(twolame_encode_buffer_interleaved, (int (*) (twolame_options * glopts,
-+				const short int pcm[],
-+				int num_samples,
-+				unsigned char *mp2buffer, int mp2buffer_size)),
-+			libtwolame);
-+
-+	dl_sym(twolame_set_num_ancillary_bits, (int (*) (twolame_options * glopts, int num)), libtwolame);
-+
-+	dl_sym(twolame_set_error_protection, (int (*) (twolame_options * glopts, int err_protection)), libtwolame);
-+
-+	dl_sym(twolame_set_mode, (int (*) (twolame_options * glopts, TWOLAME_MPEG_mode mode)), libtwolame);
-+
-+	dl_sym(twolame_set_in_samplerate, (int (*) (twolame_options * glopts, int samplerate)), libtwolame);
-+
-+	dl_sym(twolame_set_out_samplerate, (int (*) (twolame_options * glopts, int samplerate)), libtwolame)
-+
-+	dl_sym(twolame_set_version, (int (*) (twolame_options * glopts, TWOLAME_MPEG_version version)), libtwolame);
-+
-+	dl_sym(twolame_set_psymodel, (int (*) (twolame_options * glopts, int psymodel)), libtwolame);
-+
-+	dl_sym(twolame_get_psymodel, (int (*) (twolame_options * glopts)), libtwolame);
-+
-+	dl_sym(twolame_set_num_channels, (int (*) (twolame_options * glopts, int num_channels)), libtwolame);
-+
-+	dl_sym(twolame_set_bitrate, (int (*) (twolame_options * glopts, int bitrate)), libtwolame);
-+
-+	dl_sym(twolame_set_VBR, (int (*) (twolame_options * glopts, int vbr)), libtwolame);
-+
-+	dl_sym(twolame_set_VBR_q, (int (*) (twolame_options * glopts, float level)), libtwolame);
-+
-+	dl_sym(twolame_set_VBR_max_bitrate_kbps, (int (*) (twolame_options * glopts, int bitrate)), libtwolame);
-+
-+	dl_sym(twolame_get_VBR_max_bitrate_kbps, (int (*) (twolame_options * glopts)), libtwolame);
-+
-+	dl_sym(twolame_set_padding, (int (*) (twolame_options * glopts, TWOLAME_Padding padding)), libtwolame);
-+
-+	dl_sym(twolame_set_verbosity, (int (*) (twolame_options * glopts, int verbosity)), libtwolame);
-+
-+	dl_sym(twolame_set_version, (int (*) (twolame_options * glopts, TWOLAME_MPEG_version version)), libtwolame);
-+
-+	return 0;
-+error:
-+
-+	mp_msg(MSGT_OSDEP, MSGL_FATAL, "libtwolame: Missing symbols in %s: %s\n"
-+			"twolame support disabled\n", TWOLAME_LIB, err);
-+	dlclose(libtwolame);
-+
-+	return 1;
-+}
-+#endif
-+
- 
- typedef struct {
- 	twolame_options *twolame_ctx;
-@@ -143,6 +273,10 @@ int mpae_init_twolame(audio_encoder_t *e
- 	int mode;
- 	mpae_twolame_ctx *ctx = NULL;
- 
-+#ifdef TWOLAME_DLOPEN
-+	if (loadLibTwoLame())
-+		return 0;
-+#endif
- 	if(encoder->params.channels == 1)
- 	{
- 		mp_msg(MSGT_MENCODER, MSGL_INFO, "ae_twolame, 1 audio channel, forcing mono mode\n");
 --- mplayer/libmpcodecs/ve_x264.c.dlopen~	2011-04-28 15:45:16.000000000 +0200
 +++ mplayer/libmpcodecs/ve_x264.c	2012-01-13 16:20:32.416718017 +0100
 @@ -48,7 +48,97 @@
@@ -3451,3 +2910,545 @@
 +int x264_encoder_invalidate_reference( x264_t *, int64_t pts );
 +
 +#endif
+--- ./configure.dlopen~	2014-02-15 16:52:58.000000000 +0000
++++ ./configure	2014-02-21 13:16:24.473389473 +0000
+@@ -719,6 +719,7 @@
+ _mp3lame_lavc=auto
+ _toolame=auto
+ _twolame=auto
++_twolame_dlopen=auto
+ _tremor=auto
+ _libvorbis=auto
+ _speex=auto
+@@ -727,10 +728,13 @@
+ _mpg123=auto
+ _liba52=auto
+ _libdca=auto
++_libdca_dlopen=auto
+ _libmpeg2=auto
+ _libmpeg2_internal=no
+ _faad=auto
++_faad_dlopen=no
+ _faac=auto
++_faac_dlopen=no
+ _faac_lavc=auto
+ _ladspa=auto
+ _libbs2b=auto
+@@ -792,6 +796,7 @@
+ _xvid=auto
+ _xvid_lavc=auto
+ _x264=auto
++_x264_dlopen=no
+ _x264_lavc=auto
+ _libdirac_lavc=auto
+ _libschroedinger_lavc=auto
+@@ -1121,6 +1126,8 @@
+   --disable-toolame)    _toolame=no     ;;
+   --enable-twolame)     _twolame=yes    ;;
+   --disable-twolame)    _twolame=no     ;;
++  --enable-twolame-dlopen)         _twolame_dlopen=yes        ;;
++  --disable-twolame-dlopen)        _twolame_dlopen=no         ;;
+   --enable-libcdio)     _libcdio=yes    ;;
+   --disable-libcdio)    _libcdio=no     ;;
+   --enable-liblzo)      _liblzo=yes     ;;
+@@ -1141,6 +1148,8 @@
+   --disable-liba52)     _liba52=no      ;;
+   --enable-libdca)      _libdca=yes     ;;
+   --disable-libdca)     _libdca=no      ;;
++  --enable-libdca-dlopen)         _libdca_dlopen=yes        ;;
++  --disable-libdca-dlopen)        _libdca_dlopen=no         ;;
+   --enable-libmpeg2)    _libmpeg2=yes   ;;
+   --disable-libmpeg2)   _libmpeg2=no    ;;
+   --enable-libmpeg2-internal)    _libmpeg2_internal=yes   ;;
+@@ -1149,8 +1158,12 @@
+   --disable-musepack)   _musepack=no    ;;
+   --enable-faad)        _faad=yes       ;;
+   --disable-faad)       _faad=no        ;;
++  --enable-faad-dlopen)         _faad_dlopen=yes        ;;
++  --disable-faad-dlopen)        _faad_dlopen=no         ;;
+   --enable-faac)        _faac=yes       ;;
+   --disable-faac)       _faac=no        ;;
++  --enable-faac-dlopen)          _faac_dlopen=yes       ;;
++  --disable-faac-dlopen)         _faac_dlopen=no         ;;
+   --enable-faac-lavc)   _faac_lavc=yes  ;;
+   --disable-faac-lavc)  _faac_lavc=no   ;;
+   --enable-ladspa)      _ladspa=yes     ;;
+@@ -1257,6 +1270,8 @@
+   --disable-xvid-lavc)  _xvid_lavc=no   ;;
+   --enable-x264)        _x264=yes       ;;
+   --disable-x264)       _x264=no        ;;
++  --enable-x264-dlopen)         _x264_dlopen=yes        ;;
++  --disable-x264-dlopen)        _x264_dlopen=no         ;;
+   --enable-x264-lavc)   _x264_lavc=yes  ;;
+   --disable-x264-lavc)  _x264_lavc=no   ;;
+   --enable-libdirac-lavc)   _libdirac_lavc=yes  ;;
+@@ -1269,8 +1284,12 @@
+   --disable-libnut)     _libnut=no      ;;
+   --enable-libopencore_amrnb)   _libopencore_amrnb=yes  ;;
+   --disable-libopencore_amrnb)  _libopencore_amrnb=no   ;;
++  --enable-libopencore_amrnb-dlopen)   _libopencore_amrnb_dlopen=yes  ;;
++  --disable-libopencore_amrnb-dlopen)  _libopencore_amrnb_dlopen=no   ;;
+   --enable-libopencore_amrwb)   _libopencore_amrwb=yes  ;;
+   --disable-libopencore_amrwb)  _libopencore_amrwb=no   ;;
++  --enable-libopencore_amrwb-dlopen)   _libopencore_amrwb_dlopen=yes  ;;
++  --disable-libopencore_amrwb-dlopen)  _libopencore_amrwb_dlopen=no   ;;
+   --enable-ffmpeg_a)    ffmpeg_a=yes    ;;
+   --disable-ffmpeg_a)   ffmpeg_a=no     ;;
+   --enable-ffmpeg_so)   ffmpeg_so=yes   ;;
+@@ -6472,12 +6491,20 @@
+   _twolame=no
+   statement_check twolame.h 'twolame_init()' -ltwolame && _twolame=yes
+ fi
+-if test "$_twolame" = yes ; then
++if test "$_twolame_dlopen" = yes ; then
++  def_twolame="#define CONFIG_TWOLAME 1"
++  def_twolame_dlopen="#define CONFIG_TWOLAME_DLOPEN 1"
++  _twolame=yes
++  _twolame_dlopen=yes
++  codecmodules="twolame $codecmodules"
++elif test "$_twolame" = yes ; then
+   def_twolame='#define CONFIG_TWOLAME 1'
++  def_twolame_dlopen='#undef CONFIG_TWOLAME_DLOPEN'
+   libs_mencoder="$libs_mencoder -ltwolame"
+   codecmodules="twolame $codecmodules"
+ else
+   def_twolame='#undef CONFIG_TWOLAME'
++  def_twolame_dlopen='#undef CONFIG_TWOLAME_DLOPEN'
+   nocodecmodules="twolame $nocodecmodules"
+ fi
+ echores "$_twolame"
+@@ -6675,7 +6702,13 @@
+       extra_ldflags="$extra_ldflags $ld_dca" && _libdca=yes && break
+   done
+ fi
+-if test "$_libdca" = yes ; then
++if test "$_libdca_dlopen" = yes ; then
++  def_libdca="#define CONFIG_LIBDCA 1"
++  def_libdca_dlopen="#define CONFIG_LIBDCA_DLOPEN 1"
++  _libdca=yes
++  _libdca_dlopen=yes
++  codecmodules="libdca $codecmodules"
++elif test "$_libdca" = yes ; then
+   def_libdca='#define CONFIG_LIBDCA 1'
+   codecmodules="libdca $codecmodules"
+ else
+@@ -6719,9 +6752,17 @@
+ int main(void) { unsigned long x, y; faacEncOpen(48000, 2, &x, &y); return 0; }
+ EOF
+   _faac=no
++if test "$_faac_dlopen" = yes ; then
++  def_faac="#define CONFIG_FAAC 1"
++  def_faac_dlopen="#define CONFIG_FAAC_DLOPEN 1"
++  _faac=yes
++  _faac_dlopen=yes
++else
++  def_faac_dlopen="#undef CONFIG_FAAC_DLOPEN"
+   for ld_faac in "-lfaac" "-lfaac -lmp4v2 -lstdc++" ; do
+     cc_check $ld_faac && libs_mencoder="$libs_mencoder $ld_faac" && _faac=yes && break
+   done
++  fi
+ fi
+ if test "$_faac" = yes ; then
+   def_faac="#define CONFIG_FAAC 1"
+@@ -6757,7 +6798,17 @@
+ fi
+ 
+ def_faad='#undef CONFIG_FAAD'
+-if test "$_faad" = yes ; then
++def_faad_dlopen='#undef CONFIG_FAAD_DLOPEN'
++if test "$_faad_dlopen" = yes ; then
++  def_faad="#define CONFIG_FAAD 1"
++  def_faad_dlopen="#define CONFIG_FAAD_DLOPEN 1"
++  _faad=yes
++  _faad_dlopen=yes
++else
++  def_faad_dlopen="#undef CONFIG_FAAD_DLOPEN"
++fi
++
++if test "$_faad" = yes && test "$_faad_dlopen" == no; then
+   def_faad='#define CONFIG_FAAD 1'
+   extra_ldflags="$extra_ldflags -lfaad"
+   codecmodules="faad2 $codecmodules"
+@@ -7128,7 +7179,14 @@
+     res_comment="ffmpeg (static) is required by libopencore_amrnb, sorry"
+   fi
+ fi
+-if test "$_libopencore_amrnb" = yes ; then
++if test "$_libopencore_amrnb_dlopen" = yes ; then
++  _libopencore_amr=yes
++  def_libopencore_amrnb='#define CONFIG_LIBOPENCORE_AMRNB 1'
++  def_libopencore_amrnb_dlopen='#define CONFIG_LIBOPENCORE_AMRNB_DLOPEN 1'
++  libavdecoders="$libavdecoders LIBOPENCORE_AMRNB_DECODER"
++  libavencoders="$libavencoders LIBOPENCORE_AMRNB_ENCODER"
++  codecmodules="libopencore_amrnb $codecmodules"
++elif test "$_libopencore_amrnb" = yes ; then
+   _libopencore_amr=yes
+   extra_ldflags="$extra_ldflags -lopencore-amrnb"
+   def_libopencore_amrnb='#define CONFIG_LIBOPENCORE_AMRNB 1'
+@@ -7151,7 +7209,13 @@
+     res_comment="ffmpeg (static) is required by libopencore_amrwb, sorry"
+   fi
+ fi
+-if test "$_libopencore_amrwb" = yes ; then
++if test "$_libopencore_amrwb_dlopen" = yes ; then
++  _libopencore_amr=yes
++  def_libopencore_amrwb='#define CONFIG_LIBOPENCORE_AMRWB 1'
++  def_libopencore_amrwb_dlopen='#define CONFIG_LIBOPENCORE_AMRWB_DLOPEN 1'
++  libavdecoders="$libavdecoders LIBOPENCORE_AMRWB_DECODER"
++  codecmodules="libopencore_amrwb $codecmodules"
++elif test "$_libopencore_amrwb" = yes ; then
+   _libopencore_amr=yes
+   extra_ldflags="$extra_ldflags -lopencore-amrwb"
+   def_libopencore_amrwb='#define CONFIG_LIBOPENCORE_AMRWB 1'
+@@ -7238,11 +7302,23 @@
+ #endif
+ int main(void) { x264_encoder_open((void*)0); return 0; }
+ EOF
++
++if test "$_x264_dlopen" = yes ; then
++  def_x264='#define CONFIG_X264 1'
++  def_x264_dlopen='#define CONFIG_X264_DLOPEN 1'
++  codecmodules="x264 $codecmodules"
++  _x264=yes
++  _x264_dlopen=yes
++else
++  _x264_dlopen=no
++  def_x264='#undef CONFIG_X264_DLOPEN'
++  nocodecmodules="x264 $nocodecmodules"
+   _x264=no
+   for ld_x264 in "-lx264 $ld_pthread" "-lx264 $ld_pthread" ; do
+     cc_check $ld_x264 && libs_mencoder="$libs_mencoder $ld_x264" && _x264=yes && break
+   done
+ fi
++fi
+ 
+ if test "$_x264" = yes ; then
+   def_x264='#define CONFIG_X264 1'
+@@ -7262,7 +7338,6 @@
+ res_comment="in FFmpeg: $_x264_lavc"
+ echores "$_x264"
+ 
+-
+ echocheck "libdirac"
+ if test "$_libdirac_lavc" = auto; then
+   _libdirac_lavc=no
+@@ -8409,7 +8484,9 @@
+ DXR3 = $_dxr3
+ ESD = $_esd
+ FAAC=$_faac
++FAAC_DLOPEN=$_faac_dlopen
+ FAAD = $_faad
++FAAD_DLOPEN=$_faad_dlopen
+ FASTMEMCPY = $_fastmemcpy
+ FBDEV = $_fbdev
+ FREETYPE = $_freetype
+@@ -8442,6 +8519,7 @@
+ LIBBLURAY = $_bluray
+ LIBBS2B = $_libbs2b
+ LIBDCA = $_libdca
++LIBDCA_DLOPEN = $_libdca_dlopen
+ LIBDV = $_libdv
+ LIBDVDCSS_INTERNAL = $_libdvdcss_internal
+ LIBLZO = $_liblzo
+@@ -8502,6 +8580,7 @@
+ TV_V4L1 = $_tv_v4l1
+ TV_V4L2 = $_tv_v4l2
+ TWOLAME=$_twolame
++TWOLAME_DLOPEN=$_twolame_dlopen
+ UNRAR_EXEC = $_unrar_exec
+ V4L2 = $_v4l2
+ VCD = $_vcd
+@@ -8533,6 +8612,7 @@
+ WINVIDIX = $winvidix
+ X11 = $_x11
+ X264 = $_x264
++X264_DLOPEN = $_x264_dlopen
+ XANIM_CODECS = $_xanim
+ XMGA = $_xmga
+ XMMS_PLUGINS = $_xmms
+@@ -8865,10 +8945,12 @@
+ 
+ /* codec libraries */
+ $def_faac
++$def_faac_dlopen
+ $def_faad
++$def_faad_dlopen
+ $def_liba52
+ $def_libdca
+-$def_libdv
++$def_libdca_dlopen
+ $def_liblzo
+ $def_libmpeg2
+ $def_libmpeg2_internal
+@@ -8885,8 +8967,10 @@
+ $def_toolame
+ $def_tremor
+ $def_twolame
++$def_twolame_dlopen
+ $def_vorbis
+ $def_x264
++$def_x264_dlopen
+ $def_xvid
+ $def_zlib
+ 
+@@ -9095,7 +9179,9 @@
+ $def_libdirac_lavc
+ $def_libgsm
+ $def_libopencore_amrnb
++$def_libopencore_amrnb_dlopen
+ $def_libopencore_amrwb
++$def_libopencore_amrwb_dlopen
+ $def_libopenjpeg
+ $def_librtmp
+ $def_libschroedinger_lavc
+--- ./libmpcodecs/ad_libdca.c.dlopen~	2014-02-21 13:11:22.740387292 +0000
++++ ./libmpcodecs/ad_libdca.c	2014-02-21 13:28:24.636394679 +0000
+@@ -31,7 +31,76 @@
+ #include "ad_internal.h"
+ #include "dec_audio.h"
+ 
+-#include <dca.h>
++#define CONFIG_LIBDCA_DLOPEN 1
++#ifndef CONFIG_LIBDCA_DLOPEN
++ #include <dts.h>
++#else
++#include "localinc/dts.h"
++#include <dlfcn.h>
++
++static dca_state_t * (*dl_dca_init) (uint32_t mm_accel);
++static int (*dl_dca_syncinfo) (dca_state_t *state, uint8_t * buf, int * flags,
++                  int * sample_rate, int * bit_rate, int *frame_length);
++static int (*dl_dca_frame) (dca_state_t * state, uint8_t * buf, int * flags,
++               level_t * level, sample_t bias);
++static int (*dl_dca_blocks_num) (dca_state_t * state);
++static int (*dl_dca_block) (dca_state_t * state);
++static sample_t * (*dl_dca_samples) (dca_state_t * state);
++static void (*dl_dca_free) (dca_state_t * state);
++
++#define        dca_init        dl_dca_init
++#define dca_syncinfo   dl_dca_syncinfo
++#define        dca_frame       dl_dca_frame
++#define        dca_blocks_num  dl_dca_blocks_num
++#define        dca_block       dl_dca_block
++#define        dca_samples     dl_dca_samples
++#define        dca_free        dl_dca_free
++
++#define        DCA_LIB         "libdca.so.0"
++
++#define dl_sym(func, args, lib) \
++       dl_##func = args dlsym(lib, #func); \
++       if ((err = dlerror())) \
++               goto error;
++
++static int loadLibDCA() {
++    void *libdca = NULL;
++    const char *err = NULL;
++
++    libdca = dlopen(DCA_LIB, RTLD_LAZY);
++    if ((err = dlerror())) {
++        mp_msg(MSGT_OSDEP, MSGL_FATAL, "%s\n%s is missing, dca support will be disabled\n", err, DCA_LIB);
++       if (libdca)
++           dlclose(libdca);
++       return 1;
++    }
++
++    dl_sym(dca_init, (dca_state_t * (*) (uint32_t mm_accel)), libdca);
++
++    dl_sym(dca_syncinfo, (int (*) (dca_state_t *state, uint8_t * buf, int * flags,
++                  int * sample_rate, int * bit_rate, int *frame_length)), libdca);
++
++    dl_sym(dca_frame, (int (*) (dca_state_t * state, uint8_t * buf, int * flags,
++               level_t * level, sample_t bias)), libdca);
++
++    dl_sym(dca_blocks_num, (int (*) (dca_state_t * state)), libdca);
++
++    dl_sym(dca_block, (int (*) (dca_state_t * state)), libdca);
++
++    dl_sym(dca_samples, (sample_t* (*) (dca_state_t * state)), libdca);
++
++    dl_sym(dca_free, (void (*) (dca_state_t * state)), libdca);
++
++    return 0;
++
++error:
++    mp_msg(MSGT_OSDEP, MSGL_FATAL, "libdca: Missing symbols in %s: %s\n "
++         "dca support disabled\n", DCA_LIB, err);
++    dlclose(libdca);
++    return 1;
++
++}
++#endif
+ 
+ static const ad_info_t info =
+ {
+@@ -295,6 +364,11 @@
+     int flags;
+     int decoded_bytes;
+ 
++#ifdef CONFIG_LIBDCA_DLOPEN
++    if(loadLibDCA())
++       return 0;
++#endif
++
+     s = dca_init(0);
+     if(s == NULL) {
+         mp_msg(MSGT_DECAUDIO, MSGL_ERR, "dca_init() failed\n");
+--- ./libmpcodecs/ae_twolame.c.dlopen~	2013-03-17 22:47:17.000000000 +0000
++++ ./libmpcodecs/ae_twolame.c	2014-02-21 13:21:19.952391609 +0000
+@@ -23,7 +23,6 @@
+ #include <string.h>
+ #include <strings.h>
+ #include <sys/types.h>
+-#include <twolame.h>
+ 
+ #include "m_option.h"
+ #include "mp_msg.h"
+@@ -35,6 +34,137 @@
+ #include "ae_twolame.h"
+ #include "libmpdemux/mp3_hdr.h"
+ 
++#ifndef CONFIG_TWOLAME_DLOPEN
++#include <twolame.h>
++#else
++#include "localinc/twolame.h"
++#include "localinc/dlopen.h"
++
++static int (*dl_twolame_encode_buffer_float32_interleaved) (twolame_options * glopts,
++                                                  const float pcm[],
++                                                  int num_samples,
++						  unsigned char *mp2buffer, int mp2buffer_size);
++static twolame_options* (*dl_twolame_init) (void);
++static int (*dl_twolame_init_params) (twolame_options * glopts);
++static int (*dl_twolame_encode_buffer_interleaved) (twolame_options * glopts,
++                                                     const short int pcm[],
++                                                     int num_samples,
++                                                     unsigned char *mp2buffer, int mp2buffer_size);
++static int (*dl_twolame_set_num_ancillary_bits) (twolame_options * glopts, int num);
++static int (*dl_twolame_set_error_protection) (twolame_options * glopts, int err_protection);
++static int (*dl_twolame_set_mode) (twolame_options * glopts, TWOLAME_MPEG_mode mode);
++static int (*dl_twolame_set_in_samplerate) (twolame_options * glopts, int samplerate);
++static int (*dl_twolame_set_out_samplerate) (twolame_options * glopts, int samplerate);
++static int (*dl_twolame_set_version) (twolame_options * glopts, TWOLAME_MPEG_version version);
++static int (*dl_twolame_set_psymodel) (twolame_options * glopts, int psymodel);
++static int (*dl_twolame_get_psymodel) (twolame_options * glopts);
++static int (*dl_twolame_set_num_channels) (twolame_options * glopts, int num_channels);
++static int (*dl_twolame_set_bitrate) (twolame_options * glopts, int bitrate);
++static int (*dl_twolame_set_VBR) (twolame_options * glopts, int vbr);
++static int (*dl_twolame_set_VBR_q) (twolame_options * glopts, float level);
++static int (*dl_twolame_set_VBR_max_bitrate_kbps) (twolame_options * glopts, int bitrate);
++static int (*dl_twolame_get_VBR_max_bitrate_kbps) (twolame_options * glopts);
++static int (*dl_twolame_set_padding) (twolame_options * glopts, TWOLAME_Padding padding);
++static int (*dl_twolame_set_verbosity) (twolame_options * glopts, int verbosity);
++static int (*dl_twolame_set_version) (twolame_options * glopts, TWOLAME_MPEG_version version);
++
++#define	twolame_encode_buffer_float32_interleaved	dl_twolame_encode_buffer_float32_interleaved
++#define	twolame_init					dl_twolame_init
++#define	twolame_init_params				dl_twolame_init_params
++#define	twolame_encode_buffer_interleaved		dl_twolame_encode_buffer_interleaved
++#define	twolame_set_num_ancillary_bits			dl_twolame_set_num_ancillary_bits
++#define	twolame_set_error_protection			dl_twolame_set_error_protection
++#define	twolame_set_mode				dl_twolame_set_mode
++#define	twolame_set_in_samplerate			dl_twolame_set_in_samplerate
++#define	twolame_set_out_samplerate			dl_twolame_set_out_samplerate
++#define	twolame_set_version				dl_twolame_set_version
++#define	twolame_set_psymodel				dl_twolame_set_psymodel
++#define	twolame_get_psymodel				dl_twolame_get_psymodel
++#define	twolame_set_num_channels			dl_twolame_set_num_channels
++#define	twolame_set_bitrate				dl_twolame_set_bitrate
++#define	twolame_set_VBR					dl_twolame_set_VBR
++#define	twolame_set_VBR_q				dl_twolame_set_VBR_q
++#define	twolame_set_VBR_max_bitrate_kbps		dl_twolame_set_VBR_max_bitrate_kbps
++#define	twolame_get_VBR_max_bitrate_kbps		dl_twolame_get_VBR_max_bitrate_kbps
++#define	twolame_set_padding				dl_twolame_set_padding
++#define	twolame_set_verbosity				dl_twolame_set_verbosity
++#define	twolame_set_version				dl_twolame_set_version
++#define	TWOLAME_LIB					"libtwolame.so.0"
++
++static int loadLibTwoLame() {
++	void *libtwolame = NULL;
++	const char *err = NULL;
++
++	libtwolame = dlopen(TWOLAME_LIB, RTLD_LAZY);
++	if ((err = dlerror())) {
++		mp_msg(MSGT_OSDEP, MSGL_FATAL, "%s\n%s is missing, twolame support disabled\n", err, TWOLAME_LIB);
++		if (libtwolame)
++			dlclose(libtwolame);
++		return 1;
++	}
++
++
++	dl_sym(twolame_encode_buffer_float32_interleaved,(int (*) (twolame_options * glopts,
++				const float pcm[],
++				int num_samples,
++				unsigned char *mp2buffer, int mp2buffer_size)),
++			libtwolame);
++
++	dl_sym(twolame_init, (twolame_options* (*) (void)), libtwolame);
++
++	dl_sym(twolame_init_params, (int (*)(twolame_options * glopts)), libtwolame);
++
++	dl_sym(twolame_encode_buffer_interleaved, (int (*) (twolame_options * glopts,
++				const short int pcm[],
++				int num_samples,
++				unsigned char *mp2buffer, int mp2buffer_size)),
++			libtwolame);
++
++	dl_sym(twolame_set_num_ancillary_bits, (int (*) (twolame_options * glopts, int num)), libtwolame);
++
++	dl_sym(twolame_set_error_protection, (int (*) (twolame_options * glopts, int err_protection)), libtwolame);
++
++	dl_sym(twolame_set_mode, (int (*) (twolame_options * glopts, TWOLAME_MPEG_mode mode)), libtwolame);
++
++	dl_sym(twolame_set_in_samplerate, (int (*) (twolame_options * glopts, int samplerate)), libtwolame);
++
++	dl_sym(twolame_set_out_samplerate, (int (*) (twolame_options * glopts, int samplerate)), libtwolame)
++
++	dl_sym(twolame_set_version, (int (*) (twolame_options * glopts, TWOLAME_MPEG_version version)), libtwolame);
++
++	dl_sym(twolame_set_psymodel, (int (*) (twolame_options * glopts, int psymodel)), libtwolame);
++
++	dl_sym(twolame_get_psymodel, (int (*) (twolame_options * glopts)), libtwolame);
++
++	dl_sym(twolame_set_num_channels, (int (*) (twolame_options * glopts, int num_channels)), libtwolame);
++
++	dl_sym(twolame_set_bitrate, (int (*) (twolame_options * glopts, int bitrate)), libtwolame);
++
++	dl_sym(twolame_set_VBR, (int (*) (twolame_options * glopts, int vbr)), libtwolame);
++
++	dl_sym(twolame_set_VBR_q, (int (*) (twolame_options * glopts, float level)), libtwolame);
++
++	dl_sym(twolame_set_VBR_max_bitrate_kbps, (int (*) (twolame_options * glopts, int bitrate)), libtwolame);
++
++	dl_sym(twolame_get_VBR_max_bitrate_kbps, (int (*) (twolame_options * glopts)), libtwolame);
++
++	dl_sym(twolame_set_padding, (int (*) (twolame_options * glopts, TWOLAME_Padding padding)), libtwolame);
++
++	dl_sym(twolame_set_verbosity, (int (*) (twolame_options * glopts, int verbosity)), libtwolame);
++
++	dl_sym(twolame_set_version, (int (*) (twolame_options * glopts, TWOLAME_MPEG_version version)), libtwolame);
++
++	return 0;
++error:
++
++	mp_msg(MSGT_OSDEP, MSGL_FATAL, "libtwolame: Missing symbols in %s: %s\n"
++			"twolame support disabled\n", TWOLAME_LIB, err);
++	dlclose(libtwolame);
++
++	return 1;
++}
++#endif
++
+ 
+ typedef struct {
+ 	twolame_options *twolame_ctx;
+@@ -144,6 +274,10 @@
+ 	int mode;
+ 	mpae_twolame_ctx *ctx = NULL;
+ 
++#ifdef TWOLAME_DLOPEN
++	if (loadLibTwoLame())
++		return 0;
++#endif
+ 	if(encoder->params.channels == 1)
+ 	{
+ 		mp_msg(MSGT_MENCODER, MSGL_INFO, "ae_twolame, 1 audio channel, forcing mono mode\n");
