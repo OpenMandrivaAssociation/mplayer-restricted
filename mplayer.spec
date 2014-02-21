@@ -1,6 +1,7 @@
 %define oname	MPlayer
 %define prerel	%{nil}
-%define svn	%{nil}
+%define svn	r36867
+%define ffmpegversion 2.1.3
 %if "%svn" != ""
 %define fversion %{svn}
 %else
@@ -209,6 +210,7 @@ Source0:	%{name}-%{svn}.tar.xz
 %else
 Source0:	ftp://ftp1.mplayerhq.hu/MPlayer/releases/%{oname}-%{fversion}.tar.xz
 %endif
+Source1: http://ffmpeg.org/releases/ffmpeg-%{ffmpegversion}.tar.bz2
 #gw default skin
 Source4:	Blue-1.8.tar.bz2
 Source5:	kernel-version.sh
@@ -221,10 +223,9 @@ Patch33:	mplayer-have-dlfcn_h.patch
 #gw fix crash:	https://qa.mandriva.com/show_bug.cgi?id=55443
 Patch35:	mplayer-fix-dvd-crash.patch
 Patch39:	mplayer-dlopen-libfaac-libfaad-and-libx264.patch
-Patch40:	mplayer-r34578-local-copy-of-internal-ffmpeg-type-definition.patch
 Patch42:	mplayer-filters-hack-with-shared.patch
 Patch43:	mplayer-r34911-dont-use-ffmpeg-functionality-outside-stable-release.patch
-Patch44:	mplayer-mp_taglists-declaration.patch
+Patch44:	mplayer-r36613-remove-draw_slice.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	docbook-dtd412-xml
@@ -361,7 +362,7 @@ BuildRequires:	pkgconfig(librtmp)
 BuildRequires:	yasm
 %endif
 %if %{build_system_ffmpeg}
-BuildRequires:	ffmpeg-devel
+BuildRequires:	ffmpeg-devel = %{ffmpegversion}
 %endif
 
 %if "%{_lib}" == "lib64"
@@ -473,10 +474,13 @@ rm -f Blue/README
 %patch39 -p1 -b .dlopen~
 %endif
 rm -rf ffmpeg
-%patch40 -p1 -b .ffmpeg~
+tar -xjf %{SOURCE1}
+mv ffmpeg-%{ffmpegversion} ffmpeg
+pushd ffmpeg
+popd
 %patch42 -p1 -b .internal_filters~
 %patch43 -p1 -b .ffm_stable~
-%patch44 -p0 -b .mp_taglists~
+%patch44 -p1 -R
 
 # Sometimes (1.1.1) mplayer guys forget to update the VERSION file...
 # Let's fix it here, but let's not abuse this ;)
