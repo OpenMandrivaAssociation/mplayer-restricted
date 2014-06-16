@@ -11,7 +11,7 @@
 %if "%{svn}" != ""
 %define rel	1.%{prerel}.0.%{svn}.1
 %else 
-%define rel 0.%{prerel}.1
+%define rel 0.%{prerel}.2
 %endif
 %else
 %if "%{svn}" != ""
@@ -237,7 +237,7 @@ BuildRequires:	jpeg-devel
 BuildRequires:	ladspa-devel
 BuildRequires:	libdxr3-devel
 BuildRequires:	libmpcdec-devel
-BuildRequires:	mng-devel
+BuildRequires:	pkgconfig(libmng)
 BuildRequires:	nas-devel
 BuildRequires:	pkgconfig(caca)
 BuildRequires:	pkgconfig(dvdread)
