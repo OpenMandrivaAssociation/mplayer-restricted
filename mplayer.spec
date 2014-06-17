@@ -289,7 +289,7 @@ BuildRequires:	pkgconfig(libdv)
 BuildRequires:	pkgconfig(liblircclient0)
 %endif
 %if %{build_lzo}
-BuildRequires:	liblzo-devel
+BuildRequires:	lzo-devel
 %endif
 %if %{build_sdl}
 BuildRequires:	pkgconfig(sdl) >= 1.1.8
