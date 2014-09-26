@@ -476,8 +476,8 @@ tar -xjf %{SOURCE1}
 mv ffmpeg-%{ffmpegversion} ffmpeg
 pushd ffmpeg
 popd
-%patch42 -p1 -b .internal_filters~
-
+#cb - these dont build against ffmpeg 2.4+
+#patch42 -p1 -b .internal_filters~
 # Sometimes (1.1.1) mplayer guys forget to update the VERSION file...
 # Let's fix it here, but let's not abuse this ;)
 echo %{version} >VERSION
