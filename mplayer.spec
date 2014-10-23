@@ -9,7 +9,7 @@
 %endif
 %if "%{prerel}" != ""
 %if "%{svn}" != ""
-%define rel	1.%{prerel}.0.%{svn}.1
+%define rel	1.%{prerel}.0.%{svn}.2
 %else 
 %define rel 0.%{prerel}.2
 %endif
