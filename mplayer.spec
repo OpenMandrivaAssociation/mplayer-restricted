@@ -1,7 +1,7 @@
 %define oname	MPlayer
 %define prerel	%{nil}
 %define svn	r37285
-%define ffmpegversion 2.4.2
+%define ffmpegversion 2.4.3
 %if "%svn" != ""
 %define fversion %{svn}
 %else
@@ -15,7 +15,7 @@
 %endif
 %else
 %if "%{svn}" != ""
-%define rel 5.%{svn}.3
+%define rel 5.%{svn}.4
 %else
 %define rel 5
 %endif
