@@ -3,6 +3,6 @@ removed_sources:
   ffmpeg-2.4.1.tar.bz2: 8cb1c03af61001edbd0d9643b2a01b7aa097a4b3
 sources:
   Blue-1.8.tar.bz2: 0250d0b468b36ee13f160a814297afcb77f97e1d
-  ffmpeg-2.5.0.tar.bz2: ec0111e8298bdb2291d82e3b4f67354ba48fab19
+  ffmpeg-2.5.tar.bz2: ec0111e8298bdb2291d82e3b4f67354ba48fab19
   mplayer-r37263.tar.xz: caeea95e1b0651150d6df21511a0ee2fb8d70b01
   mplayer-r37285.tar.xz: e4304bbd7537a4b3318e56d26dc8b570d58a54e5
