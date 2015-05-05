@@ -1,7 +1,7 @@
 %define oname	MPlayer
 %define prerel	%{nil}
 %define svn	r36867
-%define ffmpegversion 2.1.4
+%define ffmpegversion 2.5.4
 %if "%svn" != ""
 %define fversion %{svn}
 %else
@@ -15,9 +15,9 @@
 %endif
 %else
 %if "%{svn}" != ""
-%define rel 4.%{svn}.1
+%define rel 1.%{svn}.1
 %else
-%define rel 3
+%define rel 1
 %endif
 %endif
 
@@ -237,7 +237,7 @@ BuildRequires:	jpeg-devel
 BuildRequires:	ladspa-devel
 BuildRequires:	libdxr3-devel
 BuildRequires:	libmpcdec-devel
-BuildRequires:	mng-devel
+BuildRequires:	pkgconfig(libmng)
 BuildRequires:	nas-devel
 BuildRequires:	pkgconfig(caca)
 BuildRequires:	pkgconfig(dvdread)
@@ -289,7 +289,7 @@ BuildRequires:	pkgconfig(libdv)
 BuildRequires:	pkgconfig(liblircclient0)
 %endif
 %if %{build_lzo}
-BuildRequires:	liblzo-devel
+BuildRequires:	lzo-devel
 %endif
 %if %{build_sdl}
 BuildRequires:	pkgconfig(sdl) >= 1.1.8
@@ -478,7 +478,8 @@ tar -xjf %{SOURCE1}
 mv ffmpeg-%{ffmpegversion} ffmpeg
 pushd ffmpeg
 popd
-%patch42 -p1 -b .internal_filters~
+#cb - these dont build against ffmpeg 2.4+
+#patch42 -p1 -b .internal_filters~
 %patch43 -p1 -b .ffm_stable~
 %patch44 -p1 -R
 
