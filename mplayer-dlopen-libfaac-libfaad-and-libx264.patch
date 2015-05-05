@@ -3323,7 +3323,7 @@
 +                                                     const short int pcm[],
 +                                                     int num_samples,
 +                                                     unsigned char *mp2buffer, int mp2buffer_size);
-+static int (*dl_twolame_encode_flush (twolame_options * glopts,
++static int (*dl_twolame_encode_flush) (twolame_options * glopts,
 +                                      unsigned char *mp2buffer, int mp2buffer_size);
 +static int (*dl_twolame_set_num_ancillary_bits) (twolame_options * glopts, int num);
 +static int (*dl_twolame_set_error_protection) (twolame_options * glopts, int err_protection);
