@@ -3303,7 +3303,7 @@
  
  #include "m_option.h"
  #include "mp_msg.h"
-@@ -35,6 +34,137 @@
+@@ -35,6 +34,143 @@
  #include "ae_twolame.h"
  #include "libmpdemux/mp3_hdr.h"
  
@@ -3323,6 +3323,8 @@
 +                                                     const short int pcm[],
 +                                                     int num_samples,
 +                                                     unsigned char *mp2buffer, int mp2buffer_size);
++static int (*dl_twolame_encode_flush (twolame_options * glopts,
++                                      unsigned char *mp2buffer, int mp2buffer_size);
 +static int (*dl_twolame_set_num_ancillary_bits) (twolame_options * glopts, int num);
 +static int (*dl_twolame_set_error_protection) (twolame_options * glopts, int err_protection);
 +static int (*dl_twolame_set_mode) (twolame_options * glopts, TWOLAME_MPEG_mode mode);
@@ -3345,6 +3347,7 @@
 +#define	twolame_init					dl_twolame_init
 +#define	twolame_init_params				dl_twolame_init_params
 +#define	twolame_encode_buffer_interleaved		dl_twolame_encode_buffer_interleaved
++#define	twolame_encode_flush				dl_twolame_encode_flush
 +#define	twolame_set_num_ancillary_bits			dl_twolame_set_num_ancillary_bits
 +#define	twolame_set_error_protection			dl_twolame_set_error_protection
 +#define	twolame_set_mode				dl_twolame_set_mode
@@ -3392,6 +3395,9 @@
 +				int num_samples,
 +				unsigned char *mp2buffer, int mp2buffer_size)),
 +			libtwolame);
++
++       dl_sym(twolame_encode_flush, (int (*)(twolame_options * glopts,
++                                        unsigned char *mp2buffer, int mp2buffer_size)), libtwolame);
 +
 +	dl_sym(twolame_set_num_ancillary_bits, (int (*) (twolame_options * glopts, int num)), libtwolame);
 +
