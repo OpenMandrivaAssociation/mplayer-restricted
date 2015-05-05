@@ -1,6 +1,6 @@
 %define oname	MPlayer
 %define prerel	%{nil}
-%define svn	r36867
+%define svn	r37285
 %define ffmpegversion 2.5.4
 %if "%svn" != ""
 %define fversion %{svn}
@@ -15,7 +15,7 @@
 %endif
 %else
 %if "%{svn}" != ""
-%define rel 1.%{svn}.1
+%define rel 4.%{svn}.1
 %else
 %define rel 1
 %endif
@@ -224,8 +224,6 @@ Patch33:	mplayer-have-dlfcn_h.patch
 Patch35:	mplayer-fix-dvd-crash.patch
 Patch39:	mplayer-dlopen-libfaac-libfaad-and-libx264.patch
 Patch42:	mplayer-filters-hack-with-shared.patch
-Patch43:	mplayer-r34911-dont-use-ffmpeg-functionality-outside-stable-release.patch
-Patch44:	mplayer-r36613-remove-draw_slice.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	docbook-dtd412-xml
@@ -480,8 +478,6 @@ pushd ffmpeg
 popd
 #cb - these dont build against ffmpeg 2.4+
 #patch42 -p1 -b .internal_filters~
-%patch43 -p1 -b .ffm_stable~
-%patch44 -p1 -R
 
 # Sometimes (1.1.1) mplayer guys forget to update the VERSION file...
 # Let's fix it here, but let's not abuse this ;)
