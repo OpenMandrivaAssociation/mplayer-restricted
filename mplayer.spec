@@ -21,7 +21,7 @@
 %endif
 %endif
 
-%define build_plf	0
+%define build_plf	1
 %define build_debug	0
 %define build_mencoder	1
 %define build_gui	1
@@ -84,7 +84,7 @@
 
 #####################
 # Hardcode PLF build
-%define build_plf 0
+%define build_plf 1
 #####################
 
 %if %{build_plf}
