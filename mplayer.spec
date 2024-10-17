@@ -203,7 +203,7 @@ Version:	1.1.1
 Release:	%{rel}%{?extrarelsuffix}
 License:	GPLv2
 Group:		Video
-Url:		http://www.mplayerhq.hu
+Url:		https://www.mplayerhq.hu
 %if "%svn" != ""
 #gw generated using svn export
 Source0:	%{name}-%{svn}.tar.xz
